@@ -115,9 +115,16 @@ uv run vfx inspect "outputs/run2/video-analysis.json"
 
 ## 4. Chạy bộ kiểm thử (Tests)
 
+Một số bài kiểm thử tích hợp sâu trên định dạng nhị phân RIFX (`.aep` AE 2026) sử dụng file mẫu tham chiếu từ `references/py-aep`. Trên máy clone mới (vì `references/` nằm trong `.gitignore`), hãy chuẩn bị mẫu tham chiếu bằng lệnh:
+
 ```powershell
+# Tải repo mẫu tham chiếu py-aep (chỉ cần chạy 1 lần khi clone mới)
+git clone https://github.com/forticheprod/py-aep.git references/py-aep
+
+# Chạy toàn bộ bộ kiểm thử
 uv run pytest -v
 ```
+*(Nếu `references/py-aep` chưa được tải, các bài kiểm thử phụ thuộc mẫu ngoài sẽ tự động `SKIPPED` kèm hướng dẫn cụ thể thay vì báo lỗi `AssertionError`, trong khi toàn bộ kiểm thử tự thân vẫn chạy bình thường.)*
 
 ---
 

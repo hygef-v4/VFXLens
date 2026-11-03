@@ -6,7 +6,12 @@ from pathlib import Path
 
 import pytest
 
-from vfx_engine.core.safety import FileIntegrityViolationError, UnsafeFileError, compute_sha256, readonly_file_guard
+from vfx_engine.core.safety import (
+    FileIntegrityViolationError,
+    UnsafeFileError,
+    compute_sha256,
+    readonly_file_guard,
+)
 from vfx_engine.project_analyzer.ae_bridge.bridge_client import AfterEffectsReadOnlyBridge
 from vfx_engine.project_analyzer.analyzer import analyze_ae_project
 from vfx_engine.project_analyzer.effect_extractor.plugin_registry import classify_effect
@@ -388,6 +393,22 @@ def test_readonly_file_guard_verifies_integrity_even_on_exception(tmp_path: Path
             f5.unlink()
             raise RuntimeError("Parser failed after deleting file")
     assert isinstance(del_exc_info.value.__cause__, RuntimeError)
+
+
+def test_missing_reference_sample_skips_with_actionable_setup_instructions(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Regression for Task 7: missing optional external reference sample must skip cleanly with setup instructions instead of raw AssertionError."""
+    import conftest
+
+    missing_sample = tmp_path / "nonexistent_refs" / "py-aep" / "samples" / "versions" / "ae2026" / "complete.aep"
+    monkeypatch.setenv("VFX_AE2026_SAMPLE_PATH", str(missing_sample))
+
+    with pytest.raises(pytest.skip.Exception) as skip_info:
+        conftest.resolve_ae2026_reference_sample()
+    assert "git clone https://github.com/forticheprod/py-aep.git" in str(skip_info.value)
+
 
 
 

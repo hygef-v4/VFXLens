@@ -2,18 +2,43 @@
 
 from __future__ import annotations
 
+import os
 import subprocess
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-import cv2
-import numpy as np
-import pytest
+os.environ.setdefault("OPENBLAS_NUM_THREADS", "2")
+os.environ.setdefault("OMP_NUM_THREADS", "2")
 
-from vfx_engine.project_analyzer.parsers.aepx_parser import (
+import cv2  # noqa: E402
+import numpy as np  # noqa: E402
+import pytest  # noqa: E402
+
+from vfx_engine.project_analyzer.parsers.aepx_parser import (  # noqa: E402
     aepx_xml_to_rifx_bytes,
     rifx_bytes_to_aepx_xml,
 )
+
+DEFAULT_AE2026_SAMPLE_RELPATH = Path("references/py-aep/samples/versions/ae2026/complete.aep")
+
+
+def resolve_ae2026_reference_sample(custom_path: Path | None = None) -> Path:
+    """Resolve the external `py-aep` AE 2026 reference sample or skip cleanly with setup instructions."""
+    if custom_path is not None:
+        candidate = custom_path
+    elif os.environ.get("VFX_AE2026_SAMPLE_PATH"):
+        candidate = Path(os.environ["VFX_AE2026_SAMPLE_PATH"])
+    else:
+        candidate = Path(__file__).resolve().parents[1] / DEFAULT_AE2026_SAMPLE_RELPATH
+
+    if not candidate.exists():
+        pytest.skip(
+            f"External AE2026 reference fixture not found at '{candidate}'. "
+            "To run full RIFX binary integration tests on a fresh clone, provision it with: "
+            "`git clone https://github.com/forticheprod/py-aep.git references/py-aep` "
+            "(or set VFX_AE2026_SAMPLE_PATH to an existing sample)."
+        )
+    return candidate
 
 
 def _patch_xml_with_third_party_vfx_plugins(xml_text: str) -> str:
@@ -75,9 +100,7 @@ def fixtures_dir(tmp_path_factory: pytest.TempPathFactory) -> Path:
 @pytest.fixture(scope="session")
 def real_ae2026_complete_aep() -> Path:
     """Path to the authentic AE 2026 `complete.aep` sample from `references/py-aep`."""
-    p = Path(__file__).resolve().parents[1] / "references" / "py-aep" / "samples" / "versions" / "ae2026" / "complete.aep"
-    assert p.exists(), f"Missing sample file: {p}"
-    return p
+    return resolve_ae2026_reference_sample()
 
 
 @pytest.fixture(scope="session")
