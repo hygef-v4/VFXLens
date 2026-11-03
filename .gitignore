@@ -1,0 +1,46 @@
+# Reference repositories (cloned for research only)
+references/
+
+# Private user data & analysis outputs (never commit user projects/videos/frames)
+data/
+outputs/
+*.aep
+*.aepx
+*.aet
+*.aex
+*.mp4
+*.mov
+*.mkv
+*.avi
+*.webm
+!tests/fixtures/*.aep
+!tests/fixtures/*.aepx
+
+# Python build & virtual environments
+.venv/
+venv/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.pyd
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Test & tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# OS & IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.tmp
+*.bak
