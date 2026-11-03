@@ -286,4 +286,76 @@ def test_export_evidence_frames_and_contact_sheet_raises_on_failed_imwrite(
             assert event.evidence_frames == []
 
 
+def test_contact_sheet_bounds_thumbnail_allocations_while_preserving_all_event_evidence(
+    tmp_path: Path,
+    monkeypatch: object,
+) -> None:
+    """Regression for Follow-up Task 4: 60 event peaks with max_sheet_tiles=25 must allocate at most 25 thumbnails while saving all 60 event evidence JPEGs."""
+    import cv2
+    import numpy as np
+
+    from vfx_engine.schemas.video_schema import VideoEffectEventSchema
+    from vfx_engine.video_analyzer.decoder.ffprobe_decoder import DecodedFrame
+    from vfx_engine.video_analyzer.frame_analysis.contact_sheet import (
+        export_evidence_frames_and_contact_sheet,
+    )
+
+    real_resize = cv2.resize
+
+    for mode in ("with_frame_indices", "generator_without_frame_indices"):
+        resize_calls = 0
+
+        def counting_resize(*args: object, **kwargs: object) -> object:
+            nonlocal resize_calls
+            resize_calls += 1
+            return real_resize(*args, **kwargs)  # type: ignore[arg-type]
+
+        monkeypatch.setattr(cv2, "resize", counting_resize)
+
+        def make_frame_stream():
+            for i in range(60):
+                yield DecodedFrame(
+                    frame_index=i,
+                    timestamp=i / 30.0,
+                    delta_t=1.0 / 30.0,
+                    image_bgr=np.full((180, 320, 3), (i * 4) % 255, dtype=np.uint8),
+                )
+
+        events = [
+            VideoEffectEventSchema(
+                event_id=f"ev_{i:03d}",
+                effect_type="flash_frame",
+                start_time=i / 30.0,
+                end_time=i / 30.0,
+                start_frame=i,
+                end_frame=i,
+                peak_frame=i,
+                peak_time=i / 30.0,
+                confidence=0.85,
+                confidence_explanation="synthetic peak",
+                extraction_method="test",
+            )
+            for i in range(60)
+        ]
+
+        out_sub = tmp_path / f"thumb_bound_{mode}"
+        supplied_indices = list(range(60)) if mode == "with_frame_indices" else None
+
+        cs_rel, ev_dir_rel, ev_files = export_evidence_frames_and_contact_sheet(
+            decoded_frames=make_frame_stream(),
+            events=events,
+            output_dir=out_sub,
+            max_sheet_tiles=25,
+            frame_indices=supplied_indices,
+        )
+
+        assert resize_calls <= 25, f"Mode {mode}: expected <=25 thumbnail resize calls, got {resize_calls}"
+        assert (out_sub / cs_rel).exists()
+        assert len(ev_files) == 60
+        for ev in events:
+            assert len(ev.evidence_frames) == 1
+            assert (out_sub / ev.evidence_frames[0]).exists()
+
+
+
 

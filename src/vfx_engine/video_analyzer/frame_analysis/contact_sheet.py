@@ -49,11 +49,12 @@ def export_evidence_frames_and_contact_sheet(
         for f_idx in list(frame_indices)[::step][:8]:
             needed_evidence_indices.add(int(f_idx))
 
-    # 2. Determine which frame indices are needed for the contact sheet
-    sheet_indices: set[int] = {
-        ev.peak_frame for ev in events if valid_frame_set is None or ev.peak_frame in valid_frame_set
-    }
-    if frame_indices:
+    # 2. Determine which frame indices are needed for the contact sheet (bounded to max_sheet_tiles)
+    candidate_peaks = sorted(
+        {ev.peak_frame for ev in events if valid_frame_set is None or ev.peak_frame in valid_frame_set}
+    )
+    sheet_indices: set[int] = set(candidate_peaks[:max_sheet_tiles])
+    if frame_indices and len(sheet_indices) < max_sheet_tiles:
         target_count = min(max_sheet_tiles, len(frame_indices))
         uniform_positions = np.linspace(0, len(frame_indices) - 1, num=target_count, dtype=int)
         for pos in uniform_positions:
@@ -84,8 +85,8 @@ def export_evidence_frames_and_contact_sheet(
                 raise OSError(f"Failed to write evidence frame JPEG to '{fpath}'")
             saved_frames[f_idx] = f"evidence-frames/{fname}"
 
-        want_sheet = f_idx in sheet_indices or (
-            frame_indices is None and len(sheet_thumbs) < max_sheet_tiles
+        want_sheet = len(sheet_thumbs) < max_sheet_tiles and (
+            f_idx in sheet_indices or frame_indices is None
         )
         if want_sheet and f_idx not in sheet_thumbs:
             thumb = cv2.resize(bgr, (tile_w, tile_h), interpolation=cv2.INTER_AREA)
