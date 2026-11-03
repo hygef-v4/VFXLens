@@ -224,3 +224,66 @@ def test_capped_and_incomplete_video_analysis_preserves_source_totals(
     assert len(tl_inc.frames) == 6
 
 
+def test_export_evidence_frames_and_contact_sheet_raises_on_failed_imwrite(
+    tmp_path: Path,
+    monkeypatch: object,
+) -> None:
+    """Regression for Follow-up Task 2: failed cv2.imwrite for evidence JPEG or contact sheet must raise OSError with path."""
+    import cv2
+    import numpy as np
+    import pytest
+
+    from vfx_engine.schemas.video_schema import VideoEffectEventSchema
+    from vfx_engine.video_analyzer.decoder.ffprobe_decoder import DecodedFrame
+    from vfx_engine.video_analyzer.frame_analysis.contact_sheet import (
+        export_evidence_frames_and_contact_sheet,
+    )
+
+    real_imwrite = cv2.imwrite
+
+    for failure_target in ("evidence_jpeg", "contact_sheet"):
+        frames = [
+            DecodedFrame(
+                frame_index=i,
+                timestamp=i / 30.0,
+                delta_t=1.0 / 30.0,
+                image_bgr=np.full((180, 320, 3), 40 + i * 20, dtype=np.uint8),
+            )
+            for i in range(3)
+        ]
+        event = VideoEffectEventSchema(
+            event_id="ev_001",
+            effect_type="flash_frame",
+            start_time=0.0,
+            end_time=0.066,
+            start_frame=0,
+            end_frame=2,
+            peak_frame=1,
+            peak_time=0.033,
+            confidence=0.9,
+            confidence_explanation="test",
+            extraction_method="test",
+        )
+        out_sub = tmp_path / f"fail_{failure_target}"
+
+        def fake_imwrite(filename: str, img: object, params: object = None, _target: str = failure_target) -> bool:
+            if _target == "evidence_jpeg" and "evidence-frames" in str(filename):
+                return False
+            if _target == "contact_sheet" and str(filename).endswith("contact-sheet.jpg"):
+                return False
+            return bool(real_imwrite(filename, img, params))  # type: ignore[arg-type]
+
+        monkeypatch.setattr(cv2, "imwrite", fake_imwrite)
+
+        expected_substr = "evidence-frames" if failure_target == "evidence_jpeg" else "contact-sheet.jpg"
+        with pytest.raises(OSError, match=expected_substr):
+            export_evidence_frames_and_contact_sheet(
+                decoded_frames=iter(frames),
+                events=[event],
+                output_dir=out_sub,
+            )
+        if failure_target == "evidence_jpeg":
+            assert event.evidence_frames == []
+
+
+

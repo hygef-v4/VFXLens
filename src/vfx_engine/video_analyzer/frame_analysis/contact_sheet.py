@@ -80,7 +80,8 @@ def export_evidence_frames_and_contact_sheet(
         if want_evidence and f_idx not in saved_frames:
             fname = f"frame_{f_idx:05d}_{df.timestamp:.3f}s.jpg"
             fpath = evidence_dir / fname
-            cv2.imwrite(str(fpath), bgr, [int(cv2.IMWRITE_JPEG_QUALITY), 92])
+            if not cv2.imwrite(str(fpath), bgr, [int(cv2.IMWRITE_JPEG_QUALITY), 92]):
+                raise OSError(f"Failed to write evidence frame JPEG to '{fpath}'")
             saved_frames[f_idx] = f"evidence-frames/{fname}"
 
         want_sheet = f_idx in sheet_indices or (
@@ -144,7 +145,8 @@ def export_evidence_frames_and_contact_sheet(
         )
 
     contact_sheet_path = output_dir / "contact-sheet.jpg"
-    cv2.imwrite(str(contact_sheet_path), canvas, [int(cv2.IMWRITE_JPEG_QUALITY), 90])
+    if not cv2.imwrite(str(contact_sheet_path), canvas, [int(cv2.IMWRITE_JPEG_QUALITY), 90]):
+        raise OSError(f"Failed to write contact sheet image to '{contact_sheet_path}'")
 
     return (
         "contact-sheet.jpg",
