@@ -280,6 +280,8 @@ def cmd_analyze_folder(
             title="Batch Analysis Complete",
         )
     )
+    if err_list:
+        raise typer.Exit(code=1)
 
 
 @app.command("inspect")
