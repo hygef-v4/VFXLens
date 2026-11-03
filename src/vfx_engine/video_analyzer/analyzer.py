@@ -17,7 +17,6 @@ from ..schemas.video_schema import (
 )
 from ..vision.base import VisionAnalyzer, create_vision_analyzer
 from .decoder.ffprobe_decoder import (
-    DecodedFrame,
     iter_decoded_frames,
     probe_video_metadata_and_timestamps,
 )
@@ -67,48 +66,61 @@ class VideoVFXAnalyzer:
 
         with ReadOnlyFileGuard(vpath):
             metadata, pts_list = probe_video_metadata_and_timestamps(vpath, config=self.config)
-            decoded_frames: list[DecodedFrame] = []
-            for df in iter_decoded_frames(vpath, pts_list, metadata.nominal_fps):
-                decoded_frames.append(df)
-                if max_frames is not None and len(decoded_frames) >= max_frames:
-                    break
-
-            total_frames = len(decoded_frames)
-            if total_frames > 0:
-                metadata.frame_count = total_frames
-                if metadata.duration_seconds <= 0:
-                    metadata.duration_seconds = round(decoded_frames[-1].timestamp, 4)
+            expected_frames = metadata.frame_count
+            if max_frames is not None:
+                expected_frames = min(expected_frames, max_frames) if expected_frames > 0 else max_frames
 
             # Determine full-frame vs two-pass adaptive optical flow strategy
             full_frame_eligible = (
                 metadata.duration_seconds <= self.config.full_frame_max_duration_sec
-                or total_frames <= 1800
+                or expected_frames <= 1800
             )
 
             if full_frame_eligible:
                 strategy = "full_frame_with_adaptive_windows"
-                signals = extract_frame_signals(decoded_frames, dense_frame_indices=None)
+                signals = extract_frame_signals(
+                    iter_decoded_frames(vpath, pts_list, metadata.nominal_fps, max_frames=max_frames),
+                    dense_frame_indices=None,
+                )
                 high_activity_windows = detect_high_activity_windows(signals)
             else:
                 strategy = "adaptive_two_pass"
-                # Pass 1: fast color/grid change pass without dense optical flow on every frame
-                coarse_dense = {f.frame_index for f in decoded_frames[::4]}
-                coarse_signals = extract_frame_signals(decoded_frames, dense_frame_indices=coarse_dense)
+                # Pass 1: streaming color/grid change pass with stride-4 optical flow
+                coarse_signals = extract_frame_signals(
+                    iter_decoded_frames(vpath, pts_list, metadata.nominal_fps, max_frames=max_frames),
+                    dense_frame_indices=None,
+                    dense_frame_stride=4,
+                )
                 high_activity_windows = detect_high_activity_windows(coarse_signals, padding_frames=6)
-                dense_set = set(coarse_dense)
+                dense_set = {s.frame_index for s in coarse_signals if s.is_dense_sampled}
                 for win in high_activity_windows:
                     for f_idx in range(int(win["start_frame"]), int(win["end_frame"]) + 1):
                         dense_set.add(f_idx)
-                signals = extract_frame_signals(decoded_frames, dense_frame_indices=dense_set)
+                signals = extract_frame_signals(
+                    iter_decoded_frames(vpath, pts_list, metadata.nominal_fps, max_frames=max_frames),
+                    dense_frame_indices=dense_set,
+                )
+
+            total_frames = len(signals)
+            if total_frames == 0:
+                raise ValueError(f"No decodable video frames found in '{vpath.name}'")
+
+            if metadata.frame_count <= 0:
+                metadata.frame_count = total_frames
+            if metadata.duration_seconds <= 0:
+                metadata.duration_seconds = round(signals[-1].timestamp, 4)
 
             scenes = detect_scenes(vpath, signals)
             events = detect_video_effect_candidates(signals, scenes)
 
             contact_sheet_rel, evidence_dir_rel, evidence_files = (
                 export_evidence_frames_and_contact_sheet(
-                    decoded_frames=decoded_frames,
+                    decoded_frames=iter_decoded_frames(
+                        vpath, pts_list, metadata.nominal_fps, max_frames=max_frames
+                    ),
                     events=events,
                     output_dir=out_dir,
+                    frame_indices=[s.frame_index for s in signals],
                 )
             )
 

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections import deque
+from collections.abc import Iterable
 
 import cv2
 import numpy as np
@@ -139,8 +140,9 @@ def _compute_particle_speckles(prev_gray: np.ndarray, curr_gray: np.ndarray) -> 
 
 
 def extract_frame_signals(
-    decoded_frames: list[DecodedFrame],
+    decoded_frames: Iterable[DecodedFrame],
     dense_frame_indices: set[int] | None = None,
+    dense_frame_stride: int | None = None,
 ) -> list[FrameSignalEntry]:
     """Compute per-frame visual, motion, chromatic, sharpness, and activity signals."""
     signals: list[FrameSignalEntry] = []
@@ -150,13 +152,14 @@ def extract_frame_signals(
     prev_ts: float | None = None
     edge_history: deque[np.ndarray] = deque(maxlen=4)
 
-    for item in decoded_frames:
+    for stream_pos, item in enumerate(decoded_frames):
         bgr = item.bgr
         h, w = bgr.shape[:2]
         # Resize to standardized analysis resolution (max width 320) for consistent, fast metrics
         target_w = min(320, w)
         target_h = max(36, int(round(h * (target_w / max(1, w)))))
         small_bgr = cv2.resize(bgr, (target_w, target_h), interpolation=cv2.INTER_AREA)
+        del bgr
         small_gray = cv2.cvtColor(small_bgr, cv2.COLOR_BGR2GRAY)
         small_gray_f32 = small_gray.astype(np.float32)
 
@@ -188,7 +191,12 @@ def extract_frame_signals(
         particle_count = 0
         tear_score = 0.0
 
-        is_dense = True if dense_frame_indices is None else (item.frame_index in dense_frame_indices)
+        if dense_frame_indices is not None:
+            is_dense = item.frame_index in dense_frame_indices
+        elif dense_frame_stride is not None and dense_frame_stride > 1:
+            is_dense = (stream_pos % dense_frame_stride) == 0
+        else:
+            is_dense = True
 
         curr_edges = cv2.Canny(small_gray, 60, 150).astype(np.float32) / 255.0
 

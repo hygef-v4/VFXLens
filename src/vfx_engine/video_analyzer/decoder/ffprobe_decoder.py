@@ -228,8 +228,12 @@ def iter_decoded_frames(
     video_path: Path,
     timestamps: list[float],
     nominal_fps: float,
+    max_frames: int | None = None,
 ) -> Iterator[DecodedFrame]:
     """Yield decoded BGR frames paired with their exact native presentation timestamps."""
+    if max_frames is not None and max_frames <= 0:
+        raise ValueError(f"max_frames must be a positive integer, got {max_frames}")
+
     cap = cv2.VideoCapture(str(video_path))
     if not cap.isOpened():
         raise RuntimeError(f"OpenCV failed to open video file: {video_path}")
@@ -239,6 +243,8 @@ def iter_decoded_frames(
     prev_ts = 0.0
     try:
         while True:
+            if max_frames is not None and idx >= max_frames:
+                break
             ret, frame_bgr = cap.read()
             if not ret or frame_bgr is None:
                 break

@@ -88,3 +88,53 @@ def test_video_vfx_analyzer_detects_vfr_timestamps(
     assert result.metadata.is_vfr is True
     assert result.metadata.vfr_jitter_ms > 1.5
     assert len(timeline.frames) == result.metadata.frame_count
+
+
+def test_video_frame_memory_is_bounded_not_proportional_to_frame_count(
+    synthetic_fast_vfx_video: Path,
+    tmp_path: Path,
+    monkeypatch: object,
+) -> None:
+    """Regression for Task 1: retained full-resolution frames must remain bounded O(1), not O(N)."""
+    import gc
+    import weakref
+
+    import pytest
+
+    import vfx_engine.video_analyzer.analyzer as analyzer_mod
+    from vfx_engine.video_analyzer.decoder.ffprobe_decoder import iter_decoded_frames as real_iter
+
+    def measure_peak_live_frames(frame_cap: int) -> int:
+        live_refs: list[weakref.ReferenceType[object]] = []
+        peak_live = 0
+
+        def instrumented_iter(*args: object, **kwargs: object):
+            nonlocal peak_live
+            for idx, df in enumerate(real_iter(*args, **kwargs)):
+                if idx % 20 == 0:
+                    gc.collect()
+                alive_now = sum(1 for r in live_refs if r() is not None)
+                live_refs.append(weakref.ref(df.image_bgr))
+                peak_live = max(peak_live, alive_now + 1)
+                yield df
+
+        monkeypatch.setattr(analyzer_mod, "iter_decoded_frames", instrumented_iter)
+        out_dir = tmp_path / f"mem_bound_{frame_cap}"
+        analyzer = VideoVFXAnalyzer()
+        analyzer.analyze(synthetic_fast_vfx_video, output_dir=out_dir, max_frames=frame_cap)
+        gc.collect()
+        return peak_live
+
+    peak_40 = measure_peak_live_frames(40)
+    peak_120 = measure_peak_live_frames(120)
+
+    # Full-resolution frame retention must be bounded (at most a few frames in flight),
+    # never growing proportionally with clip length (40 vs 120).
+    assert peak_40 <= 4, f"Expected <=4 live full-res frames for 40-frame run, got {peak_40}"
+    assert peak_120 <= 4, f"Expected <=4 live full-res frames for 120-frame run, got {peak_120}"
+
+    # Verify empty decode raises a clear ValueError
+    monkeypatch.setattr(analyzer_mod, "iter_decoded_frames", lambda *a, **kw: iter([]))
+    with pytest.raises(ValueError, match="No decodable video frames"):
+        VideoVFXAnalyzer().analyze(synthetic_fast_vfx_video, output_dir=tmp_path / "empty_decode")
+

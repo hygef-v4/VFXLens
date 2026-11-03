@@ -1,7 +1,8 @@
-"""Evidence frame extraction and annotated contact sheet generation."""
+"""Evidence frame extraction and annotated contact sheet generation with bounded O(1) full-frame memory."""
 
 from __future__ import annotations
 
+from collections.abc import Iterable, Sequence
 from pathlib import Path
 
 import cv2
@@ -12,13 +13,16 @@ from ..decoder.ffprobe_decoder import DecodedFrame
 
 
 def export_evidence_frames_and_contact_sheet(
-    decoded_frames: list[DecodedFrame],
+    decoded_frames: Iterable[DecodedFrame],
     events: list[VideoEffectEventSchema],
     output_dir: Path,
     cols: int = 5,
     max_sheet_tiles: int = 25,
+    frame_indices: Sequence[int] | None = None,
 ) -> tuple[str, str, list[str]]:
     """Save evidence frames for detected VFX events and generate `contact-sheet.jpg`.
+
+    Streams `decoded_frames` without retaining full-resolution BGR buffers in memory.
 
     Returns:
         Tuple of (`contact_sheet_rel_path`, `evidence_dir_rel_path`, `evidence_frame_rel_paths`).
@@ -27,56 +31,81 @@ def export_evidence_frames_and_contact_sheet(
     evidence_dir = output_dir / "evidence-frames"
     evidence_dir.mkdir(parents=True, exist_ok=True)
 
-    frame_map: dict[int, DecodedFrame] = {f.frame_index: f for f in decoded_frames}
-    saved_frames: dict[int, str] = {}
+    if frame_indices is None and isinstance(decoded_frames, Sequence):
+        frame_indices = [f.frame_index for f in decoded_frames]
 
-    # 1. Export evidence frames for each detected event
+    valid_frame_set: set[int] | None = set(frame_indices) if frame_indices is not None else None
+
+    # 1. Determine which frame indices are needed for event evidence JPEGs
+    needed_evidence_indices: set[int] = set()
     for ev in events:
-        candidate_indices = sorted({ev.start_frame, ev.peak_frame, ev.end_frame})
-        ev_paths: list[str] = []
-        for f_idx in candidate_indices:
-            if f_idx not in frame_map:
-                continue
-            if f_idx not in saved_frames:
-                df = frame_map[f_idx]
-                fname = f"frame_{f_idx:05d}_{df.timestamp:.3f}s.jpg"
-                fpath = evidence_dir / fname
-                cv2.imwrite(str(fpath), df.bgr, [int(cv2.IMWRITE_JPEG_QUALITY), 92])
-                saved_frames[f_idx] = f"evidence-frames/{fname}"
-            ev_paths.append(saved_frames[f_idx])
-        ev.evidence_frames = ev_paths
+        for f_idx in (ev.start_frame, ev.peak_frame, ev.end_frame):
+            if valid_frame_set is None or f_idx in valid_frame_set:
+                needed_evidence_indices.add(f_idx)
 
-    # Guarantee at least key timeline frames are exported if events are sparse
-    if not saved_frames and decoded_frames:
-        step = max(1, len(decoded_frames) // 6)
-        for df in decoded_frames[::step][:8]:
-            fname = f"frame_{df.frame_index:05d}_{df.timestamp:.3f}s.jpg"
-            fpath = evidence_dir / fname
-            cv2.imwrite(str(fpath), df.bgr, [int(cv2.IMWRITE_JPEG_QUALITY), 92])
-            saved_frames[df.frame_index] = f"evidence-frames/{fname}"
+    # Fallback timeline evidence indices if no events fired
+    if not needed_evidence_indices and frame_indices:
+        step = max(1, len(frame_indices) // 6)
+        for f_idx in list(frame_indices)[::step][:8]:
+            needed_evidence_indices.add(int(f_idx))
 
-    # 2. Select frames for the contact sheet (prioritizing event peak frames + uniform timeline anchors)
-    sheet_indices: set[int] = {ev.peak_frame for ev in events if ev.peak_frame in frame_map}
-    if decoded_frames:
-        target_count = min(max_sheet_tiles, len(decoded_frames))
-        uniform_positions = np.linspace(0, len(decoded_frames) - 1, num=target_count, dtype=int)
+    # 2. Determine which frame indices are needed for the contact sheet
+    sheet_indices: set[int] = {
+        ev.peak_frame for ev in events if valid_frame_set is None or ev.peak_frame in valid_frame_set
+    }
+    if frame_indices:
+        target_count = min(max_sheet_tiles, len(frame_indices))
+        uniform_positions = np.linspace(0, len(frame_indices) - 1, num=target_count, dtype=int)
         for pos in uniform_positions:
             if len(sheet_indices) >= max_sheet_tiles:
                 break
-            sheet_indices.add(decoded_frames[int(pos)].frame_index)
+            sheet_indices.add(int(frame_indices[int(pos)]))
 
-    ordered_indices = sorted(sheet_indices)[:max_sheet_tiles]
+    tile_w = 320
+    tile_h: int | None = None
+    saved_frames: dict[int, str] = {}
+    sheet_thumbs: dict[int, tuple[np.ndarray, float]] = {}
 
-    # Map frame index -> event labels for badge annotation
+    # 3. Single streaming pass: write evidence JPEGs on the fly and keep only tiny 320px thumbnails
+    for stream_pos, df in enumerate(decoded_frames):
+        f_idx = df.frame_index
+        bgr = df.bgr
+        if tile_h is None:
+            src_h, src_w = bgr.shape[:2]
+            tile_h = max(120, int(round(tile_w * (src_h / max(1, src_w)))))
+
+        want_evidence = f_idx in needed_evidence_indices or (
+            frame_indices is None and not needed_evidence_indices and len(saved_frames) < 8 and stream_pos % 6 == 0
+        )
+        if want_evidence and f_idx not in saved_frames:
+            fname = f"frame_{f_idx:05d}_{df.timestamp:.3f}s.jpg"
+            fpath = evidence_dir / fname
+            cv2.imwrite(str(fpath), bgr, [int(cv2.IMWRITE_JPEG_QUALITY), 92])
+            saved_frames[f_idx] = f"evidence-frames/{fname}"
+
+        want_sheet = f_idx in sheet_indices or (
+            frame_indices is None and len(sheet_thumbs) < max_sheet_tiles
+        )
+        if want_sheet and f_idx not in sheet_thumbs:
+            thumb = cv2.resize(bgr, (tile_w, tile_h), interpolation=cv2.INTER_AREA)
+            sheet_thumbs[f_idx] = (thumb, df.timestamp)
+            sheet_indices.add(f_idx)
+
+        del bgr
+
+    # Populate each event's evidence_frames list
+    for ev in events:
+        candidate_indices = sorted({ev.start_frame, ev.peak_frame, ev.end_frame})
+        ev.evidence_frames = [saved_frames[f_idx] for f_idx in candidate_indices if f_idx in saved_frames]
+
+    if tile_h is None:
+        tile_h = 180
+
+    ordered_indices = [idx for idx in sorted(sheet_indices) if idx in sheet_thumbs][:max_sheet_tiles]
+
     frame_badges: dict[int, list[str]] = {}
     for ev in events:
         frame_badges.setdefault(ev.peak_frame, []).append(ev.effect_type)
-
-    tile_w = 320
-    tile_h = 180
-    if decoded_frames:
-        src_h, src_w = decoded_frames[0].bgr.shape[:2]
-        tile_h = max(120, int(round(tile_w * (src_h / max(1, src_w)))))
 
     num_tiles = max(1, len(ordered_indices))
     actual_cols = min(cols, num_tiles)
@@ -91,17 +120,14 @@ def export_evidence_frames_and_contact_sheet(
         x0 = c * tile_w
         y0 = r * cell_h
 
-        df = frame_map[f_idx]
-        thumb = cv2.resize(df.bgr, (tile_w, tile_h), interpolation=cv2.INTER_AREA)
+        thumb, ts = sheet_thumbs[f_idx]
         canvas[y0 + header_h : y0 + cell_h, x0 : x0 + tile_w] = thumb
 
-        # Draw header bar
         cv2.rectangle(canvas, (x0, y0), (x0 + tile_w - 1, y0 + header_h - 1), (38, 38, 44), -1)
-        label = f"#{f_idx} | {df.timestamp:.3f}s"
+        label = f"#{f_idx} | {ts:.3f}s"
         badges = frame_badges.get(f_idx, [])
         if badges:
             label += f" [{badges[0][:14]}]"
-            # Highlight border for event peak frames
             cv2.rectangle(canvas, (x0, y0), (x0 + tile_w - 1, y0 + cell_h - 1), (0, 190, 255), 2)
         else:
             cv2.rectangle(canvas, (x0, y0), (x0 + tile_w - 1, y0 + cell_h - 1), (65, 65, 72), 1)
