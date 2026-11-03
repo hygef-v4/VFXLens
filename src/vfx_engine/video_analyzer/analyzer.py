@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import gc
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -60,6 +61,7 @@ class VideoVFXAnalyzer:
         if max_frames is not None and max_frames <= 0:
             raise ValueError(f"max_frames must be a positive integer (>= 1), got {max_frames}")
 
+        gc.collect()
         vpath = validate_video_input(Path(video_path))
         out_dir = Path(output_dir).resolve()
         out_dir.mkdir(parents=True, exist_ok=True)
@@ -221,4 +223,5 @@ class VideoVFXAnalyzer:
             frames=signals,
         )
 
+        gc.collect()
         return result, timeline

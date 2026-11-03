@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import gc
 import re
 from datetime import datetime, timezone
 from pathlib import Path
@@ -92,4 +93,5 @@ def analyze_ae_project(
                 )
             )
 
+    gc.collect()
     return result

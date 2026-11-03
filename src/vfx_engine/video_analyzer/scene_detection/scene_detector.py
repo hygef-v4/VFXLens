@@ -12,6 +12,7 @@ from ...schemas.video_schema import FrameSignalEntry, SceneBoundarySchema
 def _run_pyscenedetect_cut_frames(video_path: Path) -> set[int]:
     """Run PySceneDetect ContentDetector + AdaptiveDetector with short min_scene_len for fast VFX edits."""
     cut_frames: set[int] = set()
+    video = None
     try:
         from scenedetect import AdaptiveDetector, ContentDetector, SceneManager, open_video
 
@@ -27,6 +28,11 @@ def _run_pyscenedetect_cut_frames(video_path: Path) -> set[int]:
     except Exception:
         # Fallback cleanly to frame-exact signal cut detection if PySceneDetect encounters container quirks
         pass
+    finally:
+        if video is not None:
+            cap = getattr(video, "_cap", None)
+            if cap is not None and hasattr(cap, "release"):
+                cap.release()
     return cut_frames
 
 
