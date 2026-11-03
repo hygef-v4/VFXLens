@@ -138,3 +138,89 @@ def test_video_frame_memory_is_bounded_not_proportional_to_frame_count(
     with pytest.raises(ValueError, match="No decodable video frames"):
         VideoVFXAnalyzer().analyze(synthetic_fast_vfx_video, output_dir=tmp_path / "empty_decode")
 
+
+def test_capped_and_incomplete_video_analysis_preserves_source_totals(
+    tmp_path: Path,
+    monkeypatch: object,
+) -> None:
+    """Regression for Task 4: max_frames cap and incomplete decode must preserve source totals and report partial coverage."""
+    import subprocess
+
+    import cv2
+    import numpy as np
+    import pytest
+    from typer.testing import CliRunner
+
+    import vfx_engine.video_analyzer.analyzer as analyzer_mod
+    from vfx_engine.cli.main import app
+    from vfx_engine.video_analyzer.decoder.ffprobe_decoder import iter_decoded_frames as real_iter
+
+    # Synthesize a 10-frame, 1.0-second (10 fps) video
+    raw_avi = tmp_path / "ten_frames.avi"
+    ten_mp4 = tmp_path / "ten_frames.mp4"
+    writer = cv2.VideoWriter(str(raw_avi), cv2.VideoWriter_fourcc(*"MJPG"), 10.0, (320, 180))
+    for i in range(10):
+        img = np.full((180, 320, 3), i * 20, dtype=np.uint8)
+        writer.write(img)
+    writer.release()
+    subprocess.run(
+        [
+            "ffmpeg",
+            "-y",
+            "-v",
+            "quiet",
+            "-i",
+            str(raw_avi),
+            "-c:v",
+            "libx264",
+            "-pix_fmt",
+            "yuv420p",
+            str(ten_mp4),
+        ],
+        check=True,
+    )
+
+    # 1. Capped at max_frames=3
+    analyzer = VideoVFXAnalyzer()
+    res_capped, tl_capped = analyzer.analyze(ten_mp4, output_dir=tmp_path / "capped_3", max_frames=3)
+    assert res_capped.metadata.frame_count == 10
+    assert res_capped.sampling.total_video_frames == 10
+    assert res_capped.sampling.decoded_frames_count == 3
+    assert res_capped.sampling.analyzed_frames_count == 3
+    assert res_capped.sampling.is_partial is True
+    assert res_capped.sampling.coverage_ratio == pytest.approx(0.3, abs=1e-3)
+    assert "--max-frames 3" in res_capped.rerun_command
+    assert any("MAX_FRAMES" in w.code or "PARTIAL" in w.code for w in res_capped.warnings)
+    assert len(tl_capped.frames) == 3
+
+    # 2. Zero and negative max_frames rejected programmatically and via CLI
+    with pytest.raises(ValueError, match="max_frames"):
+        analyzer.analyze(ten_mp4, output_dir=tmp_path / "cap_zero", max_frames=0)
+    with pytest.raises(ValueError, match="max_frames"):
+        analyzer.analyze(ten_mp4, output_dir=tmp_path / "cap_neg", max_frames=-2)
+
+    runner = CliRunner()
+    cli_zero = runner.invoke(app, ["analyze-video", str(ten_mp4), "--max-frames", "0", "--output", str(tmp_path / "cli_zero")])
+    assert cli_zero.exit_code != 0
+    cli_neg = runner.invoke(app, ["analyze-video", str(ten_mp4), "--max-frames", "-3", "--output", str(tmp_path / "cli_neg")])
+    assert cli_neg.exit_code != 0
+
+    # 3. Incomplete decoder output (decoder yields only 6 of 10 frames without max_frames cap)
+    def truncated_iter(*args: object, **kwargs: object):
+        for idx, df in enumerate(real_iter(*args, **kwargs)):
+            if idx >= 6:
+                break
+            yield df
+
+    monkeypatch.setattr(analyzer_mod, "iter_decoded_frames", truncated_iter)
+    res_inc, tl_inc = analyzer.analyze(ten_mp4, output_dir=tmp_path / "incomplete_6")
+    assert res_inc.metadata.frame_count == 10
+    assert res_inc.sampling.total_video_frames == 10
+    assert res_inc.sampling.decoded_frames_count == 6
+    assert res_inc.sampling.analyzed_frames_count == 6
+    assert res_inc.sampling.is_partial is True
+    assert res_inc.sampling.coverage_ratio == pytest.approx(0.6, abs=1e-3)
+    assert any("INCOMPLETE" in w.code or "PARTIAL" in w.code for w in res_inc.warnings)
+    assert len(tl_inc.frames) == 6
+
+

@@ -138,20 +138,29 @@ def cmd_analyze_video(
         raise typer.Exit(code=1) from exc
 
     m = result.metadata
+    s = result.sampling
+    frames_summary = (
+        f"{m.duration_seconds:.3f}s / {s.decoded_frames_count}/{m.frame_count} decoded frames"
+        if s.is_partial
+        else f"{m.duration_seconds:.3f}s / {m.frame_count} frames"
+    )
     table = Table(title=f"Video VFX Analysis Summary: {m.file_name}", show_header=True)
     table.add_column("Metric", style="cyan")
     table.add_column("Value", style="green")
     table.add_row("Analysis ID", result.analysis_id)
     table.add_row("Resolution / Codec", f"{m.width}x{m.height} / {m.video_codec}")
-    table.add_row("Duration / Frames", f"{m.duration_seconds:.3f}s / {m.frame_count} frames")
+    table.add_row("Duration / Frames", frames_summary)
     table.add_row("FPS / VFR", f"{m.nominal_fps:.2f} fps (VFR={m.is_vfr}, jitter={m.vfr_jitter_ms:.2f}ms)")
-    table.add_row("Sampling Strategy", f"{result.sampling.strategy} ({result.sampling.coverage_ratio * 100:.1f}% dense)")
+    table.add_row(
+        "Sampling Strategy",
+        f"{s.strategy} ({s.coverage_ratio * 100:.1f}% source coverage, partial={s.is_partial})",
+    )
     table.add_row("Scenes Detected", str(len(result.scenes)))
     table.add_row("VFX Events Detected", str(len(result.effect_events)))
     table.add_row("Output JSON", str(json_path))
     table.add_row("Timeline JSON", str(timeline_path))
     table.add_row("Report Markdown", str(md_path))
-    table.add_row("Contact Sheet", str(out_dir / result.sampling.contact_sheet_path))
+    table.add_row("Contact Sheet", str(out_dir / s.contact_sheet_path))
     console.print(table)
 
 

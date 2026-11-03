@@ -43,26 +43,43 @@ def render_video_markdown(result: VideoAnalysisResult) -> str:
         "## 1. Executive Summary & Provenance",
         f"- **Analysis ID**: `{result.analysis_id}`",
         f"- **Analyzed At**: `{result.analyzed_at}`",
-        f"- **Sampling Strategy**: `{s.strategy}` (`{s.analyzed_frames_count}/{s.total_video_frames}` frames dense-analyzed, coverage `{s.coverage_ratio * 100:.1f}%`)",
+        (
+            f"- **Sampling Strategy**: `{s.strategy}` "
+            f"(`{s.analyzed_frames_count}` dense-analyzed / `{s.decoded_frames_count}` decoded / "
+            f"`{s.total_video_frames}` total source frames, coverage `{s.coverage_ratio * 100:.1f}%`, "
+            f"partial=`{s.is_partial}`"
+            + (f", max_frames_cap=`{s.max_frames_cap}`)" if s.max_frames_cap is not None else ")")
+        ),
         f"- **Contact Sheet**: `{s.contact_sheet_path}`",
         f"- **Evidence Frames Directory**: `{s.evidence_frames_dir}/` (`{len(s.evidence_frame_files)}` frames exported)",
         f"- **Re-run Command**: `{result.rerun_command}`",
         "",
-        "## 2. Stream & Timing Metadata",
-        "| Property | Value |",
-        "| :--- | :--- |",
-        f"| **File Path** | `{m.file_path}` |",
-        f"| **Container / Codec** | `{m.container_format}` / `{m.video_codec}` (`{m.pixel_format or 'unknown'}`) |",
-        f"| **Resolution** | `{m.width}x{m.height}` |",
-        f"| **Duration** | `{m.duration_seconds:.3f}s` (`{m.frame_count}` frames) |",
-        f"| **Frame Rate** | Nominal `{m.nominal_fps:.3f}` fps / Average `{m.average_fps:.3f}` fps |",
-        f"| **Variable Frame Rate (VFR)** | `{m.is_vfr}` (PTS jitter std = `{m.vfr_jitter_ms:.3f} ms`) |",
-        f"| **Audio Track** | `{m.has_audio}` ({m.audio_codec or 'none'}, {m.audio_sample_rate or 0} Hz) |",
-        "",
-        "## 3. Scene Segmentation",
-        "| Scene # | Start Time | End Time | Duration | Frames | Transition Type | Cut Score |",
-        "| :---: | :---: | :---: | :---: | :---: | :--- | :---: |",
     ]
+
+    if result.warnings:
+        lines.append("### Analysis Warnings")
+        for w in result.warnings:
+            lines.append(f"- ⚠️ **`[{w.code}]`**: {w.message}")
+        lines.append("")
+
+    lines.extend(
+        [
+            "## 2. Stream & Timing Metadata",
+            "| Property | Value |",
+            "| :--- | :--- |",
+            f"| **File Path** | `{m.file_path}` |",
+            f"| **Container / Codec** | `{m.container_format}` / `{m.video_codec}` (`{m.pixel_format or 'unknown'}`) |",
+            f"| **Resolution** | `{m.width}x{m.height}` |",
+            f"| **Duration** | `{m.duration_seconds:.3f}s` (`{m.frame_count}` source frames, `{s.decoded_frames_count}` decoded) |",
+            f"| **Frame Rate** | Nominal `{m.nominal_fps:.3f}` fps / Average `{m.average_fps:.3f}` fps |",
+            f"| **Variable Frame Rate (VFR)** | `{m.is_vfr}` (PTS jitter std = `{m.vfr_jitter_ms:.3f} ms`) |",
+            f"| **Audio Track** | `{m.has_audio}` ({m.audio_codec or 'none'}, {m.audio_sample_rate or 0} Hz) |",
+            "",
+            "## 3. Scene Segmentation",
+            "| Scene # | Start Time | End Time | Duration | Frames | Transition Type | Cut Score |",
+            "| :---: | :---: | :---: | :---: | :---: | :--- | :---: |",
+        ]
+    )
 
     for sc in result.scenes:
         lines.append(

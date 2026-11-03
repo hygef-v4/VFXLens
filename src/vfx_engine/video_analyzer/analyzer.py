@@ -9,7 +9,7 @@ from pathlib import Path
 from ..core.config import VFXEngineConfig
 from ..core.logging import get_logger
 from ..core.safety import ReadOnlyFileGuard, validate_video_input
-from ..schemas.common import AnalysisWarning
+from ..schemas.common import AnalysisWarning, DataAvailabilityStatus
 from ..schemas.video_schema import (
     SamplingSummarySchema,
     VideoAnalysisResult,
@@ -57,6 +57,9 @@ class VideoVFXAnalyzer:
         max_frames: int | None = None,
     ) -> tuple[VideoAnalysisResult, VideoTimelineSchema]:
         """Analyze a video file and return `(VideoAnalysisResult, VideoTimelineSchema)`."""
+        if max_frames is not None and max_frames <= 0:
+            raise ValueError(f"max_frames must be a positive integer (>= 1), got {max_frames}")
+
         vpath = validate_video_input(Path(video_path))
         out_dir = Path(output_dir).resolve()
         out_dir.mkdir(parents=True, exist_ok=True)
@@ -101,14 +104,40 @@ class VideoVFXAnalyzer:
                     dense_frame_indices=dense_set,
                 )
 
-            total_frames = len(signals)
-            if total_frames == 0:
+            decoded_count = len(signals)
+            if decoded_count == 0:
                 raise ValueError(f"No decodable video frames found in '{vpath.name}'")
 
-            if metadata.frame_count <= 0:
-                metadata.frame_count = total_frames
+            if metadata.frame_count <= 0 or (max_frames is None and decoded_count > metadata.frame_count):
+                metadata.frame_count = decoded_count
+            source_total_frames = metadata.frame_count
             if metadata.duration_seconds <= 0:
                 metadata.duration_seconds = round(signals[-1].timestamp, 4)
+
+            is_partial = decoded_count < source_total_frames
+            if is_partial:
+                if max_frames is not None and decoded_count >= max_frames:
+                    warnings.append(
+                        AnalysisWarning(
+                            code="MAX_FRAMES_CAP_APPLIED",
+                            message=(
+                                f"Partial video analysis due to --max-frames {max_frames}: "
+                                f"decoded {decoded_count} of {source_total_frames} source frames."
+                            ),
+                            status=DataAvailabilityStatus.UNAVAILABLE,
+                        )
+                    )
+                else:
+                    warnings.append(
+                        AnalysisWarning(
+                            code="INCOMPLETE_VIDEO_DECODE",
+                            message=(
+                                f"Partial video decode: decoder yielded {decoded_count} frames out of "
+                                f"{source_total_frames} probed source frames."
+                            ),
+                            status=DataAvailabilityStatus.UNAVAILABLE,
+                        )
+                    )
 
             scenes = detect_scenes(vpath, signals)
             events = detect_video_effect_candidates(signals, scenes)
@@ -131,12 +160,15 @@ class VideoVFXAnalyzer:
             )
 
         dense_count = sum(1 for s in signals if s.is_dense_sampled)
-        coverage = round(dense_count / max(1, total_frames), 4)
+        coverage = round(dense_count / max(1, source_total_frames), 4)
 
         sampling_summary = SamplingSummarySchema(
             strategy=strategy,
-            total_video_frames=total_frames,
+            total_video_frames=source_total_frames,
+            decoded_frames_count=decoded_count,
             analyzed_frames_count=dense_count,
+            max_frames_cap=max_frames,
+            is_partial=is_partial,
             coverage_ratio=coverage,
             high_activity_windows=high_activity_windows,
             contact_sheet_path=contact_sheet_rel,
@@ -144,7 +176,9 @@ class VideoVFXAnalyzer:
             evidence_frame_files=evidence_files,
         )
 
-        rerun_cmd = f'vfx analyze-video "{vpath}" --output "{out_dir}"'
+        rerun_cmd = f'vfx analyze-video "{vpath}" --output "{out_dir}"' + (
+            f" --max-frames {max_frames}" if max_frames is not None else ""
+        )
         now_iso = datetime.now(timezone.utc).isoformat()
 
         result = VideoAnalysisResult(
@@ -165,7 +199,9 @@ class VideoVFXAnalyzer:
             video_file=str(vpath),
             nominal_fps=metadata.nominal_fps,
             is_vfr=metadata.is_vfr,
-            frame_count=total_frames,
+            frame_count=source_total_frames,
+            decoded_frames_count=decoded_count,
+            is_partial=is_partial,
             duration_seconds=metadata.duration_seconds,
             high_activity_windows=high_activity_windows,
             scenes=scenes,

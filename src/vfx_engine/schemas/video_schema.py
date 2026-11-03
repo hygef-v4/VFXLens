@@ -172,7 +172,10 @@ class SamplingSummarySchema(BaseModel):
         description="full_frame_with_adaptive_windows or adaptive_two_pass",
     )
     total_video_frames: int
+    decoded_frames_count: int = 0
     analyzed_frames_count: int
+    max_frames_cap: int | None = None
+    is_partial: bool = False
     coverage_ratio: float
     high_activity_windows: list[dict[str, float | int]] = Field(default_factory=list)
     contact_sheet_path: str
@@ -188,6 +191,8 @@ class VideoTimelineSchema(BaseModel):
     nominal_fps: float
     is_vfr: bool
     frame_count: int
+    decoded_frames_count: int = 0
+    is_partial: bool = False
     duration_seconds: float
     high_activity_windows: list[dict[str, float | int]] = Field(default_factory=list)
     scenes: list[SceneBoundarySchema] = Field(default_factory=list)
