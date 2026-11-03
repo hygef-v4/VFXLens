@@ -210,6 +210,14 @@ def _parse_aepx_dom_fallback(
     plugin_map: dict[str, PluginInventoryItemSchema] = {}
     comp_hierarchy: list[CompositionGraphEdgeSchema] = []
     expressions_inventory: list[dict[str, Any]] = []
+    unsupported_fields: list[FieldProvenance] = [
+        FieldProvenance(
+            field_path="Property.synthesized_defaults",
+            status=DataAvailabilityStatus.UNSUPPORTED,
+            source_method="offline_aepx_dom_fallback",
+            reason="Simplified XML did not contain full binary RIFX header chunks for synthesis.",
+        )
+    ]
 
     # Scan global EfdG definitions if present
     for efdf in root.iter():
@@ -254,13 +262,45 @@ def _parse_aepx_dom_fallback(
                 item_id = struct.unpack(">I", raw_idta[16:20])[0]
 
         if cdta_el is not None:
-            width, height, fps, duration = 1920, 1080, 30.0, 10.0
+            width: int | None = None
+            height: int | None = None
+            fps: float | None = None
+            duration: float | None = None
+
             if cdta_el.get("bdata"):
-                raw_cdta = bytes.fromhex(cdta_el.get("bdata", ""))
+                raw_cdta = bytes.fromhex("".join(cdta_el.get("bdata", "").split()))
+                if len(raw_cdta) >= 52:
+                    dur_num, dur_den = struct.unpack(">II", raw_cdta[44:52])
+                    if dur_num > 0 and dur_den > 0:
+                        duration = round(dur_num / dur_den, 6)
                 if len(raw_cdta) >= 144:
                     w, h = struct.unpack(">HH", raw_cdta[140:144])
                     if w > 0 and h > 0:
                         width, height = w, h
+                if len(raw_cdta) >= 160:
+                    fps_int, fps_frac = struct.unpack(">HH", raw_cdta[156:160])
+                    if fps_int > 0 or fps_frac > 0:
+                        fps = round(fps_int + fps_frac / 65536.0, 4)
+
+            comp_field_status: dict[str, DataAvailabilityStatus] = {}
+            for f_name, f_val in (
+                ("width", width),
+                ("height", height),
+                ("frame_rate", fps),
+                ("duration", duration),
+            ):
+                if f_val is not None:
+                    comp_field_status[f_name] = DataAvailabilityStatus.OBSERVED
+                else:
+                    comp_field_status[f_name] = DataAvailabilityStatus.UNAVAILABLE
+                    unsupported_fields.append(
+                        FieldProvenance(
+                            field_path=f"compositions[{item_name}].{f_name}",
+                            status=DataAvailabilityStatus.UNAVAILABLE,
+                            source_method="offline_aepx_dom_fallback",
+                            reason=f"Missing or incomplete <cdta> binary payload for '{f_name}' in simplified AEPX XML.",
+                        )
+                    )
             layers_list: list[LayerSchema] = []
             for layr_idx, layr_el in enumerate(
                 [c for c in item_el if _strip_ns(c.tag) == "Layr"], start=1
@@ -337,6 +377,7 @@ def _parse_aepx_dom_fallback(
                     duration=duration,
                     layers_count=len(layers_list),
                     layers=layers_list,
+                    field_status=comp_field_status,
                 )
             )
         elif pin_el is not None:
@@ -399,14 +440,7 @@ def _parse_aepx_dom_fallback(
                 status=DataAvailabilityStatus.OBSERVED,
             )
         ],
-        unsupported_fields=[
-            FieldProvenance(
-                field_path="Property.synthesized_defaults",
-                status=DataAvailabilityStatus.UNSUPPORTED,
-                source_method="offline_aepx_dom_fallback",
-                reason="Simplified XML did not contain full binary RIFX header chunks for synthesis.",
-            )
-        ],
+        unsupported_fields=unsupported_fields,
         raw_summary={"xml_root_tag": root.tag, "fallback_mode": True},
     )
 

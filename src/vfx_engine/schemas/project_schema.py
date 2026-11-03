@@ -282,11 +282,11 @@ class CompositionSchema(BaseModel):
     name: str
     comment: str | None = None
     parent_folder_path: str = "/"
-    width: int
-    height: int
-    pixel_aspect: float = 1.0
-    frame_rate: float
-    duration: float
+    width: int | None = None
+    height: int | None = None
+    pixel_aspect: float | None = 1.0
+    frame_rate: float | None = None
+    duration: float | None = None
     work_area_start: float = 0.0
     work_area_duration: float = 0.0
     bg_color: list[float] = Field(default_factory=list)
@@ -307,6 +307,7 @@ class CompositionSchema(BaseModel):
     layers_count: int = 0
     layers: list[LayerSchema] = Field(default_factory=list)
     markers: list[KeyframeSchema] = Field(default_factory=list)
+    field_status: dict[str, DataAvailabilityStatus] = Field(default_factory=dict)
 
 
 class FootageDependencySchema(BaseModel):

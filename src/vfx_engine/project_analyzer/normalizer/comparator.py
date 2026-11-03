@@ -65,15 +65,22 @@ def compare_offline_and_live(
         l_comp = live_comps[c_name]
         # Compare dimensions & FPS
         dim_match = (
-            off_comp.width == l_comp.get("width")
+            off_comp.width is not None
+            and off_comp.height is not None
+            and off_comp.width == l_comp.get("width")
             and off_comp.height == l_comp.get("height")
+        )
+        off_dim_status = (
+            DataAvailabilityStatus.OBSERVED
+            if (off_comp.width is not None and off_comp.height is not None)
+            else DataAvailabilityStatus.UNAVAILABLE
         )
         diffs.append(
             ProjectComparisonDiffSchema(
                 field_path=f"compositions[{c_name}].dimensions",
                 offline_value=[off_comp.width, off_comp.height],
                 live_value=[l_comp.get("width"), l_comp.get("height")],
-                offline_status=DataAvailabilityStatus.OBSERVED,
+                offline_status=off_dim_status,
                 live_status=DataAvailabilityStatus.OBSERVED,
                 comparison_result="matched" if dim_match else "value_mismatch",
                 explanation="Composition resolution (width x height).",

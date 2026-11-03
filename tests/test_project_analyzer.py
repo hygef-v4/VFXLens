@@ -204,3 +204,72 @@ def test_offline_and_live_comparator(real_ae2026_complete_aep: Path) -> None:
     diffs = compare_offline_and_live(offline_res, mock_live_payload)
     assert len(diffs) > 0
     assert any(d.comparison_result in ("matched", "value_mismatch", "only_in_offline") for d in diffs)
+
+
+def test_aepx_fallback_does_not_fabricate_missing_dimensions_or_timing(tmp_path: Path) -> None:
+    """Regression for Task 2: missing AEPX cdta fields must be unavailable/None, never fabricated 1920x1080/30fps/10s."""
+    import struct
+
+    from vfx_engine.schemas.common import DataAvailabilityStatus
+
+    # 1. Exact empty <cdta /> case from audit
+    empty_cdta_path = tmp_path / "empty_cdta.aepx"
+    empty_cdta_path.write_text(
+        "<AfterEffectsProject><Item><string>UnknownComp</string><cdta /></Item></AfterEffectsProject>",
+        encoding="utf-8",
+    )
+    res_empty = analyze_ae_project(empty_cdta_path)
+    assert len(res_empty.compositions) == 1
+    comp = res_empty.compositions[0]
+    assert comp.name == "UnknownComp"
+    assert comp.width is None
+    assert comp.height is None
+    assert comp.frame_rate is None
+    assert comp.duration is None
+    assert comp.field_status.get("width") in (
+        DataAvailabilityStatus.UNAVAILABLE,
+        DataAvailabilityStatus.UNSUPPORTED,
+    )
+    assert comp.field_status.get("height") in (
+        DataAvailabilityStatus.UNAVAILABLE,
+        DataAvailabilityStatus.UNSUPPORTED,
+    )
+    assert comp.field_status.get("frame_rate") in (
+        DataAvailabilityStatus.UNAVAILABLE,
+        DataAvailabilityStatus.UNSUPPORTED,
+    )
+    assert comp.field_status.get("duration") in (
+        DataAvailabilityStatus.UNAVAILABLE,
+        DataAvailabilityStatus.UNSUPPORTED,
+    )
+    assert any("UnknownComp" in uf.field_path for uf in res_empty.unsupported_fields)
+
+    # Ensure markdown/json report generation handles None dimensions/timing cleanly without fabricating 1920x1080
+    _, md_path = write_project_reports(res_empty, tmp_path / "empty_cdta_report")
+    md_text = md_path.read_text(encoding="utf-8")
+    assert "1920x1080" not in md_text
+    assert "unavailable" in md_text.lower()
+
+    # 2. Partial valid dimension case (144-byte cdta with width=1280, height=720, but no fps bytes and zero duration)
+    buf = bytearray(144)
+    struct.pack_into(">HH", buf, 140, 1280, 720)
+    partial_cdta_path = tmp_path / "partial_cdta.aepx"
+    partial_cdta_path.write_text(
+        f'<AfterEffectsProject><Item><string>PartialComp</string><cdta bdata="{buf.hex()}" /></Item></AfterEffectsProject>',
+        encoding="utf-8",
+    )
+    res_partial = analyze_ae_project(partial_cdta_path)
+    pcomp = res_partial.compositions[0]
+    assert pcomp.width == 1280
+    assert pcomp.height == 720
+    assert pcomp.frame_rate is None
+    assert pcomp.duration is None
+    assert pcomp.field_status.get("width") == DataAvailabilityStatus.OBSERVED
+    assert pcomp.field_status.get("frame_rate") == DataAvailabilityStatus.UNAVAILABLE
+
+    # 3. Malformed XML rejection
+    bad_xml_path = tmp_path / "malformed.aepx"
+    bad_xml_path.write_text("<AfterEffectsProject><Item><unclosed>", encoding="utf-8")
+    with pytest.raises(ValueError, match="Malformed XML"):
+        analyze_ae_project(bad_xml_path)
+

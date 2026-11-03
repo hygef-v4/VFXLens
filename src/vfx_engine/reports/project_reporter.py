@@ -103,11 +103,18 @@ def render_project_markdown(result: ProjectAnalysisResult) -> str:
     lines.append("## 5. Detailed Composition & Layer Effect Stacks")
     for comp in result.compositions:
         role = "Precomposition" if comp.is_precomp else "Root / Main Composition"
+        res_str = (
+            f"{comp.width}x{comp.height}"
+            if (comp.width is not None and comp.height is not None)
+            else "unavailable"
+        )
+        fps_str = f"{comp.frame_rate:.3f}" if comp.frame_rate is not None else "unavailable"
+        dur_str = f"{comp.duration:.3f}s" if comp.duration is not None else "unavailable"
         lines.extend(
             [
                 f"### Composition: `{comp.name}` ({role})",
-                f"- **Resolution**: `{comp.width}x{comp.height}` (PAR `{comp.pixel_aspect}`) @ `{comp.frame_rate:.3f}` fps",
-                f"- **Duration**: `{comp.duration:.3f}s` | **Motion Blur**: `{comp.motion_blur}` (Shutter `{comp.shutter_angle}` deg, Phase `{comp.shutter_phase}`)",
+                f"- **Resolution**: `{res_str}` (PAR `{comp.pixel_aspect}`) @ `{fps_str}` fps",
+                f"- **Duration**: `{dur_str}` | **Motion Blur**: `{comp.motion_blur}` (Shutter `{comp.shutter_angle}` deg, Phase `{comp.shutter_phase}`)",
                 f"- **Layers Count**: `{comp.layers_count}`",
                 "",
             ]
