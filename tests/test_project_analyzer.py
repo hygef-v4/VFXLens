@@ -273,3 +273,78 @@ def test_aepx_fallback_does_not_fabricate_missing_dimensions_or_timing(tmp_path:
     with pytest.raises(ValueError, match="Malformed XML"):
         analyze_ae_project(bad_xml_path)
 
+
+def test_live_bridge_requires_matching_project_identity_and_valid_payload(
+    real_ae2026_complete_aep: Path,
+    complex_vfx_aep_and_aepx: tuple[Path, Path],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Regression for Task 3: only a valid live payload whose canonical project identity matches the input may count as hybrid_compared."""
+    other_aep, _ = complex_vfx_aep_and_aepx
+
+    monkeypatch.setattr(
+        AfterEffectsReadOnlyBridge,
+        "is_available",
+        lambda self: (True, "Mocked live AE bridge online"),
+    )
+
+    # Case 1: Different project open in AE -> must NOT mark live_bridge_tested=True or hybrid_compared
+    monkeypatch.setattr(
+        AfterEffectsReadOnlyBridge,
+        "fetch_live_project_state",
+        lambda self: {
+            "ok": True,
+            "project_file": str(other_aep.resolve()),
+            "compositions": [{"name": "Main_Comp", "width": 1920, "height": 1080, "layers": []}],
+        },
+    )
+    res_mismatch = analyze_ae_project(real_ae2026_complete_aep, use_ae_bridge=True)
+    assert res_mismatch.live_bridge_tested is False
+    assert res_mismatch.extraction_method == "offline_py_aep"
+    assert res_mismatch.comparison_with_live is None
+    assert any("MISMATCH" in w.code for w in res_mismatch.warnings)
+
+    # Case 2: Missing project identity in live payload -> must NOT mark live_bridge_tested=True
+    monkeypatch.setattr(
+        AfterEffectsReadOnlyBridge,
+        "fetch_live_project_state",
+        lambda self: {
+            "ok": True,
+            "compositions": [{"name": "Main_Comp", "width": 1920, "height": 1080, "layers": []}],
+        },
+    )
+    res_missing_id = analyze_ae_project(real_ae2026_complete_aep, use_ae_bridge=True)
+    assert res_missing_id.live_bridge_tested is False
+    assert res_missing_id.extraction_method == "offline_py_aep"
+    assert res_missing_id.comparison_with_live is None
+    assert any("IDENTITY" in w.code for w in res_missing_id.warnings)
+
+    # Case 3: Unsuccessful / malformed live payload -> must NOT mark live_bridge_tested=True
+    monkeypatch.setattr(
+        AfterEffectsReadOnlyBridge,
+        "fetch_live_project_state",
+        lambda self: {"ok": False, "error": "No project open in After Effects"},
+    )
+    res_bad_payload = analyze_ae_project(real_ae2026_complete_aep, use_ae_bridge=True)
+    assert res_bad_payload.live_bridge_tested is False
+    assert res_bad_payload.extraction_method == "offline_py_aep"
+    assert res_bad_payload.comparison_with_live is None
+    assert any("INVALID" in w.code or "FAILED" in w.code for w in res_bad_payload.warnings)
+
+    # Case 4: Matching canonical project identity and valid payload -> succeeds with hybrid_compared
+    monkeypatch.setattr(
+        AfterEffectsReadOnlyBridge,
+        "fetch_live_project_state",
+        lambda self: {
+            "ok": True,
+            "project_file": str(real_ae2026_complete_aep.resolve()),
+            "compositions": [{"name": "Main_Comp", "width": 1920, "height": 1080, "layers": []}],
+        },
+    )
+    res_match = analyze_ae_project(real_ae2026_complete_aep, use_ae_bridge=True)
+    assert res_match.live_bridge_tested is True
+    assert res_match.extraction_method == "hybrid_compared"
+    assert res_match.comparison_with_live is not None
+    assert len(res_match.comparison_with_live) > 0
+
+

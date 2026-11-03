@@ -11,7 +11,7 @@ from ..core.logging import get_logger
 from ..core.safety import validate_project_file_safety
 from ..schemas.common import AnalysisWarning, DataAvailabilityStatus
 from ..schemas.project_schema import ProjectAnalysisResult
-from .ae_bridge.bridge_client import AfterEffectsReadOnlyBridge
+from .ae_bridge.bridge_client import AfterEffectsReadOnlyBridge, verify_live_project_identity
 from .normalizer.comparator import compare_offline_and_live
 from .parsers.aepx_parser import parse_aepx_project
 from .parsers.py_aep_parser import parse_aep_with_py_aep
@@ -55,11 +55,26 @@ def analyze_ae_project(
         if bridge_online:
             try:
                 live_payload = bridge.fetch_live_project_state()
-                result.live_bridge_tested = True
-                result.extraction_method = "hybrid_compared"
-                result.comparison_with_live = compare_offline_and_live(result, live_payload)
+                is_valid, warn_code, warn_msg = verify_live_project_identity(
+                    path, result.metadata.sha256, live_payload
+                )
+                if is_valid:
+                    result.live_bridge_tested = True
+                    result.extraction_method = "hybrid_compared"
+                    result.comparison_with_live = compare_offline_and_live(result, live_payload)
+                else:
+                    result.live_bridge_tested = False
+                    result.comparison_with_live = None
+                    result.warnings.append(
+                        AnalysisWarning(
+                            code=warn_code,
+                            message=f"{warn_msg} Returning offline parse result.",
+                            status=DataAvailabilityStatus.UNAVAILABLE,
+                        )
+                    )
             except Exception as exc:
                 result.live_bridge_tested = False
+                result.comparison_with_live = None
                 result.warnings.append(
                     AnalysisWarning(
                         code="LIVE_BRIDGE_QUERY_FAILED",

@@ -245,8 +245,11 @@ var VFXReadonlyExtractor = (function () {
                 });
             }
         }
+        var projFile = null;
+        try { projFile = proj.file ? proj.file.fsName : null; } catch (eFile) { projFile = null; }
         return {
             ok: true,
+            project_file: projFile,
             ae_version: app.version,
             bits_per_channel: proj.bitsPerChannel,
             total_items: proj.numItems,

@@ -11,6 +11,7 @@ the user's original `.aep` file, and transparently reports when live AE is not a
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from typing import Any
 
@@ -18,8 +19,96 @@ import httpx
 
 from ...core.config import EngineConfig, discover_after_effects_installations
 from ...core.logging import get_logger
+from ...core.safety import compute_sha256
 
 logger = get_logger("project_analyzer.ae_bridge")
+
+
+def verify_live_project_identity(
+    target_path: Path,
+    target_sha256: str,
+    live_payload: Any,
+) -> tuple[bool, str, str]:
+    """Verify that a live AE bridge payload is structurally valid and matches the target project identity.
+
+    Returns:
+        Tuple of `(is_valid, warning_code, explanation)`.
+    """
+    if not isinstance(live_payload, dict):
+        return (
+            False,
+            "LIVE_BRIDGE_INVALID_RESPONSE",
+            "Live AE Bridge returned a non-object payload.",
+        )
+    if live_payload.get("ok") is False or live_payload.get("error"):
+        err_msg = live_payload.get("error") or "unsuccessful response"
+        return (
+            False,
+            "LIVE_BRIDGE_INVALID_RESPONSE",
+            f"Live AE Bridge reported error: {err_msg}",
+        )
+    if not isinstance(live_payload.get("compositions"), list):
+        return (
+            False,
+            "LIVE_BRIDGE_INVALID_RESPONSE",
+            "Live AE Bridge payload is missing a valid 'compositions' list.",
+        )
+
+    raw_live_path = (
+        live_payload.get("project_file")
+        or live_payload.get("file_path")
+        or live_payload.get("file")
+    )
+    if (
+        not isinstance(raw_live_path, str)
+        or not raw_live_path.strip()
+        or raw_live_path.strip().lower() == "unsaved"
+    ):
+        return (
+            False,
+            "LIVE_BRIDGE_IDENTITY_MISSING",
+            "Live AE Bridge payload does not establish an open project file path matching the analyzed input.",
+        )
+
+    live_sha256 = live_payload.get("sha256") or live_payload.get("project_sha256")
+    if live_sha256 is not None and str(live_sha256).strip().lower() != target_sha256.lower():
+        return (
+            False,
+            "LIVE_BRIDGE_PROJECT_MISMATCH",
+            f"Live AE project SHA-256 does not match analyzed file '{target_path.name}'.",
+        )
+
+    try:
+        target_norm = os.path.normcase(str(target_path.resolve()))
+        live_resolved = Path(raw_live_path.strip()).resolve()
+        live_norm = os.path.normcase(str(live_resolved))
+    except Exception as exc:
+        return (
+            False,
+            "LIVE_BRIDGE_IDENTITY_MISSING",
+            f"Could not resolve live AE project file path '{raw_live_path}': {exc}",
+        )
+
+    if live_norm != target_norm:
+        return (
+            False,
+            "LIVE_BRIDGE_PROJECT_MISMATCH",
+            f"Live AE has '{raw_live_path}' open, which does not match analyzed project '{target_path}'.",
+        )
+
+    if live_resolved.exists():
+        try:
+            disk_sha = compute_sha256(live_resolved)
+            if disk_sha.lower() != target_sha256.lower():
+                return (
+                    False,
+                    "LIVE_BRIDGE_PROJECT_MISMATCH",
+                    f"Live AE project file hash on disk differs from analyzed '{target_path.name}'.",
+                )
+        except OSError:
+            pass
+
+    return True, "", "Verified canonical project file identity."
 
 
 def probe_live_ae_bridges(config: EngineConfig | None = None) -> dict[str, Any]:
