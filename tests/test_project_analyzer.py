@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from vfx_engine.core.safety import UnsafeFileError, compute_sha256
+from vfx_engine.core.safety import FileIntegrityViolationError, UnsafeFileError, compute_sha256, readonly_file_guard
 from vfx_engine.project_analyzer.ae_bridge.bridge_client import AfterEffectsReadOnlyBridge
 from vfx_engine.project_analyzer.analyzer import analyze_ae_project
 from vfx_engine.project_analyzer.effect_extractor.plugin_registry import classify_effect
@@ -346,5 +346,48 @@ def test_live_bridge_requires_matching_project_identity_and_valid_payload(
     assert res_match.extraction_method == "hybrid_compared"
     assert res_match.comparison_with_live is not None
     assert len(res_match.comparison_with_live) > 0
+
+
+def test_readonly_file_guard_verifies_integrity_even_on_exception(tmp_path: Path) -> None:
+    """Regression for Task 6: readonly_file_guard must verify source file integrity on both normal and exceptional exits."""
+    # 1. Unchanged success
+    f1 = tmp_path / "unchanged_ok.aep"
+    f1.write_bytes(b"ORIGINAL_AEP_BYTES_1")
+    with readonly_file_guard(f1) as digest:
+        assert digest == compute_sha256(f1)
+
+    # 2. Changed on normal exit -> FileIntegrityViolationError
+    f2 = tmp_path / "mutated_ok.aep"
+    f2.write_bytes(b"ORIGINAL_AEP_BYTES_2")
+    with pytest.raises(FileIntegrityViolationError):
+        with readonly_file_guard(f2):
+            f2.write_bytes(b"MUTATED_AEP_BYTES_2")
+
+    # 3. Unchanged on parser error -> original exception propagates
+    f3 = tmp_path / "unchanged_err.aep"
+    f3.write_bytes(b"ORIGINAL_AEP_BYTES_3")
+    with pytest.raises(RuntimeError, match="Simulated parser crash"):
+        with readonly_file_guard(f3):
+            raise RuntimeError("Simulated parser crash")
+
+    # 4. Mutated AND parser raises -> FileIntegrityViolationError raised with original exception as __cause__
+    f4 = tmp_path / "mutated_and_err.aep"
+    f4.write_bytes(b"ORIGINAL_AEP_BYTES_4")
+    with pytest.raises(FileIntegrityViolationError) as exc_info:
+        with readonly_file_guard(f4):
+            f4.write_bytes(b"CORRUPTED_DURING_EXCEPTION")
+            raise ValueError("Parser failed after mutating file")
+    assert isinstance(exc_info.value.__cause__, ValueError)
+    assert "Parser failed after mutating file" in str(exc_info.value.__cause__)
+
+    # 5. Deleted AND parser raises -> FileIntegrityViolationError raised with original exception as __cause__
+    f5 = tmp_path / "deleted_and_err.aep"
+    f5.write_bytes(b"ORIGINAL_AEP_BYTES_5")
+    with pytest.raises(FileIntegrityViolationError) as del_exc_info:
+        with readonly_file_guard(f5):
+            f5.unlink()
+            raise RuntimeError("Parser failed after deleting file")
+    assert isinstance(del_exc_info.value.__cause__, RuntimeError)
+
 
 

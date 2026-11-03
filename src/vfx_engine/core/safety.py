@@ -105,16 +105,43 @@ def validate_video_input(path: Path, max_size_mb: int = 2048) -> Path:
 
 @contextmanager
 def readonly_file_guard(path: Path) -> Iterator[str]:
-    """Context manager that verifies the source file's SHA-256 and size are untouched after read."""
+    """Context manager that verifies the source file's SHA-256 and size are untouched after read, even on exception."""
     before_hash = compute_sha256(path)
     before_size = path.stat().st_size
-    yield before_hash
-    after_hash = compute_sha256(path)
-    after_size = path.stat().st_size
-    if before_hash != after_hash or before_size != after_size:
-        raise FileIntegrityViolationError(
-            f"CRITICAL: Read-only integrity check failed for {path}!"
-        )
+    caught_exc: BaseException | None = None
+    try:
+        yield before_hash
+    except BaseException as exc:
+        caught_exc = exc
+        raise
+    finally:
+        if not path.exists():
+            violation = FileIntegrityViolationError(
+                f"CRITICAL: Read-only integrity check failed — source file was deleted: {path}!"
+            )
+            if caught_exc is not None:
+                raise violation from caught_exc
+            raise violation
+
+        try:
+            after_hash = compute_sha256(path)
+            after_size = path.stat().st_size
+        except OSError as stat_err:
+            violation = FileIntegrityViolationError(
+                f"CRITICAL: Read-only integrity check could not re-verify {path}: {stat_err}"
+            )
+            if caught_exc is not None:
+                raise violation from caught_exc
+            raise violation from stat_err
+
+        if before_hash != after_hash or before_size != after_size:
+            violation = FileIntegrityViolationError(
+                f"CRITICAL: Read-only integrity check failed for {path} "
+                f"(size {before_size}->{after_size}, sha256 {before_hash[:12]}->{after_hash[:12]})!"
+            )
+            if caught_exc is not None:
+                raise violation from caught_exc
+            raise violation
 
 
 ReadOnlyFileGuard = readonly_file_guard
