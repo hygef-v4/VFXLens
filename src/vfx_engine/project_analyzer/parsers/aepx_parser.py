@@ -10,7 +10,12 @@ from pathlib import Path
 from typing import Any
 
 from ...core.logging import get_logger
-from ...core.safety import readonly_file_guard, validate_project_file_safety
+from ...core.safety import (
+    FileIntegrityViolationError,
+    UnsafeFileError,
+    readonly_file_guard,
+    validate_project_file_safety,
+)
 from ...schemas.common import AnalysisWarning, DataAvailabilityStatus, FieldProvenance
 from ...schemas.project_schema import (
     CompositionGraphEdgeSchema,
@@ -455,25 +460,27 @@ def parse_aepx_project(
     with readonly_file_guard(project_path):
         xml_text = project_path.read_text(encoding="utf-8", errors="replace")
 
-    try:
-        rifx_bytes = aepx_xml_to_rifx_bytes(xml_text)
-        return parse_aep_with_py_aep(
-            project_path=project_path,
-            analysis_id=analysis_id,
-            rerun_command=rerun_command,
-            rifx_bytes_override=rifx_bytes,
-            file_format_override="aepx",
-        )
-    except ET.ParseError as exc:
-        raise ValueError(f"Malformed XML in .aepx file '{project_path.name}': {exc}") from exc
-    except Exception as exc:
-        logger.info("AEPX-to-RIFX transcode encountered '%s'; falling back to direct XML DOM parser", exc)
-        return _parse_aepx_dom_fallback(
-            project_path=project_path,
-            xml_text=xml_text,
-            size_bytes=size_bytes,
-            sha256_hex=sha256_hex,
-            analysis_id=analysis_id,
-            rerun_command=rerun_command,
-            transcode_error=str(exc),
-        )
+        try:
+            rifx_bytes = aepx_xml_to_rifx_bytes(xml_text)
+            return parse_aep_with_py_aep(
+                project_path=project_path,
+                analysis_id=analysis_id,
+                rerun_command=rerun_command,
+                rifx_bytes_override=rifx_bytes,
+                file_format_override="aepx",
+            )
+        except (FileIntegrityViolationError, UnsafeFileError):
+            raise
+        except ET.ParseError as exc:
+            raise ValueError(f"Malformed XML in .aepx file '{project_path.name}': {exc}") from exc
+        except Exception as exc:
+            logger.info("AEPX-to-RIFX transcode encountered '%s'; falling back to direct XML DOM parser", exc)
+            return _parse_aepx_dom_fallback(
+                project_path=project_path,
+                xml_text=xml_text,
+                size_bytes=size_bytes,
+                sha256_hex=sha256_hex,
+                analysis_id=analysis_id,
+                rerun_command=rerun_command,
+                transcode_error=str(exc),
+            )

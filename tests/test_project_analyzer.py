@@ -410,5 +410,40 @@ def test_missing_reference_sample_skips_with_actionable_setup_instructions(
     assert "git clone https://github.com/forticheprod/py-aep.git" in str(skip_info.value)
 
 
+def test_aepx_integrity_failure_never_falls_back(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Regression for Follow-up Task 1: FileIntegrityViolationError during .aepx parsing must propagate and never trigger DOM fallback."""
+    from vfx_engine.project_analyzer.parsers import aepx_parser
+
+    disposable_aepx = tmp_path / "integrity_violation.aepx"
+    disposable_aepx.write_text(
+        '<AfterEffectsProject><Item><string>CompA</string><cdta bdata="00" /></Item></AfterEffectsProject>',
+        encoding="utf-8",
+    )
+
+    fallback_called = False
+    orig_fallback = aepx_parser._parse_aepx_dom_fallback
+
+    def spy_fallback(*args: object, **kwargs: object) -> object:
+        nonlocal fallback_called
+        fallback_called = True
+        return orig_fallback(*args, **kwargs)  # type: ignore[arg-type]
+
+    def mutating_binary_parser(*args: object, **kwargs: object) -> object:
+        disposable_aepx.write_text("<AfterEffectsProject>MUTATED</AfterEffectsProject>", encoding="utf-8")
+        raise FileIntegrityViolationError(f"CRITICAL: Read-only integrity check failed for {disposable_aepx}!")
+
+    monkeypatch.setattr(aepx_parser, "_parse_aepx_dom_fallback", spy_fallback)
+    monkeypatch.setattr(aepx_parser, "parse_aep_with_py_aep", mutating_binary_parser)
+
+    with pytest.raises(FileIntegrityViolationError, match="Read-only integrity check failed"):
+        analyze_ae_project(disposable_aepx)
+
+    assert fallback_called is False
+
+
+
 
 
