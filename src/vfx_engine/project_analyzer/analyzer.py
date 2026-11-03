@@ -53,6 +53,7 @@ def analyze_ae_project(
     result.live_bridge_status_note = bridge_note
 
     if use_ae_bridge:
+        offline_method = result.extraction_method
         if bridge_online:
             try:
                 live_payload = bridge.fetch_live_project_state()
@@ -60,11 +61,13 @@ def analyze_ae_project(
                     path, result.metadata.sha256, live_payload
                 )
                 if is_valid:
+                    comparison_diffs = compare_offline_and_live(result, live_payload)
+                    result.comparison_with_live = comparison_diffs
                     result.live_bridge_tested = True
                     result.extraction_method = "hybrid_compared"
-                    result.comparison_with_live = compare_offline_and_live(result, live_payload)
                 else:
                     result.live_bridge_tested = False
+                    result.extraction_method = offline_method
                     result.comparison_with_live = None
                     result.warnings.append(
                         AnalysisWarning(
@@ -75,6 +78,7 @@ def analyze_ae_project(
                     )
             except Exception as exc:
                 result.live_bridge_tested = False
+                result.extraction_method = offline_method
                 result.comparison_with_live = None
                 result.warnings.append(
                     AnalysisWarning(

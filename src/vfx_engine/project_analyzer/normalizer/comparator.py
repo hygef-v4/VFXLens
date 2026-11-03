@@ -110,7 +110,7 @@ def compare_offline_and_live(
                 continue
             off_eff_mns = [e.match_name for e in off_layer.effects]
             live_eff_mns = [
-                str(le.get("match_name", ""))
+                str(le.get("match_name") if "match_name" in le else le.get("matchName", ""))
                 for le in (ll.get("effects") or [])
                 if isinstance(le, dict)
             ]

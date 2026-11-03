@@ -24,6 +24,66 @@ from ...core.safety import compute_sha256
 logger = get_logger("project_analyzer.ae_bridge")
 
 
+def _is_pos_int(val: Any) -> bool:
+    return isinstance(val, int) and not isinstance(val, bool) and val > 0
+
+
+def _validate_live_comparison_structure(live_payload: dict[str, Any]) -> tuple[bool, str]:
+    """Validate the structure and required field types consumed by `compare_offline_and_live`."""
+    bpc = live_payload.get("bits_per_channel")
+    if bpc is not None and not _is_pos_int(bpc):
+        return False, "Live AE Bridge payload has invalid 'bits_per_channel' (expected positive integer)."
+
+    comps = live_payload.get("compositions")
+    if not isinstance(comps, list):
+        return False, "Live AE Bridge payload is missing a valid 'compositions' list."
+
+    for c_idx, comp in enumerate(comps):
+        if not isinstance(comp, dict):
+            return False, f"Live AE Bridge composition entry #{c_idx} is not an object."
+        c_name = comp.get("name")
+        if not isinstance(c_name, str) or not c_name.strip():
+            return False, f"Live AE Bridge composition entry #{c_idx} is missing a non-empty string 'name'."
+        if not _is_pos_int(comp.get("width")) or not _is_pos_int(comp.get("height")):
+            return (
+                False,
+                f"Live AE Bridge composition '{c_name}' has invalid 'width' or 'height' (expected positive integers).",
+            )
+        layers = comp.get("layers")
+        if not isinstance(layers, list):
+            return False, f"Live AE Bridge composition '{c_name}' is missing a valid 'layers' list."
+        for l_idx, lyr in enumerate(layers):
+            if not isinstance(lyr, dict):
+                return False, f"Live AE Bridge layer entry #{l_idx} in '{c_name}' is not an object."
+            if not _is_pos_int(lyr.get("index")):
+                return (
+                    False,
+                    f"Live AE Bridge layer entry #{l_idx} in '{c_name}' has invalid 'index' (expected positive integer).",
+                )
+            if lyr.get("name") is not None and not isinstance(lyr.get("name"), str):
+                return False, f"Live AE Bridge layer #{lyr.get('index')} in '{c_name}' has non-string 'name'."
+            effects = lyr.get("effects")
+            if not isinstance(effects, list):
+                return (
+                    False,
+                    f"Live AE Bridge layer #{lyr.get('index')} in '{c_name}' is missing a valid 'effects' list.",
+                )
+            for e_idx, eff in enumerate(effects):
+                if not isinstance(eff, dict):
+                    return (
+                        False,
+                        f"Live AE Bridge effect entry #{e_idx} on layer #{lyr.get('index')} in '{c_name}' is not an object.",
+                    )
+                raw_mn = eff.get("match_name") if "match_name" in eff else eff.get("matchName")
+                if not isinstance(raw_mn, str) or not raw_mn.strip():
+                    return (
+                        False,
+                        f"Live AE Bridge effect entry #{e_idx} on layer #{lyr.get('index')} in '{c_name}' is missing a valid 'match_name'.",
+                    )
+
+    return True, ""
+
+
 def verify_live_project_identity(
     target_path: Path,
     target_sha256: str,
@@ -47,11 +107,12 @@ def verify_live_project_identity(
             "LIVE_BRIDGE_INVALID_RESPONSE",
             f"Live AE Bridge reported error: {err_msg}",
         )
-    if not isinstance(live_payload.get("compositions"), list):
+    struct_ok, struct_err = _validate_live_comparison_structure(live_payload)
+    if not struct_ok:
         return (
             False,
             "LIVE_BRIDGE_INVALID_RESPONSE",
-            "Live AE Bridge payload is missing a valid 'compositions' list.",
+            struct_err,
         )
 
     raw_live_path = (

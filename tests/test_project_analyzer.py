@@ -444,6 +444,62 @@ def test_aepx_integrity_failure_never_falls_back(
     assert fallback_called is False
 
 
+def test_live_bridge_rejects_malformed_comparison_payloads(
+    real_ae2026_complete_aep: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Regression for Follow-up Task 3: malformed compositions/layers/effects in live payload must be rejected with LIVE_BRIDGE_INVALID_RESPONSE."""
+    monkeypatch.setattr(
+        AfterEffectsReadOnlyBridge,
+        "is_available",
+        lambda self: (True, "Mocked live AE bridge online"),
+    )
+
+    matching_path = str(real_ae2026_complete_aep.resolve())
+
+    malformed_payloads = [
+        # 1. Exact reproduced case from audit: non-dict entry in compositions list
+        {"ok": True, "project_file": matching_path, "compositions": [123]},
+        # 2. Composition missing valid name or dimensions
+        {"ok": True, "project_file": matching_path, "compositions": [{"name": "", "width": 1920, "height": 1080, "layers": []}]},
+        {"ok": True, "project_file": matching_path, "compositions": [{"name": "Main_Comp", "width": "1920", "height": 1080, "layers": []}]},
+        # 3. Composition missing layers list or non-list layers
+        {"ok": True, "project_file": matching_path, "compositions": [{"name": "Main_Comp", "width": 1920, "height": 1080}]},
+        {"ok": True, "project_file": matching_path, "compositions": [{"name": "Main_Comp", "width": 1920, "height": 1080, "layers": "invalid"}]},
+        # 4. Malformed layer entry or invalid layer index consumed by comparator indexing
+        {"ok": True, "project_file": matching_path, "compositions": [{"name": "Main_Comp", "width": 1920, "height": 1080, "layers": [123]}]},
+        {"ok": True, "project_file": matching_path, "compositions": [{"name": "Main_Comp", "width": 1920, "height": 1080, "layers": [{"index": "not_an_int", "name": "L1", "effects": []}]}]},
+        {"ok": True, "project_file": matching_path, "compositions": [{"name": "Main_Comp", "width": 1920, "height": 1080, "layers": [{"index": 1, "name": "L1", "effects": None}]}]},
+        # 5. Malformed effect entry inside layer
+        {"ok": True, "project_file": matching_path, "compositions": [{"name": "Main_Comp", "width": 1920, "height": 1080, "layers": [{"index": 1, "name": "L1", "effects": ["bad_eff"]}]}]},
+        {"ok": True, "project_file": matching_path, "compositions": [{"name": "Main_Comp", "width": 1920, "height": 1080, "layers": [{"index": 1, "name": "L1", "effects": [{"name": "NoMatchName"}]}]}]},
+    ]
+
+    for bad_payload in malformed_payloads:
+        monkeypatch.setattr(
+            AfterEffectsReadOnlyBridge,
+            "fetch_live_project_state",
+            lambda self, _p=bad_payload: _p,
+        )
+        res = analyze_ae_project(real_ae2026_complete_aep, use_ae_bridge=True)
+        assert res.live_bridge_tested is False, f"Expected live_bridge_tested=False for payload: {bad_payload}"
+        assert res.extraction_method == "offline_py_aep", f"Expected offline_py_aep for payload: {bad_payload}"
+        assert res.comparison_with_live is None
+        assert any(w.code == "LIVE_BRIDGE_INVALID_RESPONSE" for w in res.warnings)
+
+    # Legitimate empty composition list must still be accepted
+    monkeypatch.setattr(
+        AfterEffectsReadOnlyBridge,
+        "fetch_live_project_state",
+        lambda self: {"ok": True, "project_file": matching_path, "compositions": []},
+    )
+    res_empty_comps = analyze_ae_project(real_ae2026_complete_aep, use_ae_bridge=True)
+    assert res_empty_comps.live_bridge_tested is True
+    assert res_empty_comps.extraction_method == "hybrid_compared"
+    assert res_empty_comps.comparison_with_live is not None
+
+
+
 
 
 
