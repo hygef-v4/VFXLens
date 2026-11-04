@@ -4,6 +4,8 @@ references/
 # Private user data & analysis outputs (never commit user projects/videos/frames)
 data/
 outputs/
+# Machine-specific editing inventories, original notes and source mappings
+local/
 *.aep
 *.aepx
 *.aet

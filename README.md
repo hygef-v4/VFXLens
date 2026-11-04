@@ -1,5 +1,9 @@
 # VFX Learning Engine — Phase 1
 
+## Thư viện kiến thức edit
+
+Tra [thư viện Markdown](library/README.md) theo kỹ thuật, style, resource, công cụ và case study. Hướng dẫn dùng được độc lập với bộ sưu tập asset cá nhân; thông số nguồn và mức kiểm chứng được ghi riêng.
+
 Hệ thống độc lập phân tích dự án **Adobe After Effects (`.aep` / `.aepx`)** và **Video VFX (`.mp4` / `.mov` / FFmpeg)** trên Windows (tối ưu cho phần cứng có GPU NVIDIA RTX 4060 8GB và hỗ trợ hoàn chỉnh CPU fallback).
 
 ---
@@ -61,7 +65,7 @@ Hệ thống độc lập phân tích dự án **Adobe After Effects (`.aep` / `
 ### Các bước cài đặt
 ```powershell
 # 1. Di chuyển vào thư mục dự án
-cd F:\code\git\VFXLens
+cd VFXLens
 
 # 2. Khởi tạo môi trường ảo và cài đặt dependencies
 uv sync --extra dev
