@@ -1,24 +1,24 @@
-# Timing và easing
+# Timing and Easing
 
-**Mục đích:** đặt chuyển động vào đúng hành động/nhịp, đồng thời giữ đơn vị thời gian rõ ràng. Đây là hướng dẫn tổng quát; các con số trong case study chỉ thuộc nguồn được ghi tên.
+**Purpose:** Align motion with action and musical rhythm while keeping time units unambiguous. This is a general guide; numeric values in case studies belong strictly to their named sources.
 
-## Phân biệt các đồng hồ
+## Distinguish the Clocks
 
-- Video có timestamp/fps riêng; composition và precomp có thể khác fps, start time, stretch hoặc Time Remap.
-- Khoảng dài `n` frame ở fps `f` tương ứng `n/f` giây khi dùng timebase đó. Không chuyển thời gian precomp sang demo bằng fps giống nhau.
-- Still image không mang thời lượng dựng. Image sequence cần fps diễn giải; dữ liệu preset có thể chỉ chứa time units chưa xác định.
-- Các frame được mã hóa ở fps cao có thể lặp hình. Chưa đo cadence thì chưa khẳng định có thêm chuyển động để slow motion.
+- A video stream has its own presentation timestamps and FPS; compositions and precompositions can differ in frame rate, start time, time stretch, or Time Remapping.
+- A span of `n` frames at frame rate `f` equals `n / f` seconds within that specific timebase. Do not map precomposition time directly to a demo render's timeline without checking nested offsets and time remapping.
+- Still images carry no intrinsic edit duration. Image sequences require an interpreted frame rate, and preset files (`.ffx`) may store raw time units without an explicit composition FPS.
+- High-FPS encoded videos may contain duplicate frames. Until frame cadence is measured, do not assume extra motion samples exist for smooth slow motion.
 
-## Thiết kế đường chuyển động
+## Designing a Motion Curve
 
-1. Chọn điểm hành động: bắt đầu, điểm nhấn, kết thúc ổn định.
-2. Đặt giá trị ở các mốc, xem chuyển động ở tốc độ phát thực.
-3. Chỉnh easing để điều khiển cách vào/ra; dùng HOLD cho đổi trạng thái có chủ đích.
-4. Nếu thêm overshoot/shake, kiểm tra envelope giảm và trạng thái cuối thay vì chỉ tăng cường độ.
-5. Với nhiều layer/ký tự, phân biệt độ trễ bắt đầu với độ dài và easing của từng animation.
+1. Identify the action landmarks: anticipation/start, peak accent, and settled rest state.
+2. Block out values at those landmarks and preview at real-time playback speed.
+3. Shape incoming/outgoing easing curves to control acceleration; use `HOLD` keyframes for deliberate stepped state changes.
+4. When adding overshoot or camera shake, verify the decay envelope and resting end state rather than merely cranking up peak amplitude.
+5. Across multiple layers or text characters, distinguish stagger offset (start delay) from each element's individual duration and easing curve.
 
-## Cách kiểm tra
+## How to Verify
 
-Xem riêng đường keyframe và kết quả trong comp cha; kiểm tra motion blur, frame trước/sau cut và dependency của expression. Không kết luận có speed ramp chỉ vì thấy Twixtor. [Retime](../techniques/retiming/speed-ramp.md) và [chữ trễ](../techniques/typography/staggered-text.md) có quy trình chi tiết.
+Inspect both the local keyframe graph and the composite result inside the parent composition; check motion blur, frames immediately before and after cuts, and expression dependencies. Never conclude a speed ramp is active merely because Twixtor is present on a layer. See [Speed Ramp Retiming](../techniques/retiming/speed-ramp.md) and [Staggered Text](../techniques/typography/staggered-text.md) for detailed workflows.
 
-**Đối chiếu:** [White Ferrari: Posterize Time và prerender](../case-studies/white-ferrari.md), [Chal7z: time units của FFX](../case-studies/chal7z-presets.md).
+**Cross-References:** [White Ferrari: Posterize Time and prerenders](../case-studies/white-ferrari.md), [Chal7z: FFX preset time units](../case-studies/chal7z-presets.md).

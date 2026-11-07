@@ -1,23 +1,23 @@
-# Tên nguồn — mẫu case study
+# Source Name — Case Study Template
 
-## Nguồn và phạm vi
+## Source and Scope
 
-[Định danh, loại nguồn, ngày, hash khi có; locator riêng giữ local].
+[Identifier, source type, analysis date, SHA-256 hash when available; keep private file paths local].
 
-[Phương pháp, phiên bản, timebase và trạng thái dữ liệu].
+[Extraction method, version, timebase, and data availability status].
 
-## Dữ liệu đọc được
+## Extracted Data
 
-[Comp/layer/property, enabled, effect order, thông số/keyframe/expression hoặc timestamp/frame].
+[Comp/layer/property locators, enabled flags, effect stack order, parameters/keyframes/expressions, or timestamps/frames].
 
-## Quan sát và cách giải thích
+## Observations and Interpretation
 
-[Tách điều thấy/đo khỏi nguyên nhân được suy luận; không gán plugin chỉ từ video].
+[Separate directly observed/measured facts from inferred causes; never assert plugin identity from video pixels alone].
 
-## Khả năng tái sử dụng
+## Reusability
 
-[Bài kỹ thuật/resource liên quan; dependency; bước dựng thử].
+[Related technique/resource articles; dependencies; proposed test recreation steps].
 
-## Giới hạn và kiểm chứng tiếp
+## Limitations and Next Verification Steps
 
-[Footage thiếu, runtime expression, unsupported/error, render chưa làm].
+[Missing footage, runtime expressions, unsupported/error fields, unperformed render checks].

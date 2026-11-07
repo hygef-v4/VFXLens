@@ -1,19 +1,19 @@
-# Shake có đường bao giảm dần
+# Shake with a Decaying Envelope
 
-**Mục đích:** tạo điểm nhấn rồi đưa hình về ổn định. Hướng dẫn là đề xuất dựa trên envelope đọc được; chưa xác nhận sync với beat trong mọi nguồn.
+**Purpose:** Create a sharp impact accent and smoothly return the frame to rest. This guide proposes a workflow informed by source-extracted envelopes; beat synchronization is not assumed across all reference sources.
 
-## Cách dựng thử
+## Proposed Recreation Workflow
 
-1. Chọn điểm nhấn và khoảng cần ổn định trở lại.
-2. Đặt amplitude cao quanh điểm nhấn rồi giảm về mức nền mong muốn.
-3. Chọn frequency, trục và rotation theo chuyển động shot; kiểm tra easing và seed nếu dùng ngẫu nhiên.
-4. Kiểm tra biên khi dịch/xoay/zoom; thêm xử lý biên phù hợp và đánh giá motion blur.
-5. Bật/tắt shake để xác định nó làm rõ hành động hay che mất nội dung.
+1. Choose the accent frame and the settling window required to return to rest.
+2. Keyframe a peak amplitude at the accent and decay it down to your baseline level.
+3. Tune frequency, X/Y axes, and Z-tilt rotation to match the shot's motion direction; inspect easing handles and random seed if applicable.
+4. Check frame edges during translation, rotation, or zoom; apply edge expansion/mirroring beforehand when needed and evaluate motion blur.
+5. Toggle the shake effect on and off to verify that it reinforces the action rather than obscuring the subject.
 
-## Đơn vị và dependency
+## Units and Dependencies
 
-Amplitude chuẩn hóa của plugin không mặc định là pixel. `wiggle` và keyframe phase không có cùng nghĩa với amplitude envelope. Chú ý layer in/out, key ngoài đoạn hiện và shake khác ở precomp cha.
+A plugin's normalized `Amplitude` parameter does not directly equal pixels. Expression `wiggle()` and keyframed phase curves do not carry the same semantics as an amplitude envelope. Always check the layer's `in`/`out` trim points, keyframes falling outside the active trim range, and additional shake effects applied on parent precompositions.
 
-**Bằng chứng:** [Takt Op, mục 2](../../case-studies/takt-op.md#2-shake-giảm-dần-sau-điểm-nhấn) có đường Amplitude giảm; [White Ferrari](../../case-studies/white-ferrari.md) có ví dụ Motion Tile/Mirror Edges; [Chal7z](../../case-studies/chal7z-presets.md) giữ time units FFX chưa quy đổi.
+**Evidence:** [Takt Op, Section 2](../../case-studies/takt-op.md#2-decaying-shake-after-an-accent) documents a decaying `Amplitude` curve; [White Ferrari](../../case-studies/white-ferrari.md) shows `Motion Tile` / `Mirror Edges` placed before `S_Shake`; [Chal7z](../../case-studies/chal7z-presets.md) preserves unscaled `.ffx` time units.
 
-**Dùng trong:** [impact](../../styles/impact.md), [dissolve-shake](../transitions/dissolve-shake.md).
+**Used In:** [Impact Style](../../styles/impact.md), [Dissolve-Shake Transition](../transitions/dissolve-shake.md).

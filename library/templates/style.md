@@ -1,17 +1,17 @@
-# Tên style — mẫu bài
+# Style Name — Article Template
 
-## Đặc điểm nhận biết
+## Defining Characteristics
 
-[Hình ảnh, chuyển động và nhịp; không định nghĩa style chỉ bằng plugin].
+[Visual language, motion behavior, and edit pacing; never define a style solely by plugin names].
 
-## Chuỗi dựng đề xuất
+## Proposed Assembly Workflow
 
-[Các bước phối; liên kết bài kỹ thuật/resource chính thay vì chép lại].
+[Step-by-step combination; link to canonical technique and resource articles rather than duplicating them].
 
-## Biến thể và lỗi thường gặp
+## Variations and Common Pitfalls
 
-[Cách điều chỉnh theo footage; điều làm mất mục tiêu thị giác].
+[How to adapt to different footage; what breaks the intended visual goal].
 
-## Kiểm chứng và nguồn
+## Verification and Sources
 
-[Case study cụ thể, phần quan sát và phần suy luận; recipe đã render chưa?].
+[Specific case studies, observed facts vs. inferred interpretations; whether the recipe has been render-verified].

@@ -1,27 +1,27 @@
-# Tên kỹ thuật — mẫu bài
+# Technique Name — Article Template
 
-**Mục đích:** [Nhiệm vụ và kết quả mong muốn].
+**Purpose:** [Target task and intended visual/audio outcome].
 
-**Mức kiểm chứng:** [Đề xuất / đã đọc nguồn / đã render so sánh; ghi điều kiện].
+**Verification Level:** [Proposed workflow / source-extracted / render-compared; state conditions].
 
-## Khi dùng và đầu vào
+## When to Use and Inputs
 
-[Dấu hiệu cần kỹ thuật; loại layer/footage; điều kiện].
+[Signals that call for this technique; required layer/footage types; preconditions].
 
-## Các bước thực hiện
+## Execution Steps
 
-1. [Thiết lập đầu vào và dependency].
-2. [Thao tác chính theo thứ tự].
-3. [Cách quan sát kết quả].
+1. [Set up inputs and dependencies].
+2. [Primary operations in exact order].
+3. [How to inspect and verify the result].
 
-## Điều khiển và dependency
+## Controls and Dependencies
 
-[Property, đơn vị, timebase, controller, effect order; giá trị ví dụ phải dẫn tới case study].
+[Properties, units, timebase, controllers, effect stack order; numeric examples must link to a case study].
 
-## Lỗi thường gặp và kiểm chứng
+## Common Pitfalls and Verification
 
-[Artifact, điều kiện biên, bước so sánh; điều chưa xác nhận].
+[Artifacts, boundary conditions, comparison steps; what remains unverified].
 
-## Nguồn và bài liên quan
+## Sources and Related Articles
 
-[Liên kết nguồn, case study, resource và style].
+[Source links, case studies, resources, and styles].

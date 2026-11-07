@@ -1,19 +1,19 @@
-# Textures: chọn chất liệu và cách hòa trộn
+# Textures: Selecting Surface Overlays and Blending
 
-## Nhận biết
+## Identification
 
-Giấy, plastic, film grain, xước, bụi và lens dirt có thể là ảnh tĩnh hoặc video. Kiểm tra ảnh thực: tên PAPER không bảo đảm nền trắng; tên Film Burn chưa chứng minh đặc trưng cháy phim. Phân biệt texture toàn bề mặt với dirt chỉ hợp quanh nguồn sáng.
+Paper, plastic wrap, film grain, scratches, dust, and lens dirt can be still images or video loops. Always inspect the actual pixels: a filename containing `PAPER` does not guarantee a bright white background, and `Film Burn` does not prove authentic celluloid halation. Distinguish full-frame surface textures from lens dirt that should only light up around bright highlights.
 
-## Chọn và ứng dụng
+## Selection and Application
 
-1. Xác định cần chất liệu, tương phản, độ cũ hay chi tiết foreground.
-2. Xem độ phân giải, nền sáng/tối/xám, alpha và scale hạt ở kích thước xuất.
-3. Thử Multiply cho nét tối trên nền sáng; Overlay/Soft Light cho tương tác tương phản; Screen cho highlight trên nền đen. So sánh từng phương án.
-4. Điều chỉnh mức đóng góp và vùng tác động để giữ da, mắt, chữ dễ đọc.
-5. Nếu ảnh tĩnh cần chuyển động, animate có chủ đích; không coi ảnh lớn là một video loop.
+1. Decide whether the shot needs tactile surface grain, contrast shaping, vintage aging, or foreground lens detail.
+2. Check resolution, background luminance (white, black, or neutral 50% gray), alpha channel, and grain scale at final export dimensions.
+3. Test `Multiply` for dark ink/folds on a white background; `Overlay` or `Soft Light` for neutral-gray contrast textures; and `Screen` for bright dust/scratches on a black background. Compare candidates visually.
+4. Dial in opacity and mask/localize the coverage so skin tones, eyes, and typography remain clean and legible.
+5. When animating a still texture (e.g., stepped position/rotation jumps for a stop-motion paper feel), drive it deliberately rather than mistaking a high-res still for a video loop.
 
-## Lỗi thường gặp
+## Common Pitfalls
 
-Kéo giãn làm hạt/xước méo; blend làm đen hoặc bạc hình; texture vẫn đứng yên khi vật thể cần chuyển động cùng; loop có điểm nối lộ. Không gán cùng opacity hoặc scale cho mọi shot.
+Non-uniformly stretching a texture and warping grain/scratches; choosing a blend mode that crushes shadows or lifts blacks; leaving a surface texture static when it is supposed to track a moving cutout; or exposing an obvious loop cut. Never apply a blind opacity or scale value across unrelated shots.
 
-**Liên quan:** [compositing](../foundations/compositing.md), [retro/VHS](../styles/retro-vhs.md), [collage](../styles/collage.md). Đối chiếu [Standard](../case-studies/standard.md): layer có texture vẫn cần xét đường render và prerender.
+**Related:** [Compositing Foundations](../foundations/compositing.md), [Retro / VHS Style](../styles/retro-vhs.md), [Collage Style](../styles/collage.md). Cross-reference [Standard](../case-studies/standard.md): even when a texture layer is present in a composition, verify the active render path and prerenders.

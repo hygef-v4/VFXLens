@@ -1,7 +1,7 @@
-# Foundations — nền tảng
+# Foundations
 
-- [Timing và easing](timing-and-easing.md): phân biệt thời gian nguồn, comp, keyframe và độ trễ.
-- [Compositing](compositing.md): alpha, blend, matte, thứ tự effect và xử lý biên.
-- [Bằng chứng và kiểm chứng](evidence-and-validation.md): tách dữ liệu đọc được khỏi cách giải thích.
+- [Timing and Easing](timing-and-easing.md): Distinguish source time, composition time, keyframes, and stagger offsets.
+- [Compositing](compositing.md): Alpha channels, blending modes, mattes, effect order, and edge handling.
+- [Evidence and Validation](evidence-and-validation.md): Separate directly read data from interpretation.
 
-[Về thư viện](../README.md)
+[Back to Library](../README.md)

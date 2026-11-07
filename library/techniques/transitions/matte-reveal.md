@@ -1,19 +1,19 @@
-# Reveal và transition bằng matte
+# Matte Reveal and Wipe Transitions
 
-**Mục đích:** dùng hình hoặc độ trong suốt của một layer để điều khiển vùng hiện của layer khác. Có thể dùng cho wipe, ink, noise và khung đồ họa; đây là quy trình dựng thử.
+**Purpose:** Use the luminance or alpha channel of one layer to drive the visible region of another layer. Applicable to custom wipes, ink bleeds, procedural noise masks, and graphic frames; this guide presents a proposed working workflow.
 
-## Cách dựng thử
+## Proposed Recreation Workflow
 
-1. Đặt shot A làm nền và shot B cần reveal ở trên.
-2. Chọn matte: alpha nếu có vùng trong suốt đúng ý, luma nếu dùng độ sáng.
-3. Với Luma Matte, trắng hiện B và đen ẩn B; đảo matte khi cần hướng ngược lại.
-4. Trim/retime matte theo nhịp, kiểm tra vùng che tại đầu/cuối và điểm nối.
-5. Xem mép và phần xám trung gian trước khi tăng contrast hoặc threshold.
+1. Place outgoing shot A as the base layer and incoming shot B above it.
+2. Choose the matte type: `Alpha Matte` when the control layer carries true transparency, or `Luma Matte` when luminance drives visibility.
+3. With a standard `Luma Matte`, bright white reveals shot B and black hides it; invert the matte when the opposite direction is needed.
+4. Trim or retime the matte clip to match the transition beat, verifying full coverage at both the start and end of the wipe.
+5. Inspect transition edges and mid-gray feathering before boosting contrast or applying a hard threshold.
 
-Theo [Adobe: track mattes](https://helpx.adobe.com/after-effects/desktop/work-with-transparency-and-compositing/work-with-track-mattes-and-traveling-mattes/track-mattes-and-traveling-mattes.html), alpha và luma là hai nguồn điều khiển khác nhau. Video trắng đen có thể opaque hoàn toàn nên dùng Alpha Matte sẽ không tạo vùng reveal mong muốn.
+As documented in [Adobe: Track mattes and traveling mattes](https://helpx.adobe.com/after-effects/desktop/work-with-transparency-and-compositing/work-with-track-mattes-and-traveling-mattes/track-mattes-and-traveling-mattes.html), alpha and luminance are two distinct control signals. A black-and-white MP4 clip is fully opaque (`Alpha = 1.0` everywhere), so assigning it as an `Alpha Matte` will not produce the intended wipe reveal.
 
-## Lỗi thường gặp
+## Common Pitfalls
 
-Chọn nhầm loại/chiều matte; matte không phủ kín; source quá nhỏ làm vỡ biên; thay đổi timing matte nhưng quên hai shot. Effect wipe trực tiếp trong case study là một cách triển khai khác, không phải bằng chứng đã dùng footage matte.
+Picking the wrong matte channel or inversion state; using a matte asset that fails to reach full white/black at the transition endpoints; scaling up a low-resolution matte and exposing blocky edges; or retiming the matte layer without adjusting the overlap of shots A and B. Direct plugin wipe effects documented in case studies represent an effect-based alternative rather than proof that a separate footage matte layer was used.
 
-**Đọc tiếp:** [overlays](../../resources/overlays.md), [compositing](../../foundations/compositing.md), [The Less I Know: các wipe có keyframe](../../case-studies/the-less-i-know-the-better.md).
+**Further Reading:** [Overlays](../../resources/overlays.md), [Compositing Foundations](../../foundations/compositing.md), [The Less I Know: keyframed plugin wipes](../../case-studies/the-less-i-know-the-better.md).

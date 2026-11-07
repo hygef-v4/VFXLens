@@ -1,23 +1,23 @@
-# Loại resource — mẫu bài
+# Resource Type — Article Template
 
-## Nhận biết
+## Identification
 
-[Hình/âm, nền/alpha/channel, metadata; đừng chỉ dựa vào tên file].
+[Visual/audio characteristics, background/alpha/channels, metadata; never rely on filenames alone].
 
-## Khi chọn
+## Selection Criteria
 
-[Mục đích, kích thước/fps/cadence hoặc glyph/ngôn ngữ nếu phù hợp].
+[Target role, resolution/FPS/cadence, or glyph/language coverage where applicable].
 
-## Cách ứng dụng
+## Application
 
-[Đặt vào shot, blend/matte, timing, match và cách thử].
+[Placement in the shot, blend/matte mode, timing, color/contrast matching, and preview checks].
 
-## Lỗi thường gặp
+## Common Pitfalls
 
-[Biên, màu, scale, sync, dependency và giới hạn].
+[Hard edges, color casts, scaling artifacts, sync drift, dependencies, and limitations].
 
-## Mức kiểm chứng và nguồn
+## Verification Level and Sources
 
-[Điều đo/nhìn/nghe được; hướng áp dụng đề xuất; liên kết nguồn được phép công khai].
+[What was directly measured/seen/heard; proposed application workflow; publicly shareable source links].
 
-Không ghi inventory hoặc đường dẫn bộ sưu tập cá nhân vào bài hướng dẫn chung.
+Do not include personal asset inventories or local machine paths in general resource guides.

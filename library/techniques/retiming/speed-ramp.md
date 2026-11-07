@@ -1,25 +1,25 @@
-# Retime và speed ramp
+# Retiming and Speed Ramps
 
-**Mục đích:** điều khiển tốc độ hành động theo thời gian. Chưa có curve speed ramp hoàn chỉnh được xác minh từ các nguồn hiện tại; đây là quy trình kiểm tra và dựng thử.
+**Purpose:** Shape the apparent speed of action over time. No complete, render-verified speed-ramp curve has been confirmed from the current static project sources; this guide documents the inspection and recreation workflow.
 
-## Phân biệt trước khi dựng
+## Distinguish Mechanisms Before Editing
 
-| Cơ chế | Điều nó thay đổi |
+| Mechanism | What It Actually Changes |
 | --- | --- |
-| Stretch/Time Remap/retime | Quan hệ thời gian nguồn và timeline |
-| Speed ramp | Tốc độ thay đổi theo thời gian |
-| Posterize Time | Nhịp lấy/giữ hình |
-| Trail/echo/wide time | Tích lũy hoặc phối hình từ nhiều thời điểm |
-| Motion blur | Độ nhòe chuyển động, chưa chứng minh retime |
+| Time Stretch / Time Remap / Retiming plugin | Mapping between source clip time and composition timeline |
+| Speed ramp | Time-varying playback speed within a shot |
+| Posterize Time | Sample-and-hold frame update cadence |
+| Trails / Echo / Wide Time | Temporal accumulation or multi-frame blending |
+| Motion blur | Directional motion smear (does not by itself prove retiming) |
 
-## Cách dựng thử
+## Proposed Recreation Workflow
 
-1. Kiểm tra source fps, timestamp/cadence và cut trong clip.
-2. Xác định action frame cần nhấn và các đoạn tăng/giảm tốc.
-3. Dựng curve tốc độ, xem thời gian nguồn có đi đúng action không.
-4. Đánh giá interpolation ở tóc, biên tay, occlusion và vùng qua cut.
-5. Chỉ thêm motion blur sau khi đã xem chuyển động ở tốc độ mục tiêu; kiểm tra thứ tự xử lý thực tế.
+1. Inspect source FPS, presentation timestamps/cadence, and baked-in cuts within the clip.
+2. Identify the key action frame to accent and the surrounding slow-in / fast-burst / slow-out windows.
+3. Shape the speed or Time Remap curve and verify that the source action lands on the intended beat.
+4. Check optical-flow interpolation artifacts around hair, fast hands, occlusions, and scene cuts.
+5. Add motion blur only after verifying motion at the target speed, and confirm the exact effect stacking order.
 
-Sự có mặt của Twixtor không đủ để khẳng định có ramp; cần đọc tốc độ, keyframe, Time Remap, stretch và các precomp. Twixtor retime khác nhiệm vụ RSMB motion blur. Xem [công cụ render](../../tools/render-effects.md).
+The mere presence of Twixtor on a layer does not prove an active speed ramp; always inspect static speed parameters, child property groups, Time Remapping, layer stretch, and parent precompositions. Twixtor retiming and RSMB motion blur solve distinct tasks; see [Render Effects](../../tools/render-effects.md).
 
-**Nguồn và giới hạn:** [Takt Op, mục 6](../../case-studies/takt-op.md#6-retime-và-speed-ramp), [White Ferrari](../../case-studies/white-ferrari.md), [Chal7z: trail/wide time](../../case-studies/chal7z-presets.md). **Resource:** [footage](../../resources/footage.md).
+**Sources and Limitations:** [Takt Op, Section 6](../../case-studies/takt-op.md#6-retiming-and-speed-ramps), [White Ferrari](../../case-studies/white-ferrari.md), [Chal7z: trails and wide time](../../case-studies/chal7z-presets.md). **Resource:** [Footage](../../resources/footage.md).

@@ -1,30 +1,30 @@
-# Sound effects: vai trò, đồng bộ và mix
+# Sound Effects: Sonic Roles, Synchronization, and Mixing
 
-## Nhận biết bằng nghe và waveform
+## Identifying by Ear and Waveform
 
-| Vai trò đề xuất | Dấu hiệu cần nghe/xem | Dùng thử cho |
+| Suggested Role | Waveform / Sonic Cues | Typical Editorial Use |
 | --- | --- | --- |
-| Whoosh/flyby | Envelope và chuyển động âm | Quét, xoay, chuyển cảnh có hướng |
-| Hit/impact | Transient và phần body/tail | Contact, cut mạnh, từ khóa |
-| Reverse/suck/riser | Năng lượng tiến tới điểm kết | Buildup vào hành động |
-| Click/typewriter | Độ ngắn, nhịp và sắc thái | Cụm chữ/UI |
-| Ambience | Độ liên tục, không gian | Nền cảnh và nối shot |
-| Glitch | Cấu trúc nhịp/đứt đoạn | Điểm nhiễu có chủ đích |
+| Whoosh / flyby | Smooth rise-peak-decay envelope with directional sweep | Camera whips, spins, and directional transitions |
+| Hit / impact | Sharp initial transient followed by low-end body/tail | Physical contact, hard cuts, and title slams |
+| Reverse / suck / riser | Energy building toward an abrupt cutoff | Pre-cut anticipation leading into a beat or impact |
+| Click / typewriter | Short, crisp impulse with distinct rhythmic attack | Kinetic typography, UI callouts, and counters |
+| Ambience / room tone | Sustained texture without aggressive transients | Scene bed and smoothing across cuts |
+| Glitch / static | Stuttering rhythmic bursts or frequency tears | Deliberate analog/digital distortion accents |
 
-Tên file là đầu mối; chỉ đo peak chưa xác nhận âm sắc, chất lượng hoặc đúng loại.
+Filenames are only an initial clue; measuring peak amplitude alone never confirms timbre, audio quality, or category.
 
-## Chọn và ứng dụng
+## Selection and Application
 
-1. Nghe riêng asset và xác định phần cần dùng; xem waveform để tìm lead-in, transient và tail.
-2. Căn sự kiện nghe được với hành động hình ảnh, không mặc định đầu file hoặc sample peak là điểm sync tốt nhất.
-3. Trim trên timeline, fade mép cắt và giữ tail phù hợp không gian.
-4. Cân với nhạc/thoại, nghe tổng mix và kiểm tra mức đỉnh sau khi cộng lớp.
-5. Dùng ít lớp có vai trò khác nhau; tránh thêm một hit cho mọi frame chữ hoặc mọi cut.
+1. Audition the asset solo and identify the usable section; inspect the waveform to locate the lead-in, primary transient, and decay tail.
+2. Align the **audible transient peak** (not the start of the audio file) with the visual point of impact or motion peak.
+3. Trim on the timeline, apply short micro-fades at cut boundaries to prevent clicks, and let the tail decay naturally into the space.
+4. Balance against music and dialogue, monitor the master bus after stacking layers, and check peak headroom.
+5. Prefer a few distinct sonic layers with clear frequency roles over stacking an identical impact hit on every single text frame or cut.
 
-## Đo gì và chưa biết gì?
+## Measurements vs. Unknowns
 
-Sample peak, true peak, RMS và LUFS là các đại lượng khác nhau. Báo giá trị phải ghi cách đo, kênh, sample rate và đoạn đo. Peak chạm 0 dBFS cần kiểm tra headroom nhưng tự nó chưa chứng minh clipped; đo một đoạn không kết luận peak toàn file. Sample rate/bit depth cao hơn không đảm bảo âm phù hợp hơn.
+Sample peak, true peak, RMS, and integrated LUFS measure different physical quantities. When reporting audio metrics, state the measurement method, channel layout, sample rate, and time window. A sample peak touching `0 dBFS` warrants checking headroom but does not by itself prove audible clipping, and measuring a short slice does not characterize the entire file. Higher sample rates or bit depths do not automatically make a sound effect fit a scene better.
 
-Không lưu một gain cố định cho mọi SFX khi chưa nghe trong mix. Đánh dấu rõ trường hợp mới đọc tên hoặc chỉ đo tín hiệu.
+Never hardcode a universal gain offset for all SFX without auditioning in the mix. Clearly distinguish filenames/signal measurements from subjective mix decisions.
 
-**Liên quan:** [lọc âm/reverb](../techniques/sound-design/filters-and-reverb.md), [impact](../styles/impact.md), [AE Notes: ví dụ xử lý âm](../case-studies/ae-notes.md).
+**Related:** [Audio Filters and Reverb](../techniques/sound-design/filters-and-reverb.md), [Impact Style](../styles/impact.md), [AE Notes: audio processing examples](../case-studies/ae-notes.md).

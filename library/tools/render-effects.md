@@ -1,19 +1,19 @@
-# Render effects: chọn theo vấn đề cần giải quyết
+# Render Effects: Selecting by Problem
 
-| Vấn đề | Nhóm công cụ tham khảo | Trước khi chọn |
+| Problem to Solve | Reference Tool Family | Check Before Selecting |
 | --- | --- | --- |
-| Đổi tốc độ và nội suy chuyển động | [Twixtor](https://revisionfx.com/products/twixtor/) | FPS/cadence, curve, occlusion và artifact |
-| Thêm motion blur từ hình ảnh | [RSMB](https://revisionfx.com/products/rsmb/) | Chuyển động nguồn, biên vật thể và thứ tự xử lý |
-| Biến dạng bằng map | [Displacer Pro](https://aescripts.com/displacer-pro/) | Map/channel, lượng biến dạng, biên và version |
-| Reveal lan trong biên layer | [AutoFill](https://aescripts.com/autofill/) | Alpha/biên nguồn, điểm xuất phát và timing |
-| Glow, bokeh, màu, shake | Effect tích hợp hoặc plugin phù hợp | MatchName, đơn vị, effect order và input |
+| Variable speed and motion interpolation | [Twixtor](https://revisionfx.com/products/twixtor/) | Source FPS/cadence, retiming curve, occlusions, and warping artifacts |
+| Estimate motion blur from pixel motion | [RSMB](https://revisionfx.com/products/rsmb/) | Source motion vectors, object silhouettes, and stack order |
+| Map-driven spatial distortion | [Displacer Pro](https://aescripts.com/displacer-pro/) | Map/channel source, displacement amount, border behavior, and version |
+| Progressive fill reveal within layer bounds | [AutoFill](https://aescripts.com/autofill/) | Source alpha/boundaries, growth origin, and timing |
+| Glow, bokeh, color grading, camera shake | Built-in effects or dedicated third-party plugins | `matchName`, parameter units, effect stack order, and input color depth |
 
-Đây là bản đồ nhiệm vụ, không phải khuyến nghị mua/cài. Twixtor và RSMB xử lý hai vấn đề khác nhau; có retime không tự chứng minh có speed ramp. Nhiều hiệu ứng có cách làm bằng công cụ tích hợp, nhưng chưa bảo đảm kết quả giống một plugin cụ thể.
+This is a task mapping rather than a purchasing or installation recommendation. Twixtor and RSMB solve two distinct problems, and the mere presence of a retiming effect does not prove an active speed ramp. Many effects can be approximated with native tools, though visual parity with a specific third-party plugin is not guaranteed.
 
-## Đọc version và matchName
+## Reading Versions and `matchName`
 
-Tên hiển thị, matchName trong project, nhãn folder và version binary là các nguồn khác nhau. Tài liệu sản phẩm hiện tại có thể mô tả chức năng/fix chưa có ở bản cũ. Changelog Displacer Pro có bản sửa scale/anti-aliasing; cần đối chiếu đúng phiên bản trước khi so kết quả, không suy ra từ tên folder.
+Display names, project `matchName` strings, folder labels, and binary versions are distinct sources of information. Current vendor documentation may describe features or bug fixes absent in older binaries. For example, Displacer Pro's changelog notes fixes for scale and anti-aliasing; verify the exact version before comparing render output rather than assuming from a folder name.
 
-Không xác nhận plugin từ hình video. Với project, ghi đúng instance, enabled, parameter tree và plugin version nếu đọc được. Classifier chỉ là đầu mối khi chưa xác minh taxonomy.
+Never assert a plugin name from rendered video pixels alone. When analyzing project files, record the exact instance, `enabled` state, parameter tree, and plugin version when readable. Automated classifiers provide leads until taxonomy is verified.
 
-**Kỹ thuật:** [retime](../techniques/retiming/speed-ramp.md), [displacement](../techniques/transitions/chromatic-displacement.md), [glow/màu/bokeh](../techniques/lighting-and-color/glow-color-bokeh.md). **Nguồn:** [Takt Op](../case-studies/takt-op.md), [White Ferrari](../case-studies/white-ferrari.md).
+**Related Techniques:** [Speed Ramp Retiming](../techniques/retiming/speed-ramp.md), [Chromatic Displacement](../techniques/transitions/chromatic-displacement.md), [Glow, Color, and Bokeh](../techniques/lighting-and-color/glow-color-bokeh.md). **Sources:** [Takt Op](../case-studies/takt-op.md), [White Ferrari](../case-studies/white-ferrari.md).

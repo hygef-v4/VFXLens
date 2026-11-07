@@ -1,24 +1,24 @@
-# Script và preset: dependency và phạm vi tác động
+# Scripts and Presets: Dependencies and Scope of Impact
 
-## Phân biệt vai trò
+## Distinguishing Roles
 
-- Plugin render tạo hoặc xử lý hình khi host chạy.
-- Script/panel thao tác với project, thiết lập workflow hoặc sinh control/expression.
-- Preset FFX lưu cấu hình/animation; không bảo đảm có đủ plugin, footage, font hoặc layer được tham chiếu.
-- Công cụ tìm effect/snapshot như [FX Console](https://www.videocopilot.net/blog/2016/10/new-workflow-plug-in-fx-console-is-now-available/) hỗ trợ thao tác, không tự là look nhìn thấy trong video.
+- **Render plugins** generate or process pixels when the host renders a frame.
+- **Scripts/panels** manipulate project structure, automate setup, or generate controllers and expressions.
+- **`.ffx` presets** store effect configurations, keyframes, or expressions; they do not bundle the referenced plugins, footage, fonts, or target layers.
+- **Workflow utilities** such as [FX Console](https://www.videocopilot.net/blog/2016/10/new-workflow-plug-in-fx-console-is-now-available/) accelerate effect application and snapshots rather than producing a visible look in rendered video.
 
-## Nhận biết trước khi dùng
+## Pre-Use Inspection Checklist
 
-1. Kiểm tra host: một panel Adobe có thể dành cho Premiere thay vì AE.
-2. Kiểm tra dependency: JSX có thể cần thư mục phương trình, icons, plugin hoặc runtime đi kèm.
-3. `.jsx` không đảm bảo mã nguồn đọc được: file có thể chứa marker JSXBIN hoặc payload gọi qua `eval`. Chưa đọc được payload thì ghi chưa xác minh, không suy diễn tính năng/an toàn.
-4. Với FFX, kiểm tra effect/control, keyframe, expression và đơn vị lưu; chưa có timebase thì không đổi integer thành giây/frame.
-5. Nếu script sửa/xóa cấu trúc, thử trên bản làm việc được phép sửa, không trên nguồn học.
+1. **Check the target host:** An Adobe extension panel may target Premiere Pro rather than After Effects.
+2. **Check companion dependencies:** A `.jsx` script may require external equation folders, icon assets, pseudo-effect definitions, or plugins.
+3. **`.jsx` extension does not guarantee readable source:** A file may contain compiled `JSXBIN` markers or obfuscated `eval` payloads. When the payload is unreadable, mark it unverified rather than guessing its behavior or safety.
+4. **For `.ffx` presets:** Inspect the stored effects/controllers, keyframes, expressions, and raw storage units; without a known composition timebase, never convert raw integer ticks directly into seconds or frames.
+5. **For structure-mutating scripts:** Test only on a disposable working copy, never on original reference projects.
 
-## Bài học từ script dọn layer
+## Lessons from a Layer Cleanup Script
 
-Một bản Hidden Layer Cleaner 1.0.0.1 đã đọc tĩnh loại một số parent/matte/effect reference khi chọn layer disabled; nút Delete Selected lại xóa mọi layer đang selected. Mã đã đọc không phân tích tham chiếu expression/cross-comp đầy đủ. Đây là giới hạn của bản nguồn đã xem, không kết luận mọi script dọn layer đều giống vậy.
+Static inspection of a Hidden Layer Cleaner 1.0.0.1 script showed that while its selection step filters out certain parent/matte/effect references when selecting disabled layers, its `Delete Selected` action deletes every currently selected layer without re-checking. Moreover, the inspected code did not parse expression strings or cross-composition references. This documents a limitation of that specific script version rather than a blanket claim about all cleanup scripts.
 
-Layer tắt vẫn có thể là nguồn tham chiếu hoặc giữ cấu trúc trước prerender. Không lấy `enabled == false` làm bằng chứng có thể xóa. Chọn layer và xóa layer là hai thao tác cần kiểm tra riêng.
+A disabled layer (`enabled == false`) may still serve as an expression/effect reference target or preserve pre-prerender structure. Never treat `enabled == false` as proof that a layer is safe to delete. Selecting layers and deleting layers are two distinct operations that require separate verification.
 
-**Case study:** [Chal7z: cấu trúc FFX, time units và scalar storage](../case-studies/chal7z-presets.md), [White Ferrari: layer disabled](../case-studies/white-ferrari.md). **Quy ước:** [bằng chứng](../foundations/evidence-and-validation.md).
+**Case Studies:** [Chal7z: FFX structure, time units, and scalar storage](../case-studies/chal7z-presets.md), [White Ferrari: disabled layers](../case-studies/white-ferrari.md). **Conventions:** [Evidence and Validation](../foundations/evidence-and-validation.md).

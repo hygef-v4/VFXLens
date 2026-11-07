@@ -1,16 +1,16 @@
-# Dissolve kết hợp rung
+# Dissolve Combined with Shake
 
-**Mục đích:** kết hợp thay đổi độ hiện với dao động giảm dần để nối hoặc đưa một lớp vào hình. Chưa có recipe render độc lập; xem [Takt Op, mục 3](../../case-studies/takt-op.md#3-dissolve-kết-hợp-rung) và [White Ferrari](../../case-studies/white-ferrari.md) cho dữ liệu nguồn.
+**Purpose:** Pair a visibility/dissolve transition with a decaying oscillation to introduce or bridge layers across a cut. No standalone render-verified preset is assumed; see [Takt Op, Section 3](../../case-studies/takt-op.md#3-dissolve-combined-with-shake) and [White Ferrari](../../case-studies/white-ferrari.md) for source-extracted parameters.
 
-## Cách dựng thử
+## Proposed Recreation Workflow
 
-1. Xác định lớp đang xuất hiện/biến mất và layer nền cần lộ.
-2. Dựng đường dissolve theo semantics của effect; không mặc định giá trị 0 luôn là trong suốt.
-3. Tạo dao động qua lại rồi giảm về trạng thái ổn định; phân biệt phase, amplitude và frequency.
-4. Nếu chồng thêm shake riêng, xem hai envelope có cộng quá mạnh hoặc kéo dài ngoài đoạn hiện không.
+1. Identify the incoming/outgoing layer and the underlying background shot being revealed.
+2. Keyframe the dissolve progression according to the specific plugin's semantics; never assume a parameter value of `0` always means fully transparent.
+3. Keyframe a sign-reversing oscillation that damps down to rest, distinguishing phase, amplitude, and frequency controls.
+4. When stacking a separate camera shake layer on top, verify that the two envelopes do not compound excessively or extend beyond the layer's active `in`/`out` span.
 
-## Dependency và kiểm tra
+## Dependencies and Inspection
 
-Ghi layer in/out, alpha, blend, dissolve percent, phase từng trục, amplitude/frequency và easing. Xem cả shot cha và background khi layer thay đổi độ hiện. Keyframe phase đổi dấu là bằng chứng điều khiển phase; chưa đủ để suy ra mọi tham số của preset.
+Record layer `in`/`out` points, alpha, blending mode, dissolve percentage, per-axis phase keyframes, amplitude/frequency, and easing. Preview both the local layer and the parent composition against the background as visibility changes. Sign-reversing phase keyframes prove explicit phase control, but do not by themselves specify every static parameter of the plugin.
 
-**Đọc tiếp:** [shake envelope](../camera-and-motion/shake-envelope.md), [timing](../../foundations/timing-and-easing.md), [preset/script](../../tools/scripts-and-presets.md).
+**Further Reading:** [Shake Envelope](../camera-and-motion/shake-envelope.md), [Timing and Easing](../../foundations/timing-and-easing.md), [Scripts and Presets](../../tools/scripts-and-presets.md).

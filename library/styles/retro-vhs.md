@@ -1,17 +1,17 @@
 # Retro / VHS
 
-**Dấu hiệu định hướng:** scanline, noise, lệch màu, chất liệu film/CRT hoặc nhịp hình gợi phương tiện cũ. Film grain, VHS, CRT và digital glitch có thể khác cơ chế; chọn motif cụ thể thay vì coi chúng đồng nghĩa.
+**Defining Characteristics:** Scanlines, analog noise, chroma shift, film/CRT texture, or stepped frame cadence evoking vintage media. Film grain, VHS tape, CRT phosphor, and digital glitch operate via distinct mechanisms—choose the specific motif rather than treating them as interchangeable.
 
-## Chuỗi dựng đề xuất
+## Proposed Assembly Workflow
 
-1. Chọn đặc trưng cần gợi và giữ shot nền đọc rõ.
-2. Chọn [texture](../resources/textures.md) hoặc [overlay](../resources/overlays.md), xem có chữ/HUD/border được in sẵn không.
-3. Match màu/tương phản và mức nhiễu theo từng shot.
-4. Nếu thay nhịp hình, phân biệt [Posterize Time với retime/trail](../techniques/retiming/speed-ramp.md).
-5. Canh điểm nhiễu/flash theo dựng; nghe SFX trong mix và kiểm tra transition.
+1. Decide which analog artifact to evoke while keeping the underlying shot legible.
+2. Select [textures](../resources/textures.md) or [overlays](../resources/overlays.md), checking whether baked-in text, HUDs, or borders are present.
+3. Match color cast, contrast, and grain/noise intensity per shot.
+4. When altering frame cadence, distinguish [Posterize Time from retiming or echo trails](../techniques/retiming/speed-ramp.md).
+5. Time glitch/flash bursts to editorial cuts; balance tape/static SFX in the mix and inspect transitions.
 
-## Kiểm tra
+## Inspection Checklist
 
-Không để texture che chữ, loop lộ, scan quá dày hoặc tương phản giảm không chủ đích. Tên pack VHS không xác nhận hiệu ứng của từng file, và nhìn nhiễu trong MP4 không xác định được plugin.
+Prevent textures from obscuring typography, avoid obvious loop seams or overly dense scanlines, and watch for unintended contrast loss. A "VHS" pack name does not guarantee what is baked into each file, and observing noise in an MP4 never proves which plugin generated it.
 
-**Case study:** [White Ferrari](../case-studies/white-ferrari.md) có effect/expression tạo look; [AE Notes](../case-studies/ae-notes.md) ghi nhóm texture/glitch. Các lựa chọn style trên vẫn chưa được render đối chiếu như một recipe hoàn chỉnh.
+**Case Studies:** [White Ferrari](../case-studies/white-ferrari.md) documents look-building effects and expressions; [AE Notes](../case-studies/ae-notes.md) catalogs texture/glitch presets. These style combinations remain proposed workflows rather than side-by-side render-verified recipes.

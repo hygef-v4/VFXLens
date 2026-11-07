@@ -1,23 +1,23 @@
-# Chữ động trễ từng ký tự
+# Per-Character Staggered Text
 
-**Mục đích:** cho ký tự/từ/dòng dùng cùng chuyển động ở các thời điểm lệch nhau, thay vì đặt toàn bộ keyframe riêng cho từng chữ. Đây là nguyên lý và quy trình đề xuất; các expression nguồn chưa được chạy để kiểm chứng toàn bộ dependency.
+**Purpose:** Drive individual characters, words, or lines through a shared motion curve at staggered time offsets rather than keyframing every glyph manually. This guide explains the underlying mechanism and proposed workflow; source expressions extracted offline have not been executed in the host to verify all runtime dependencies.
 
-## Cách dựng thử
+## Proposed Recreation Workflow
 
-1. Chọn đơn vị: ký tự, từ hoặc dòng; xác định chiều đi và thứ tự.
-2. Dựng chuyển động mẫu của animator/control.
-3. Cho mỗi phần tử lấy mẫu animation tại thời điểm trễ theo index. Delay theo giây khác delay theo frame.
-4. Nếu thêm dao động tắt dần, kiểm soát amplitude/frequency/decay và thời điểm bắt đầu.
-5. Xem chữ đầu, giữa, cuối, khoảng trắng, nhiều dòng và câu tiếng Việt thực tế.
+1. Choose the grouping unit (`Characters`, `Words`, or `Lines`), traversal direction, and ordering.
+2. Keyframe the master motion curve on the text animator or controller property.
+3. Have each text unit sample the master animation at an index-dependent time delay (`time - offset`). Keep fixed-second delays distinct from frame-duration delays (`thisComp.frameDuration`).
+4. When adding damped cosine/sine overshoot, tune amplitude, frequency, exponential decay, and trigger time.
+5. Inspect the first, middle, and last characters, whitespace handling, multi-line wraps, and diacritics on the actual display string.
 
-## Ba cách triển khai cần phân biệt
+## Three Implementation Approaches to Distinguish
 
-- Text animator/Expression Selector: giữ text editable và hệ selector.
-- TextEvo: phụ thuộc control/pseudo-effect và biểu thức liên kết; không copy riêng một dòng expression rồi gọi là recipe đầy đủ.
-- TextExploder hoặc cutout: tách thành layer/ảnh riêng để xử lý như collage; không còn cùng cơ chế selector của một text layer.
+- **Built-in Text Animator / Expression Selector:** Keeps the text layer live and editable while evaluating per-glyph selector weights.
+- **TextEvo:** Relies on a companion pseudo-effect controller and linked expressions; never copy a single expression line in isolation and call it a self-contained recipe.
+- **TextExploder or Raster Cutouts:** Splits glyphs/words into independent layers or image cutouts for collage-style parenting and drop shadows; no longer uses a single text layer's `textIndex` selector.
 
-## Dependency và kiểm chứng
+## Dependencies and Verification
 
-Giữ tên control, chỉ số property, đơn vị delay, dimensions và animator properties. Cosine amplitude cố định khác overshoot lấy vận tốc keyframe. Gán Ease and Wizz có thể thay expression đang có; chọn [công cụ easing/text](../../tools/easing-and-typography.md) theo nhiệm vụ.
+Preserve controller names, property indices, delay units (seconds vs. frames), vector dimensions (`2D` vs. `3D`), and animator properties (`Position`, `Scale`, `Rotation`). A fixed-amplitude damped cosine selector behaves differently from velocity-driven keyframe overshoot. Applying Ease and Wizz can overwrite an existing property expression; select [Easing and Typography Tools](../../tools/easing-and-typography.md) according to the specific task.
 
-**Nguồn:** [Takt Op, mục 5](../../case-studies/takt-op.md#5-chữ-động-trễ-từng-ký-tự), [Standard](../../case-studies/standard.md), [Chal7z](../../case-studies/chal7z-presets.md), [AE Notes](../../case-studies/ae-notes.md). **Resource:** [fonts](../../resources/fonts.md), [cutouts](../../resources/cutouts-and-frames.md).
+**Sources:** [Takt Op, Section 5](../../case-studies/takt-op.md#5-per-character-staggered-text), [Standard](../../case-studies/standard.md), [Chal7z](../../case-studies/chal7z-presets.md), [AE Notes](../../case-studies/ae-notes.md). **Resources:** [Fonts](../../resources/fonts.md), [Cutouts and Frames](../../resources/cutouts-and-frames.md).

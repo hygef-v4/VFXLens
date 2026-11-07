@@ -1,34 +1,34 @@
-# Bổ sung kiến thức
+# Contributing Knowledge
 
-## Đặt bài đúng nơi
+## Placing Articles in the Right Section
 
-- `foundations`: nguyên lý dùng lại ở nhiều kỹ thuật.
-- `techniques`: một nhiệm vụ thực hiện được; liên kết tới bằng chứng thay vì chép bảng nguồn.
-- `styles`: đặc điểm và cách phối bài kỹ thuật/resource.
-- `resources`: cách nhận biết/chọn/ghép một loại asset, không phụ thuộc pack cá nhân.
-- `tools`: công cụ giải quyết nhiệm vụ gì, dependency, version và giới hạn.
-- `case-studies`: thông số/vị trí nguồn và điều đã kiểm chứng.
+- `foundations`: Core principles reused across multiple techniques.
+- `techniques`: A single actionable task; link to source evidence rather than duplicating raw tables.
+- `styles`: Visual/rhythmic traits and how to combine technique and resource articles.
+- `resources`: How to identify, select, and composite an asset type independently of personal packs.
+- `tools`: What task a tool solves, its dependencies, versions, and limitations.
+- `case-studies`: Source parameters/locations and what has been verified.
 
-Một chủ đề có một bài chính; dùng liên kết cho các style khác nhau. Chỉ tạo thư mục khi có nội dung. Dùng tên file tiếng Anh dạng `kebab-case`, nội dung tiếng Việt trong giai đoạn hiện tại.
+Each topic has one canonical article; use links when referencing it from different styles. Create directories only when they have content. Use `kebab-case` English filenames and write content in English.
 
-## Một bài có ích phải chứa
+## What a Useful Article Should Contain
 
-Mục đích, dấu hiệu nhận biết/đầu vào, cách thực hiện, điều khiển và đơn vị, dependency, lỗi thường gặp, mức kiểm chứng và nguồn. Chọn [mẫu](templates/README.md) tương ứng. Nếu chưa có render so sánh, ghi quy trình là đề xuất.
+Purpose, visual/audio indicators or inputs, step-by-step execution, controls and units, dependencies, common pitfalls, verification level, and sources. Start from the matching [template](templates/README.md). If no side-by-side render comparison has been performed, state that the workflow is a proposed guide.
 
-## Phần công khai và phần riêng
+## Public vs. Private Data
 
-Giữ đường dẫn máy, inventory, báo cáo gốc và ảnh/media riêng trong vùng local bị Git bỏ qua. Trong bài công khai dùng định danh nguồn và locator comp/layer/property có ý nghĩa; không tạo link bắt người đọc phải có file private. Giữ hash để nhận diện nguồn khi phù hợp, nhưng hash không chứng minh quyền phân phối.
+Keep machine-specific paths, personal asset inventories, raw analysis reports, and private media inside the Git-ignored `local/` directory. In public articles, use meaningful source identifiers and comp/layer/property locators; never create links that require private local files to read. Keep SHA-256 hashes to identify sources where appropriate, noting that a hash does not grant redistribution rights.
 
-Không đưa plugin, font, preset, project hoặc media của bên thứ ba vào thư viện khi chưa xác nhận quyền chia sẻ. Thư viện hiện không tự cấp giấy phép cho các nguồn đó; giấy phép của phần tài liệu cần được quyết định trước khi phát hành chính thức.
+Do not commit third-party plugins, fonts, presets, projects, or media into the library without verified redistribution rights. The library does not grant licenses for referenced third-party sources; documentation licensing must be decided before any public release.
 
-## Kiểm tra trước khi gửi thay đổi
+## Pre-Submission Checklist
 
-- Đi từ mục lục tới được bài mới, và liên kết file/heading đều hợp lệ.
-- Không có đường dẫn máy, inventory hoặc liên kết tới báo cáo private trong phần công khai.
-- Giá trị ví dụ có nguồn, đơn vị/timebase và giới hạn; không bị biến thành mặc định chung.
-- Phân biệt `observed`, `inferred`, `unavailable`, `unsupported`, `error`.
-- Không lặp lại bài đã có; style/tool/resource dẫn tới bài phù hợp.
+- New articles are reachable from section indexes, and all file/heading links resolve.
+- No local machine paths, personal inventories, or private report links appear in public pages.
+- Numeric examples cite their source, unit/timebase, and limitations rather than masquerading as universal defaults.
+- `observed`, `inferred`, `unavailable`, `unsupported`, and `error` states are clearly distinguished.
+- No duplicate topic pages; style, tool, and resource pages link to the canonical article.
 
-Không cần chạy analyzer hoặc mở project chỉ để sửa tài liệu. Nếu thay đổi recipe, ghi đúng các bước kiểm chứng thực tế đã làm, bao gồm những gì chưa làm.
+You do not need to run the analyzer or open After Effects solely to edit documentation. When updating a recipe, record the exact verification steps actually performed, including what remains unverified.
 
-[Về thư viện](README.md)
+[Back to Library](README.md)

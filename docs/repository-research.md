@@ -1,122 +1,122 @@
-# Báo cáo Nghiên cứu & Đánh giá GitHub Repositories (`docs/repository-research.md`)
+# GitHub Repository Research & Evaluation Report (`docs/repository-research.md`)
 
-Tài liệu này tổng hợp kết quả kiểm tra thực tế, phân tích mã nguồn, kiến trúc, giấy phép (license), khả năng tương thích Windows và mức độ hoàn thiện của 9 repository tham khảo đã được clone vào thư mục `references/` (thư mục này được đưa vào `.gitignore` để không trộn lẫn vào source chính).
+This document summarizes the empirical inspection, source code analysis, architecture review, license verification, Windows compatibility check, and maturity evaluation of the 9 reference repositories cloned into `references/` (which is excluded via `.gitignore` to keep third-party checkouts separate from the main source tree).
 
 ---
 
-## 1. Bảng Tổng hợp Trạng thái & Chỉ số Repository
+## 1. Repository Status & Metrics Summary
 
-| Repository | Phân nhóm | Trạng thái | Ngôn ngữ chính | Stars / Forks | Commits / Contributors (kiểm tra thực tế) | License | Tương thích Windows | Quyết định sử dụng |
+| Repository | Category | Status | Primary Language | Stars / Forks | Commits / Contributors (Inspected) | License | Windows Compatibility | Adoption Decision |
 |---|---|---|---|---|---|---|---|---|
-| [`forticheprod/py-aep`](https://github.com/forticheprod/py-aep) | AEP Parsing | Hoạt động tích cực (cập nhật 11/2026) | Python | 81 ⭐ / 14 🍴 | >50 commits gần nhất / 7+ contributors (Fortiche Production) | **MIT** (có file `LICENSE` đầy đủ) | **Tốt** (OS Independent, pure Python + `struct`, `attrs`, `fonttools`, `uharfbuzz`) | **CHỌN LÀM CORE PACKAGE** (`py-aep` qua PyPI/dependency) cho Offline `.aep` Parser |
-| [`ChenxingM/AEP-Tools`](https://github.com/ChenxingM/AEP-Tools) | AEP Parsing | Hoạt động (cập nhật 09/2026) | Python + Rust (`PyO3`/`maturin`) | 7 ⭐ / 0 🍴 | ~50 commits / 1 contributor | Khai báo `license = "MIT"` trong `pyproject.toml` nhưng **thiếu file `LICENSE` gốc** | Trung bình (cần Rust toolchain & `maturin` để build `_core`, có pure-Python fallback) | **KHÔNG SAO CHÉP CODE** (do thiếu file `LICENSE` tường minh); chỉ tham khảo tài liệu đặc tả RIFX/AEPX để tự viết clean-room `.aepx` parser |
-| [`boltframe/aftereffects-aep-parser`](https://github.com/boltframe/aftereffects-aep-parser) | AEP Parsing | Ngừng cập nhật (từ 02/2022) | Go + Kaitai Struct | 131 ⭐ / 13 🍴 | 22 commits / 3 contributors | **MIT** (có file `LICENSE`) | Chạy được qua Go runtime | **BỎ QUA TÍCH HỢP TRỰC TIẾP** (viết bằng Go, độ phủ chunk thấp hơn nhiều so với `py-aep`) |
-| [`JUNKDOGE-JOE/after-effects-mcp`](https://github.com/JUNKDOGE-JOE/after-effects-mcp) | After Effects MCP | Hoạt động tích cực (v0.11.1, 10/2026) | JS / ExtendScript (`.jsx`) / C++ AEGP | 90 ⭐ / 8 🍴 | 59+ commits / 4 contributors | **MIT** (có file `LICENSE`) | **Tốt** (hỗ trợ Windows x64 + CEP + HTTP `:11488/mcp` + Named Pipe) | **CHỌN HỖ TRỢ ADAPTER** trong `ae_bridge` (kết nối Read-only qua HTTP `:11488/mcp` và học hỏi cơ chế `readonly-worker.jsx` mở bản sao snapshot) |
-| [`solomondivyananth/aftereffects-mcp`](https://github.com/solomondivyananth/aftereffects-mcp) | After Effects MCP | Hoạt động (10/2026) | Node.js / ExtendScript (`bridge.jsx`) | 81 ⭐ / 9 🍴 | 19 commits / 1 contributor | **MIT** (có file `LICENSE`) | **Tốt** (CEP panel lắng nghe HTTP `127.0.0.1:7788`, dùng token tại `~/.ae-mcp-bridge.json`) | **CHỌN HỖ TRỢ ADAPTER** trong `ae_bridge` (hỗ trợ giao thức HTTP `:7788/call` Read-only và tham khảo kỹ thuật spill-file JSON trong ExtendScript ES3) |
-| [`Breakthrough/PySceneDetect`](https://github.com/Breakthrough/PySceneDetect) | Video Analysis | Rất trưởng thành (v0.7.2, 11/2026) | Python | 5,326 ⭐ / 552 🍴 | >95 commits gần nhất / 18+ contributors | **BSD-3-Clause** (có file `LICENSE`) | **Rất tốt** (hỗ trợ Windows đầy đủ với OpenCV/PyAV + FFmpeg) | **CHỌN LÀM PACKAGE DEPENDENCY** (`scenedetect`) kết hợp với bộ phân tích tín hiệu multi-cue riêng |
-| [`pouyashahrdami/mimic-mcp`](https://github.com/pouyashahrdami/mimic-mcp) | Video Analysis | Hoạt động (08/2026) | TypeScript (Node.js + Remotion) | 30 ⭐ / 0 🍴 | 73 commits / 1 contributor | **MIT** (có file `LICENSE`) | Một phần (phần OCR và TTS phụ thuộc macOS Vision/`say`, phần toán học phân tích chạy đa nền tảng) | **THAM KHẢO THUẬT TOÁN** (Adaptive MAD threshold `median + k*MAD`, grid-cell change area để phân biệt full-frame cut vs dissolve vs localized overlay) |
-| [`moshspro-dev/video-effect-reel`](https://github.com/moshspro-dev/video-effect-reel) | Video Analysis | Mới (10/2026) | Python | 1 ⭐ / 0 🍴 | 5 commits / 1 contributor | **MIT** (có file `LICENSE`) | Một phần (sử dụng `fcntl` của POSIX và `setup.sh`, dùng fallback `fcntl = None` trên Windows) | **THAM KHẢO CẤU TRÚC CATALOG & CONTACT SHEET** (tổ chức evidence frames, contact sheet grid có gắn timestamp/frame label) |
-| [`docsforadobe/after-effects-scripting-guide`](https://github.com/docsforadobe/after-effects-scripting-guide) | Reference Docs | Hoạt động (cập nhật AE 26.5, 09/2026) | Markdown (MkDocs) | 185 ⭐ / 41 🍴 | 93+ commits / 15+ contributors | Tài liệu cộng đồng (Copyright Adobe Systems Inc., mục đích giáo dục/tra cứu) | Độc lập nền tảng (tài liệu) | **DÙNG LÀM TÀI LIỆU TRA CỨU CHÍNH THỨC** cho ExtendScript DOM, Match Names (`ADBE ...`), `KeyframeInterpolationType`, `TrackMatteType`, `BlendingMode` |
+| [`forticheprod/py-aep`](https://github.com/forticheprod/py-aep) | AEP Parsing | Actively maintained (updated 11/2026) | Python | 81 ⭐ / 14 🍴 | >50 recent commits / 7+ contributors (Fortiche Production) | **MIT** (full `LICENSE` file present) | **Excellent** (OS Independent, pure Python + `struct`, `attrs`, `fonttools`, `uharfbuzz`) | **SELECTED AS CORE PACKAGE** (`py-aep` via PyPI/dependency) for the Offline `.aep` Parser |
+| [`ChenxingM/AEP-Tools`](https://github.com/ChenxingM/AEP-Tools) | AEP Parsing | Active (updated 09/2026) | Python + Rust (`PyO3`/`maturin`) | 7 ⭐ / 0 🍴 | ~50 commits / 1 contributor | Declares `license = "MIT"` in `pyproject.toml` but **lacks a root `LICENSE` file** | Moderate (requires Rust toolchain & `maturin` to build `_core`, has pure-Python fallback) | **DO NOT COPY CODE** (due to missing explicit `LICENSE` file); consult RIFX/AEPX format documentation only to build a clean-room `.aepx` parser |
+| [`boltframe/aftereffects-aep-parser`](https://github.com/boltframe/aftereffects-aep-parser) | AEP Parsing | Unmaintained (since 02/2022) | Go + Kaitai Struct | 131 ⭐ / 13 🍴 | 22 commits / 3 contributors | **MIT** (`LICENSE` file present) | Runs via Go runtime | **SKIPPED FOR DIRECT INTEGRATION** (written in Go; much lower chunk coverage than `py-aep`) |
+| [`JUNKDOGE-JOE/after-effects-mcp`](https://github.com/JUNKDOGE-JOE/after-effects-mcp) | After Effects MCP | Actively maintained (v0.11.1, 10/2026) | JS / ExtendScript (`.jsx`) / C++ AEGP | 90 ⭐ / 8 🍴 | 59+ commits / 4 contributors | **MIT** (`LICENSE` file present) | **Good** (supports Windows x64 + CEP + HTTP `:11488/mcp` + Named Pipe) | **SELECTED FOR ADAPTER SUPPORT** in `ae_bridge` (Read-only connection over HTTP `:11488/mcp` and snapshot-copy pattern inspired by `readonly-worker.jsx`) |
+| [`solomondivyananth/aftereffects-mcp`](https://github.com/solomondivyananth/aftereffects-mcp) | After Effects MCP | Active (10/2026) | Node.js / ExtendScript (`bridge.jsx`) | 81 ⭐ / 9 🍴 | 19 commits / 1 contributor | **MIT** (`LICENSE` file present) | **Good** (CEP panel listening on HTTP `127.0.0.1:7788`, token at `~/.ae-mcp-bridge.json`) | **SELECTED FOR ADAPTER SUPPORT** in `ae_bridge` (supports Read-only HTTP `:7788/call` protocol and ES3 JSON spill-file patterns) |
+| [`Breakthrough/PySceneDetect`](https://github.com/Breakthrough/PySceneDetect) | Video Analysis | Mature (v0.7.2, 11/2026) | Python | 5,326 ⭐ / 552 🍴 | >95 recent commits / 18+ contributors | **BSD-3-Clause** (`LICENSE` file present) | **Excellent** (full Windows support with OpenCV/PyAV + FFmpeg) | **SELECTED AS PACKAGE DEPENDENCY** (`scenedetect`) combined with custom multi-cue frame signal analyzers |
+| [`pouyashahrdami/mimic-mcp`](https://github.com/pouyashahrdami/mimic-mcp) | Video Analysis | Active (08/2026) | TypeScript (Node.js + Remotion) | 30 ⭐ / 0 🍴 | 73 commits / 1 contributor | **MIT** (`LICENSE` file present) | Partial (OCR and TTS rely on macOS Vision/`say`; mathematical signal analysis is cross-platform) | **ALGORITHMIC REFERENCE** (Adaptive MAD threshold `median + k*MAD`, grid-cell change area to distinguish full-frame cuts vs. dissolves vs. localized overlays) |
+| [`moshspro-dev/video-effect-reel`](https://github.com/moshspro-dev/video-effect-reel) | Video Analysis | Early stage (10/2026) | Python | 1 ⭐ / 0 🍴 | 5 commits / 1 contributor | **MIT** (`LICENSE` file present) | Partial (uses POSIX `fcntl` and `setup.sh`, falls back to `fcntl = None` on Windows) | **CATALOG & CONTACT SHEET REFERENCE** (organization of evidence frames and timestamped contact sheet grids) |
+| [`docsforadobe/after-effects-scripting-guide`](https://github.com/docsforadobe/after-effects-scripting-guide) | Reference Docs | Active (updated for AE 26.5, 09/2026) | Markdown (MkDocs) | 185 ⭐ / 41 🍴 | 93+ commits / 15+ contributors | Community documentation (Copyright Adobe Systems Inc., educational/reference use) | Platform-independent (documentation) | **USED AS AUTHORITATIVE REFERENCE** for ExtendScript DOM, Match Names (`ADBE ...`), `KeyframeInterpolationType`, `TrackMatteType`, `BlendingMode` |
 
 ---
 
-## 2. Phân tích Chi tiết từng Nhóm Repository
+## 2. Detailed Analysis by Repository Category
 
-### 2.1. Nhóm AEP Parsing
+### 2.1. AEP Parsing
 
 #### A. `forticheprod/py-aep`
-- **Kiến trúc & Source:**
-  - Được phát triển bởi studio hoạt hình **Fortiche Production** (tác giả Aurore Delaunay).
-  - Tổ chức thành các phân hệ rõ ràng trong `src/py_aep/`:
-    - `binary/`: Giải mã cấu trúc container `RIFX` / `RIFF` (`Egg!`), các chunk `Fold`, `Item`, `Layr`, `tdgp`, `tdbs`, `cdat`, `ldat`, `lhd3`, `sspc`, `parT`, `pard`, `btdk`.
-    - `parsers/`: Parser chuyên biệt cho `application`, `project`, `composition`, `layer`, `property`, `effect`, `text`, `mask`, `marker`, `essential_graphics`, `render_queue`.
-    - `models/`: Mô hình hóa đối tượng sát với ExtendScript API (`Application`, `Project`, `CompItem`, `AVLayer`, `TextLayer`, `ShapeLayer`, `CameraLayer`, `LightLayer`, `PropertyGroup`, `Property`, `Keyframe`).
-    - `synthesis/` & `resolvers/`: Tự động tổng hợp (synthesize) các thuộc tính mặc định mà After Effects lược bỏ khỏi file binary khi chưa chỉnh sửa, đồng thời hợp nhất (merge) định nghĩa tham số `parT`/`pard` của cả built-in effect lẫn **third-party plugin** (ví dụ Sapphire `S_BlurDirectional`, `S_Shake`, Deep Glow...).
-  - Có bộ script kiểm chứng đối chiếu trực tiếp với After Effects (`scripts/jsx/export_project_json.jsx`) và hàng trăm file `.aep` mẫu từ AE 2018 đến AE 2026 trong `samples/`.
-- **Dependencies:** `attrs>=21.3.0`, `PyYAML>=5.1`, `fonttools>=4.38`, `uharfbuzz>=0.39`. Tương thích chính thức tới Python 3.14.
-- **Giới hạn kỹ thuật (Limitations):**
-  - Không hỗ trợ đánh giá biểu thức (expression evaluation) tại runtime: khi `expression_enabled == True`, `Property.value` trả về giá trị tĩnh/keyframe lưu trong binary trước khi chạy expression (tuy nhiên chuỗi `Property.expression` vẫn đọc được đầy đủ).
-  - `Property.expression_error` luôn rỗng khi đọc offline vì AE tính toán lỗi expression lúc runtime.
-  - Các thuộc tính thuần runtime (`Application.effects`, `Application.fonts`, `memoryInUse`, trạng thái cửa sổ) không nằm trong file `.aep`.
-  - Chỉ đọc trực tiếp định dạng binary `.aep` (`RIFX`/`RIFF`), chưa có hàm đọc trực tiếp `.aepx` (XML).
+- **Architecture & Source:**
+  - Developed by animation studio **Fortiche Production** (authored by Aurore Delaunay).
+  - Organized into clear subsystems under `src/py_aep/`:
+    - `binary/`: Decodes `RIFX` / `RIFF` (`Egg!`) container structures and chunks (`Fold`, `Item`, `Layr`, `tdgp`, `tdbs`, `cdat`, `ldat`, `lhd3`, `sspc`, `parT`, `pard`, `btdk`).
+    - `parsers/`: Specialized parsers for `application`, `project`, `composition`, `layer`, `property`, `effect`, `text`, `mask`, `marker`, `essential_graphics`, and `render_queue`.
+    - `models/`: Object model closely mirroring the ExtendScript API (`Application`, `Project`, `CompItem`, `AVLayer`, `TextLayer`, `ShapeLayer`, `CameraLayer`, `LightLayer`, `PropertyGroup`, `Property`, `Keyframe`).
+    - `synthesis/` & `resolvers/`: Automatically synthesizes default properties omitted from the binary file when unmodified in After Effects, and merges `parT`/`pard` parameter definitions for both built-in effects and **third-party plugins** (e.g., Sapphire `S_BlurDirectional`, `S_Shake`, Deep Glow).
+  - Includes validation scripts comparing parsed output directly against After Effects (`scripts/jsx/export_project_json.jsx`) and hundreds of sample `.aep` files from AE 2018 through AE 2026 under `samples/`.
+- **Dependencies:** `attrs>=21.3.0`, `PyYAML>=5.1`, `fonttools>=4.38`, `uharfbuzz>=0.39`. Officially compatible up to Python 3.14.
+- **Technical Limitations:**
+  - Does not evaluate expressions at runtime: when `expression_enabled == True`, `Property.value` returns the pre-expression static/keyframe value stored in the binary (though the `Property.expression` string is extracted in full).
+  - `Property.expression_error` is always empty during offline parsing because AE computes expression errors at runtime.
+  - Purely runtime application attributes (`Application.effects`, `Application.fonts`, `memoryInUse`, window state) are not stored inside `.aep` files.
+  - Directly parses binary `.aep` (`RIFX`/`RIFF`) files only; does not include a built-in `.aepx` (XML) reader.
 
 #### B. `ChenxingM/AEP-Tools`
-- **Kiến trúc & Source:**
-  - Gồm phần lõi Rust (`rust/lib.rs` dùng `PyO3`) để tăng tốc tách chunk RIFF và phần Python (`python/aep_parser/` và `python/aep_tools/`) để dựng model + GUI PySide6.
-  - Điểm đáng chú ý là tài liệu `docs/aep-format.md` mô tả chi tiết cấu trúc byte của `idta`, `cdta`, `ldta`, `tdb4`, `cdat`, `lhd3`, `ldat`, `EfDf`, `parT`, `mkif`, `shph`, `btdk` và cách ánh xạ giữa `.aep` (binary) với `.aepx` (XML).
-- **Giới hạn & Lý do không tích hợp code:**
-  - Đang ở giai đoạn Alpha (`0.1.0a1`), yêu cầu biên dịch Rust bằng `maturin`.
-  - Độ chính xác khi tái tạo property tree, spatial tangents, text animators và third-party effect parameters thấp hơn `py-aep`.
-  - **Quan trọng về mặt pháp lý:** Repo khai báo `license = "MIT"` trong `pyproject.toml` nhưng không có file `LICENSE` trong kho mã nguồn. Tuân thủ nghiêm ngặt quy tắc an toàn bản quyền, chúng ta **không sao chép bất kỳ dòng code nào** từ `AEP-Tools`, mà tự xây dựng parser `.aepx` (clean-room implementation) dựa trên định dạng XML/RIFX chuẩn của After Effects.
+- **Architecture & Source:**
+  - Combines a Rust core (`rust/lib.rs` via `PyO3`) for fast RIFF chunk splitting with Python packages (`python/aep_parser/` and `python/aep_tools/`) for data modeling and a PySide6 GUI.
+  - Notably includes `docs/aep-format.md`, which documents byte layouts for `idta`, `cdta`, `ldta`, `tdb4`, `cdat`, `lhd3`, `ldat`, `EfDf`, `parT`, `mkif`, `shph`, `btdk`, and the mapping between `.aep` (binary) and `.aepx` (XML).
+- **Limitations & Reason for Non-Integration:**
+  - Alpha stage (`0.1.0a1`), requiring Rust compilation via `maturin`.
+  - Lower fidelity than `py-aep` when reconstructing property trees, spatial tangents, text animators, and third-party effect parameters.
+  - **Licensing Precaution:** The repository declares `license = "MIT"` in `pyproject.toml` but lacks a `LICENSE` file in the source tree. Adhering strictly to license compliance rules, we **do not copy any code** from `AEP-Tools`, and instead implement our own clean-room `.aepx` parser/transcoder based on standard After Effects XML/RIFX structures.
 
 #### C. `boltframe/aftereffects-aep-parser`
-- **Kiến trúc & Source:**
-  - Thư viện viết bằng Go (`project.go`, `item.go`, `layer.go`, `property.go`) kèm định nghĩa Kaitai Struct trong README.
-- **Giới hạn:**
-  - Ngừng phát triển từ tháng 02/2022.
-  - Chỉ đọc được một phần rất cơ bản của `idta`, `cdta`, `ldta`, `tdgp`; không giải mã đầy đủ keyframe spatial/temporal ease, text layer COS, shape paths hay cấu trúc `parT` phức tạp của plugin bên thứ ba.
+- **Architecture & Source:**
+  - Go library (`project.go`, `item.go`, `layer.go`, `property.go`) accompanied by a Kaitai Struct specification in the README.
+- **Limitations:**
+  - Unmaintained since February 2022.
+  - Parses only basic subsets of `idta`, `cdta`, `ldta`, and `tdgp`; does not decode keyframe spatial/temporal ease, text layer COS structures, shape paths, or complex third-party `parT` parameter blocks.
 
 ---
 
-### 2.2. Nhóm After Effects MCP & Automation Bridge
+### 2.2. After Effects MCP & Automation Bridges
 
 #### D. `JUNKDOGE-JOE/after-effects-mcp`
-- **Kiến trúc & Source:**
-  - Gồm CEP Extension (`plugin/`), Node host lắng nghe Streamable HTTP tại `http://127.0.0.1:11488/mcp`, stdio shim (`clients/ae-mcp-jkdg`) và plugin native AEGP (`native/`).
-  - Cung cấp 16 MCP tools (`ae_status`, `ae_read`, `ae_exec`, `ae_previewFrame`, `ae_validateExpressions`, `ae_instances`...).
-  - Điểm kiến trúc xuất sắc nhất: **`plugin/jsx/readonly-worker.jsx`** — khi cần đọc/preview mà không ảnh hưởng project gốc của người dùng, hệ thống chỉ mở một bản sao (`snapshot.aep`) trong thư mục tạm riêng biệt, kiểm tra `project.file.fsName`, tắt hộp thoại modal và đóng với `CloseOptions.DO_NOT_SAVE_CHANGES`.
-- **Giới hạn:**
-  - Đòi hỏi người dùng cài đặt ZXP CEP extension và mở panel `Window > Extensions > ae-mcp` bên trong After Effects đang chạy.
+- **Architecture & Source:**
+  - Comprises a CEP Extension (`plugin/`), a Node host listening on Streamable HTTP at `http://127.0.0.1:11488/mcp`, a stdio shim (`clients/ae-mcp-jkdg`), and a native C++ AEGP plugin (`native/`).
+  - Exposes 16 MCP tools (`ae_status`, `ae_read`, `ae_exec`, `ae_previewFrame`, `ae_validateExpressions`, `ae_instances`, etc.).
+  - Key architectural highlight: **`plugin/jsx/readonly-worker.jsx`** — to inspect or preview without touching the user's original project, it opens only an isolated copy (`snapshot.aep`) in a temporary directory, verifies `project.file.fsName`, suppresses modal dialogs, and closes with `CloseOptions.DO_NOT_SAVE_CHANGES`.
+- **Limitations:**
+  - Requires the user to install the ZXP CEP extension and open `Window > Extensions > ae-mcp` inside a running After Effects session.
 
 #### E. `solomondivyananth/aftereffects-mcp` (AE MCP Bridge)
-- **Kiến trúc & Source:**
-  - Kiến trúc gọn nhẹ, zero npm dependencies: `mcp/ae-mcp.js` giao tiếp qua HTTP `127.0.0.1:7788/call` (xác thực bằng header `X-AE-Bridge-Token` đọc từ `~/.ae-mcp-bridge.json`) tới CEP panel chạy `panel/jsx/bridge.jsx` (hơn 3,100 dòng ExtendScript ES3).
-  - Xử lý rất tốt các vấn đề thực tế của ExtendScript ES3:
-    - Tự cài đặt polyfill `JSON.stringify` / `JSON.parse` vì ExtendScript không có sẵn đối tượng `JSON` chuẩn.
-    - Bọc lệnh bằng `app.beginSuppressDialogs()` / `app.endSuppressDialogs(false)` để tránh treo AE khi project thiếu font hoặc thiếu plugin.
-    - Cơ chế **Spill File**: khi payload JSON lớn hơn 100 KB, ghi ra file tạm UTF-8 trong `Folder.temp` thay vì trả chuỗi lớn qua `evalScript`.
-    - Kiểm tra PNG hoàn chỉnh bằng cách xác nhận chunk `IEND` ở cuối file sau khi gọi `saveFrameToPng`.
-- **Giới hạn:**
-  - Cũng yêu cầu mở CEP panel `AE MCP Bridge` trong After Effects để dùng qua cổng HTTP `:7788`.
+- **Architecture & Source:**
+  - Lightweight, zero-npm-dependency architecture: `mcp/ae-mcp.js` communicates over HTTP `127.0.0.1:7788/call` (authenticated via `X-AE-Bridge-Token` read from `~/.ae-mcp-bridge.json`) with a CEP panel running `panel/jsx/bridge.jsx` (>3,100 lines of ES3 ExtendScript).
+  - Handles real-world ES3 ExtendScript quirks effectively:
+    - Includes a custom `JSON.stringify` / `JSON.parse` polyfill since ES3 ExtendScript lacks a standard `JSON` object.
+    - Wraps execution in `app.beginSuppressDialogs()` / `app.endSuppressDialogs(false)` to prevent AE modal hangs on missing fonts or plugins.
+    - **Spill File mechanism**: writes payloads larger than 100 KB to a UTF-8 temporary file in `Folder.temp` rather than returning huge strings over `evalScript`.
+    - Verifies PNG completion by checking the trailing `IEND` chunk after `saveFrameToPng`.
+- **Limitations:**
+  - Also requires opening the `AE MCP Bridge` CEP panel inside a running After Effects instance to listen on HTTP port `:7788`.
 
 ---
 
-### 2.3. Nhóm Video Analysis
+### 2.3. Video Analysis
 
 #### F. `Breakthrough/PySceneDetect`
-- **Kiến trúc & Source:**
-  - Thư viện chuẩn công nghiệp trong Python để phát hiện chuyển cảnh (`ContentDetector`, `AdaptiveDetector`, `ThresholdDetector`, `FlashDetector`/`HistogramDetector`).
-  - Hỗ trợ cả backend OpenCV (`VideoStreamCv2`) và PyAV, quản lý timecode chính xác theo frame (`FrameTimecode`).
-- **Giới hạn đối với Video VFX nhanh (5–15 giây):**
-  - Cấu hình mặc định của `ContentDetector` (`threshold=27.0`, `min_scene_len=15`) được thiết kế cho phim dài nên sẽ bỏ sót các flash frame 1–3 frames hoặc các đoạn cắt dồn dập (micro-cuts) mỗi 4–8 frames trong video VFX/Edit ngắn.
-  - Do đó, trong `VFX Learning Engine`, chúng ta kết hợp `PySceneDetect` (với `min_scene_len` nhỏ và `AdaptiveDetector` / `ContentDetector`) **cùng với** bộ phân tích tín hiệu từng frame (per-frame timestamped signal analyzer) của riêng chúng ta.
+- **Architecture & Source:**
+  - Industry-standard Python library for cut and transition detection (`ContentDetector`, `AdaptiveDetector`, `ThresholdDetector`, `FlashDetector`/`HistogramDetector`).
+  - Supports both OpenCV (`VideoStreamCv2`) and PyAV backends with frame-accurate timecodes (`FrameTimecode`).
+- **Limitations for Fast VFX Videos (5–15 seconds):**
+  - Default `ContentDetector` settings (`threshold=27.0`, `min_scene_len=15`) are tuned for long-form cinema and miss 1–3 frame flash frames or rapid micro-cuts occurring every 4–8 frames in fast VFX edits.
+  - Therefore, in `VFX Learning Engine`, we combine `PySceneDetect` (configured with a short `min_scene_len` and `AdaptiveDetector` / `ContentDetector`) **with** our own per-frame timestamped signal analyzer.
 
 #### G. `pouyashahrdami/mimic-mcp`
-- **Kiến trúc & Source:**
-  - MCP server viết bằng TypeScript phục vụ phân tích video reel mẫu và dựng lại bằng Remotion.
-  - File `src/analysis.ts` chứa nhiều thuật toán thị giác máy tính gọn nhẹ và hiệu quả:
-    - Tính độ biến thiên theo kênh màu lớn nhất (`max(|R1-R2|, |G1-G2|, |B1-B2|)`) thay vì chỉ dùng độ chói (luminance), giúp bắt được cả các cú cắt đổi màu có cùng độ sáng.
-    - Chia khung hình thành lưới ô (`cols x rows`, ví dụ `12 x 9`) để tính tỷ lệ diện tích thay đổi (`area`): nếu `area` lớn và sụp đổ ngay ở frame kế tiếp thì là **hard cut**; nếu duy trì trên một cửa sổ thời gian thì là **fade/dissolve**; nếu chỉ thay đổi cục bộ (`area < 0.5`) thì là **overlay / text / graphic reveal**.
-    - Ngưỡng thích nghi (Adaptive threshold) dựa trên trung vị và độ lệch tuyệt đối trung vị: `max(floor, median + k * MAD)`.
-    - Ước lượng chuyển động trong cảnh (pan/zoom) và độ rung (camera shake) từ vector chuyển dịch giữa các frame liên tiếp.
-- **Giới hạn:**
-  - Viết bằng TypeScript/Node.js, hướng tới dựng reel mạng xã hội bằng Remotion hơn là phân tích chuyên sâu kỹ thuật VFX của After Effects (RGB split, glow/bloom, optical flow speed ramp, radial blur, distortion, particles).
+- **Architecture & Source:**
+  - TypeScript MCP server designed to analyze reference video reels and recreate them in Remotion.
+  - `src/analysis.ts` contains compact, effective computer vision heuristics:
+    - Computes maximum per-channel difference (`max(|R1-R2|, |G1-G2|, |B1-B2|)`) rather than luminance alone, catching isoluminant color cuts.
+    - Divides frames into a grid (`cols x rows`, e.g., `12 x 9`) to measure changed cell fraction (`area`): a spike in `area` that immediately collapses on the next frame indicates a **hard cut**; sustained change over a window indicates a **fade/dissolve**; localized change (`area < 0.5`) indicates an **overlay / text / graphic reveal**.
+    - Adaptive threshold based on median and median absolute deviation: `max(floor, median + k * MAD)`.
+    - Intra-scene motion (pan/zoom) and camera shake estimation from inter-frame displacement vectors.
+- **Limitations:**
+  - Written in TypeScript/Node.js and targeted toward social media reel generation in Remotion rather than deep After Effects VFX signal analysis (RGB split, glow/bloom, optical flow speed ramps, directional motion blur, distortion, particles).
 
 #### H. `moshspro-dev/video-effect-reel`
-- **Kiến trúc & Source:**
-  - Cung cấp thư viện 123 công thức hiệu ứng (`library/effects.json`) và script `reel_effects.py` tạo contact sheet gắn nhãn thời gian bằng FFmpeg + Pillow.
-- **Giới hạn:**
-  - Không có bộ detector Computer Vision tự động mà phụ thuộc hoàn toàn vào việc gọi CLI `claude` đọc ảnh contact sheet.
-  - Dùng thư viện `fcntl` của POSIX (trên Windows phải fallback `fcntl = None`).
+- **Architecture & Source:**
+  - Provides a catalog of 123 effect recipes (`library/effects.json`) and `reel_effects.py` for generating timestamp-annotated contact sheets via FFmpeg + Pillow.
+- **Limitations:**
+  - Lacks automated computer vision detectors, relying entirely on invoking the `claude` CLI on contact sheet images.
+  - Uses POSIX `fcntl` (requires `fcntl = None` fallback on Windows).
 
 ---
 
-### 2.4. Nhóm Reference Documentation
+### 2.4. Reference Documentation
 
 #### I. `docsforadobe/after-effects-scripting-guide`
-- Cung cấp tài liệu chuẩn xác cho:
-  - Hệ thống phân cấp đối tượng: `app.project` -> `items` (`CompItem`, `FootageItem`, `FolderItem`) -> `layers` (`AVLayer`, `TextLayer`, `ShapeLayer`, `CameraLayer`, `LightLayer`) -> `PropertyGroup` / `Property`.
-  - Danh sách **Match Names** (`docs/matchnames/`):
+- Provides authoritative documentation for:
+  - Object hierarchy: `app.project` -> `items` (`CompItem`, `FootageItem`, `FolderItem`) -> `layers` (`AVLayer`, `TextLayer`, `ShapeLayer`, `CameraLayer`, `LightLayer`) -> `PropertyGroup` / `Property`.
+  - Official **Match Names** (`docs/matchnames/`):
     - Layer Transform (`ADBE Transform Group`, `ADBE Anchor Point`, `ADBE Position`, `ADBE Position_0/1/2`, `ADBE Scale`, `ADBE Orientation`, `ADBE Rotate X/Y/Z`, `ADBE Opacity`).
     - Effects (`ADBE Effect Parade`), Masks (`ADBE Mask Parade`, `ADBE Mask Atom`, `ADBE Mask Shape`, `ADBE Mask Feather`, `ADBE Mask Opacity`, `ADBE Mask Offset`).
     - Text (`ADBE Text Properties`, `ADBE Text Document`, `ADBE Text Animators`, `ADBE Text Animator`, `ADBE Text Selectors`, `ADBE Text Animator Properties`).
@@ -125,55 +125,55 @@ Tài liệu này tổng hợp kết quả kiểm tra thực tế, phân tích m�
 
 ---
 
-## 3. Quyết định Lựa chọn Công nghệ cho `VFX Learning Engine` (Phase 1)
+## 3. Technology Stack Decisions for `VFX Learning Engine` (Phase 1)
 
-Dựa trên kết quả nghiên cứu thực nghiệm và cấu hình phần cứng mục tiêu (**Windows, NVIDIA GeForce RTX 4060 8GB, Python, FFmpeg 8.1.1, Adobe After Effects 2026**):
+Based on empirical evaluation and the target hardware environment (**Windows, NVIDIA GeForce RTX 4060 8GB, Python, FFmpeg 8.1.1, Adobe After Effects 2026**):
 
-1. **Quản lý package & Môi trường:**
-   - Sử dụng `pyproject.toml` chuẩn PEP 621 với `uv` / `pip`.
-   - Sử dụng **Pydantic v2** (`pydantic>=2.0`) cho toàn bộ data schemas, đảm bảo kiểm kiểu nghiêm ngặt và phân biệt rõ nguồn dữ liệu (`observed`, `inferred`, `unavailable`, `unsupported`, `error`).
-   - Sử dụng **Typer** + **Rich** cho CLI (`vfx`) thân thiện, log có cấu trúc rõ ràng.
+1. **Package & Environment Management:**
+   - Standard PEP 621 `pyproject.toml` managed with `uv` / `pip`.
+   - **Pydantic v2** (`pydantic>=2.0`) for all data schemas, enforcing strict typing and explicit epistemic provenance (`observed`, `inferred`, `unavailable`, `unsupported`, `error`).
+   - **Typer** + **Rich** for an ergonomic CLI (`vfx`) and structured console output.
 
 2. **Module A — After Effects Project Analyzer (`vfx_engine.project_analyzer`):**
    - **Method A (Offline Project Parsing):**
-     - Tích hợp package **`py-aep`** (MIT License) làm động cơ chính để phân tích file `.aep` binary. `py-aep` đọc được đầy đủ compositions, precompositions, layer hierarchy, parenting, track matte, blending mode, transforms, masks, shapes, text animators, cameras, lights, **toàn bộ effect stack và tham số của cả plugin bên thứ ba** (nhờ giải mã `parT`/`pard` và `tdgp`), keyframes (giá trị, timing, interpolation, temporal/spatial easing, roving), expressions, time remapping, motion blur, adjustment layers và missing footage/dependencies.
-     - Tự triển khai module **Clean-room `.aepx` Parser & Transcoder** (`parsers/aepx_parser.py`): đọc trực tiếp cấu trúc XML `.aepx`, có khả năng chuyển đổi lossless cây XML `.aepx` sang bộ nhớ đệm `RIFX` để tận dụng toàn bộ pipeline giải mã sâu của `py-aep`, đồng thời có fallback XML parser trực tiếp nếu file `.aepx` bị cắt cụt hoặc không chuẩn.
-     - Tự triển khai bộ **Third-Party Plugin & Missing Dependency Classifier** (`effect_extractor/`): nhận diện họ plugin (Sapphire `S_*`, Boris FX Continuum `BCC*`, Deep Glow, Trapcode `tc*`/`Particular`/`Form`/`Mir`/`Tao`/`Shine`/`Starglow`, Video Copilot `VIDEOCOPILOT*`/`Element`/`Optical Flares`/`Saber`, RE:Vision `Twixtor*`/`RSMB*`, Red Giant Universe `uni.*`, Rowbyte `Plexus*`, Frischluft, Plugin Everything, v.v.) từ `matchName` và `EfdG` definitions mà **tuyệt đối không thực thi `.aex`**.
+     - Integrates **`py-aep`** (MIT License) as the primary engine for binary `.aep` parsing. `py-aep` extracts compositions, precompositions, layer hierarchy, parenting, track mattes, blending modes, transforms, masks, shapes, text animators, cameras, lights, **complete effect stacks and parameters including third-party plugins** (via `parT`/`pard` and `tdgp` decoding), keyframes (values, timing, interpolation, temporal/spatial easing, roving), expressions, time remapping, motion blur, adjustment layers, and missing footage/dependencies.
+     - Implements a **Clean-room `.aepx` Parser & Transcoder** (`parsers/aepx_parser.py`): reads XML `.aepx` structures directly, transcodes `.aepx` XML trees losslessly into in-memory `RIFX` binary buffers to leverage the full `py-aep` decoding pipeline, and provides a direct XML DOM fallback parser if an `.aepx` file is truncated or non-standard.
+     - Implements a **Third-Party Plugin & Missing Dependency Classifier** (`effect_extractor/`): identifies plugin families (Sapphire `S_*`, Boris FX Continuum `BCC*`, Deep Glow, Trapcode `tc*`/`Particular`/`Form`/`Mir`/`Tao`/`Shine`/`Starglow`, Video Copilot `VIDEOCOPILOT*`/`Element`/`Optical Flares`/`Saber`, RE:Vision `Twixtor*`/`RSMB*`, Red Giant Universe `uni.*`, Rowbyte `Plexus*`, Frischluft, Plugin Everything, etc.) from `matchName` and `EfdG` definitions **without ever loading or executing `.aex` binaries**.
    - **Method B (After Effects Read-only Bridge):**
-     - Thiết kế `ae_bridge/` hỗ trợ 3 chế độ kết nối **Read-only** an toàn (luôn làm việc trên bản sao tạm thời hoặc chế độ chỉ đọc, không bao giờ ghi đè project gốc):
-       1. **JUNKDOGE `ae-mcp` HTTP Adapter** (`http://127.0.0.1:11488/mcp` — công cụ `ae_status`, `ae_read`, `ae_exec`, `ae_previewFrame`).
-       2. **Solomon `aftereffects-mcp` HTTP Adapter** (`http://127.0.0.1:7788/call` — xác thực token `~/.ae-mcp-bridge.json`).
-       3. **Standalone ExtendScript Read-only Exporter (`ae-scripts/vfx_readonly_extract.jsx`)**: script ES3 độc lập có đầy đủ JSON polyfill, `beginSuppressDialogs()`, đọc toàn bộ cây project/composition/layer/effect/keyframe/expression từ bản sao `.aep` và ghi kết quả ra file JSON.
+     - `ae_bridge/` supports three safe **Read-only** inspection modes (always operating on temporary snapshots or read-only queries, never overwriting original user projects):
+       1. **JUNKDOGE `ae-mcp` HTTP Adapter** (`http://127.0.0.1:11488/mcp` — `ae_status`, `ae_read`, `ae_exec`, `ae_previewFrame`).
+       2. **Solomon `aftereffects-mcp` HTTP Adapter** (`http://127.0.0.1:7788/call` — authenticated via `~/.ae-mcp-bridge.json`).
+       3. **Standalone ExtendScript Read-only Exporter (`ae-scripts/vfx_readonly_extract.jsx`)**: self-contained ES3 script with JSON polyfill and `beginSuppressDialogs()` that reads the project/composition/layer/effect/keyframe/expression tree and serializes it to JSON.
    - **Normalizer & Comparator (`normalizer/`):**
-     - Đưa dữ liệu từ Offline Parser và Live AE Bridge về cùng một Pydantic Schema (`ProjectAnalysisResult`), tự động đối chiếu (`compare_offline_and_live`) để chỉ ra trường nào khớp (`matched`), trường nào chỉ có trên Live AE (`only_in_live`), hoặc khác biệt giá trị (`value_mismatch`, ví dụ `Property.value` khi có expression đang bật).
+     - Normalizes both Offline Parser and Live AE Bridge outputs into `ProjectAnalysisResult` and compares them (`compare_offline_and_live`) to report `matched`, `only_in_live`, `only_in_offline`, `value_mismatch`, and `expected_runtime_difference` (such as `Property.value` when an expression is active).
 
 3. **Module B — Video VFX Analyzer (`vfx_engine.video_analyzer`):**
    - **Decoder & Exact Timestamps (`decoder/`):**
-     - Kết hợp **`ffprobe`** (lấy thông tin stream, codec, audio, VFR/CFR và bảng `pkt_pts_time` thực tế của từng frame) và **OpenCV (`cv2.VideoCapture`)** / FFmpeg pipe. Không bao giờ giả định `timestamp = frame_index / fps` đối với video Variable Frame Rate (VFR).
+     - Combines **`ffprobe`** (stream metadata, codec, audio, VFR/CFR detection, and per-frame `pkt_pts_time` presentation timestamps) with **OpenCV (`cv2.VideoCapture`)**. Never assumes `timestamp = frame_index / fps` on Variable Frame Rate (VFR) videos.
    - **Scene & Flash Detection (`scene_detection/`):**
-     - Kết hợp **`PySceneDetect`** (`ContentDetector`, `AdaptiveDetector`) với bộ phân tích **Per-Frame Multi-Channel Change & Grid Area** (lấy cảm hứng từ thuật toán MAD threshold + cell grid của `mimic-mcp`) để bắt chính xác:
-       - Hard cuts (kể cả trong video cắt cực nhanh 5–15s).
-       - Flash frames (1–5 frames chớp trắng/đen/màu độ chói cao rồi trở lại bình thường).
+     - Combines **`PySceneDetect`** (`ContentDetector`, `AdaptiveDetector`) with a **Per-Frame Multi-Channel Change & Grid Area** analyzer (inspired by `mimic-mcp`'s MAD threshold + cell grid) to detect:
+       - Hard cuts (even in rapid 5–15s VFX edits).
+       - Flash frames (1–5 frame bright/dark/color luminance impulses).
        - Dissolve / Fade transitions.
-       - Localized overlays / Mask reveals / Text pop-ins (thay đổi cục bộ trên một phần diện tích khung hình).
+       - Localized overlays / Mask reveals / Text pop-ins (localized partial-grid changes).
    - **Motion & Optical Flow Analysis (`motion_analysis/`):**
-     - Sử dụng **Dense Optical Flow (Farneback)** và **Affine/RANSAC Global Motion Estimation** (`cv2.estimateAffinePartial2D` trên Lucas-Kanade keypoints hoặc grid flow) để tách biệt:
-       - **Camera Shake / Impact Shake:** biến thiên tần số cao, đổi dấu liên tục của vector dịch chuyển toàn cục $(dx, dy)$ và góc xoay $d\theta$ trong khoảng thời gian ngắn.
-       - **Zoom / Punch-in / Pull-out Transitions:** hệ số divergence (scale factor $s(t)$) tăng/giảm đột biến với đỉnh vận tốc cao.
-       - **Speed Ramp / Time Remapping:** biến thiên phi tuyến mạnh (gia tốc/giảm tốc đột ngột) của độ lớn optical flow toàn cảnh giữa các đoạn liên tiếp trong cùng một shot.
-       - **3D Camera Motion & Parallax:** sự phân tầng độ lớn vector optical flow theo chiều sâu (foreground vs background flow variance khi camera tịnh tiến).
+     - Uses **Dense Optical Flow (Farneback)** and radial/global motion estimation to separate:
+       - **Camera Shake / Impact Shake:** high-frequency sign reversals of global velocity vectors $(dx, dy)$ over short windows.
+       - **Zoom / Punch-in / Pull-out Transitions:** rapid radial expansion/contraction divergence spikes.
+       - **Speed Ramp / Time Remapping:** strong non-linear intra-scene optical flow velocity envelope changes (slow -> fast burst -> slow).
+       - **3D Camera Motion & Parallax:** depth-stratified foreground vs. background flow variance during translational camera motion.
    - **Visual Effect Signal Detectors (`effect_detection/`):**
-     - Đo lường trực tiếp các tín hiệu thị giác có thể kiểm chứng:
-       - **RGB Split / Chromatic Aberration:** độ lệch tương quan chéo (cross-correlation shift) và sai khác biên Sobel giữa hai kênh R–B và R–G ở vùng biên độ tương phản cao.
-       - **Glow / Bloom:** tỷ lệ vùng sáng bão hòa (highlight saturation ratio) kết hợp với độ lan tỏa hào quang tần số thấp (Gaussian halo energy) quanh vùng sáng.
-       - **Motion Blur / Directional Blur:** sự suy giảm năng lượng tần số cao (Laplacian variance drop) đi kèm tính định hướng mạnh của phổ gradient (anisotropy của Sobel gradient tensor) đồng pha với đỉnh vận tốc chuyển động.
-       - **Distortion / Displacement / Glitch:** biến dạng cục bộ phi tuyến của trường optical flow (curl/vorticity và high spatial residual so với mô hình affine toàn cục) hoặc dịch chuyển ngang theo dải scanline (block/row tearing).
-       - **Motion Trails / Echo:** tương quan cao giữa phần dư khung hình hiện tại $|\Delta I_t|$ với biên của các khung hình trước đó $I_{t-1}, I_{t-2}, \dots$.
-       - **Particles / High-frequency Emitters & Kinetic Typography / Masking Candidates:** phát hiện các cụm điểm sáng chuyển động độc lập hoặc vùng biên sắc nét xuất hiện cục bộ, đánh dấu rõ phần nào là tín hiệu đo được (`observed` / `inferred`) và phần nào cần xác nhận ngữ nghĩa qua `VisionAnalyzer`.
+     - Directly measures verifiable visual signals:
+       - **RGB Split / Chromatic Aberration:** phase-correlation spatial offset and Sobel edge shift between R–B and R–G channels along high-contrast edges.
+       - **Glow / Bloom:** highlight saturation ratio combined with annular low-frequency Gaussian halo luminance excess around bright cores.
+       - **Motion Blur / Directional Blur:** Laplacian variance sharpness drop paired with strong structure-tensor gradient anisotropy aligned with motion velocity peaks.
+       - **Distortion / Displacement / Glitch:** non-affine optical flow spatial residuals and horizontal scanline row tearing.
+       - **Motion Trails / Echo:** lagged frame edge residual correlation across $I_{t-1}, I_{t-2}, \dots$.
+       - **Particles / High-frequency Emitters & Kinetic Typography / Masking Candidates:** morphological Top-Hat moving bright speckles and localized high-contrast sharp edge appearances, distinguishing measured signals (`observed` / `inferred`) from semantic interpretations requiring `VisionAnalyzer`.
    - **Adaptive Frame Sampler & Contact Sheet Generator:**
-     - Tự động lấy mẫu toàn bộ frame (full-frame analysis) đối với các đoạn ngắn 5–15 giây và trích xuất dày đặc các frame bằng chứng (`evidence-frames/`) tại các đỉnh sự kiện kèm `contact-sheet.jpg` có đóng dấu `Frame #` và `Timestamp (s)`.
+     - Performs full-frame analysis on short clips (5–20s) and exports timestamped evidence frames (`evidence-frames/`) at event peaks alongside an annotated `contact-sheet.jpg` with `Frame #` and `Timestamp (s)` badges.
 
 4. **Module C — AI Vision Adapter (`vfx_engine.vision`):**
-   - Giao diện trừu tượng `VisionAnalyzer` với các triển khai:
-     - `NoOpVisionAnalyzer` (mặc định khi chưa cấu hình API key hoặc chạy offline: giữ nguyên kết quả CV, đánh dấu nhận định ngữ nghĩa nâng cao là `unavailable`, tuyệt đối không bịa kết quả AI và không gọi mạng).
-     - `OpenAICompatibleVisionAnalyzer` / `GeminiVisionAnalyzer` (chỉ kích hoạt khi người dùng chủ động cấu hình biến môi trường và truyền cờ `--enable-vision`, hỗ trợ cả local Ollama/LM Studio trên RTX 4060 8GB).
+   - Abstract `VisionAnalyzer` interface with implementations:
+     - `NoOpVisionAnalyzer` (default when offline or unconfigured: preserves local CV measurements, marks higher-level semantic descriptions as `unavailable`, never fabricates AI outputs, and makes zero network calls).
+     - `OpenAICompatibleVisionAnalyzer` (activated only when explicitly configured via environment variables, supporting local Ollama/LM Studio on RTX 4060 8GB as well as OpenAI-compatible endpoints).

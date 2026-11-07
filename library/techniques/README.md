@@ -1,15 +1,15 @@
-# Techniques — kỹ thuật độc lập
+# Techniques — Standalone Building Blocks
 
-Mỗi bài giải quyết một nhiệm vụ, dùng được trong nhiều style. Các bước là đề xuất dựng thử; thông số đã đọc từ nguồn giữ trong case study được liên kết.
+Each article addresses one specific task that can be reused across multiple visual styles. The steps describe proposed working workflows; source-extracted parameters are preserved in the linked case studies.
 
-| Nhóm | Bài |
+| Category | Articles |
 | --- | --- |
-| Transitions | [Chroma/displacement](transitions/chromatic-displacement.md), [dissolve-shake](transitions/dissolve-shake.md), [matte reveal](transitions/matte-reveal.md) |
-| Camera and motion | [Shake có envelope giảm](camera-and-motion/shake-envelope.md) |
-| Lighting and color | [Glow, màu và bokeh](lighting-and-color/glow-color-bokeh.md) |
-| Typography | [Chữ động trễ từng ký tự](typography/staggered-text.md) |
-| Retiming | [Retime và speed ramp](retiming/speed-ramp.md) |
-| Compositing | [Overlay và audio visualizer](compositing/overlays-and-audio-visualizers.md) |
-| Sound design | [Lọc âm và reverb](sound-design/filters-and-reverb.md) |
+| Transitions | [Chromatic / Displacement](transitions/chromatic-displacement.md), [Dissolve-Shake](transitions/dissolve-shake.md), [Matte Reveal](transitions/matte-reveal.md) |
+| Camera and Motion | [Shake with a Decaying Envelope](camera-and-motion/shake-envelope.md) |
+| Lighting and Color | [Glow, Color, and Bokeh](lighting-and-color/glow-color-bokeh.md) |
+| Typography | [Per-Character Staggered Text](typography/staggered-text.md) |
+| Retiming | [Retiming and Speed Ramps](retiming/speed-ramp.md) |
+| Compositing | [Overlays and Audio Visualizers](compositing/overlays-and-audio-visualizers.md) |
+| Sound Design | [Audio Filters and Reverb](sound-design/filters-and-reverb.md) |
 
-Đọc [timing](../foundations/timing-and-easing.md) và [compositing](../foundations/compositing.md) trước nếu chưa rõ đơn vị, matte hoặc thứ tự effect. [Về thư viện](../README.md).
+Read [Timing and Easing](../foundations/timing-and-easing.md) and [Compositing](../foundations/compositing.md) first if you need context on timebases, mattes, or effect stacking order. [Back to Library](../README.md).

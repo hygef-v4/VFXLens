@@ -1,17 +1,17 @@
 # Collage
 
-**Dấu hiệu để nhận biết:** nhiều mảnh ảnh/chữ/icon có biên riêng, sự chồng lớp, khung, chất liệu và bố cục thay đổi. Đây là mô tả định hướng, không phải mọi collage đều cần mọi yếu tố.
+**Defining Characteristics:** Multiple image cutouts, text fragments, or icons with distinct borders, layered overlap, framing elements, tactile textures, and shifting layouts. This is an orienting description—not every collage requires every element.
 
-## Chuỗi dựng đề xuất
+## Proposed Assembly Workflow
 
-1. Chọn bố cục và thứ tự đọc, đặt background và chủ thể chính.
-2. Thêm [cutout/khung](../resources/cutouts-and-frames.md), giữ tỉ lệ và khoảng trống cho chữ.
-3. Chọn [font](../resources/fonts.md) hoặc ảnh chữ cắt giấy; thống nhất viền và shadow.
-4. Dựng chuyển động nhóm qua Null/camera hoặc transform, rồi thêm [độ trễ chữ](../techniques/typography/staggered-text.md) nếu cần.
-5. Thêm [texture](../resources/textures.md) và SFX vừa đủ; kiểm tra ở tốc độ phát.
+1. Establish the spatial layout and reading order; place the background and primary subject.
+2. Add [cutouts and frames](../resources/cutouts-and-frames.md), preserving proportions and negative space for typography.
+3. Choose [fonts](../resources/fonts.md) or ransom/paper-cut letter assets; unify stroke borders and drop shadows.
+4. Drive group motion via a parent Null/camera or transform, then layer in [staggered text](../techniques/typography/staggered-text.md) if needed.
+5. Add subtle [textures](../resources/textures.md) and sound effects; preview at real-time playback speed.
 
-## Kiểm tra
+## Inspection Checklist
 
-Thứ tự lớp, alpha, hướng shadow, độ đọc và mép khung; các mảnh có chuyển động theo cùng hệ tọa độ không? Dùng camera không tự tạo chiều sâu nếu mọi lớp vẫn cùng mặt phẳng. Tránh keyframe tất cả mảnh khi một nhóm điều khiển đã đủ.
+Verify layer stacking order, alpha edges, shadow direction, text legibility, and frame borders; check whether cutout pieces move within a coherent coordinate space. Adding a 3D Camera does not create parallax if all layers remain at the same Z depth. Avoid keyframing every cutout individually when a parent Null controller suffices.
 
-**Case study:** [The Less I Know](../case-studies/the-less-i-know-the-better.md) có camera/Null và shadow; [Standard](../case-studies/standard.md) có chữ/sticker và hai bố cục. Đây là ví dụ từng kỹ thuật, chưa phải xác nhận mọi lớp đang hiện trong bản prerender.
+**Case Studies:** [The Less I Know](../case-studies/the-less-i-know-the-better.md) demonstrates camera/Null parenting and drop shadows; [Standard](../case-studies/standard.md) illustrates text/sticker layering across two layout setups. These document specific techniques without claiming every layer is visible in a final prerender.

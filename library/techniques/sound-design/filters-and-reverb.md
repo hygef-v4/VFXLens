@@ -1,17 +1,17 @@
-# Lọc âm và reverb theo chuyển động
+# Audio Filters and Reverb Driven by Motion
 
-**Mục đích:** dùng lọc tần số và không gian âm để hỗ trợ nhịp hình, không che transient hoặc làm đục mix. Đây là đề xuất thực hành; chưa có so sánh nghe/đo xác nhận cho ví dụ nguồn.
+**Purpose:** Use frequency filtering and spatial reverb to reinforce visual pacing without masking transients or muddying the mix. This is a proposed working guide; no A/B listening or loudness comparison has been verified for the reference note screenshot.
 
-## Cách dựng thử
+## Proposed Recreation Workflow
 
-1. Chọn SFX bằng nghe trong ngữ cảnh, xác định transient và tail cần giữ.
-2. Thử High/Low Pass theo mục đích: giảm dải không cần hoặc tạo thay đổi âm sắc có chủ đích.
-3. Nếu cần chuyển động âm, animate cutoff/envelope theo action thay vì áp giá trị screenshot lên mọi file.
-4. Thêm reverb theo không gian mong muốn, kiểm tra dry/wet, tail và gain.
-5. Nghe tổng mix, so sánh khi bypass và kiểm tra khoảng nối/cắt.
+1. Select SFX by auditioning in context, identifying the transient attack and decay tail to preserve.
+2. Apply a High-Pass or Low-Pass filter according to the editorial goal: carve out competing frequencies or create a deliberate muffled pre-hit buildup.
+3. For dynamic filter sweeps, keyframe the cutoff frequency envelope to follow the visual action rather than copying a static screenshot value across all clips.
+4. Add reverb matched to the scene's perceived space, checking dry/wet balance, decay time, and output gain.
+5. Audition the full mix, compare with the effect chain bypassed, and check transition boundaries for clicks or tails.
 
-## Dependency và giới hạn
+## Dependencies and Limitations
 
-Ghi nguồn âm, timing, cutoff, dry/wet và gain. Chỉ đo peak chưa đánh giá được âm sắc; sample peak không thay LUFS/true peak. Không gọi thông số screenshot là recipe đã nghe thử.
+Record the audio source, timing, cutoff frequency, dry/wet mix, and gain. Measuring peak level alone does not evaluate timbre, and sample peak does not replace integrated LUFS or true-peak metering. Never treat a static screenshot parameter table as an auditioned audio recipe.
 
-**Nguồn:** [AE Notes: SFX](../../case-studies/ae-notes.md). **Đọc tiếp:** [resource SFX](../../resources/sound-effects.md), [impact](../../styles/impact.md).
+**Source:** [AE Notes: SFX](../../case-studies/ae-notes.md). **Further Reading:** [Sound Effects Resource](../../resources/sound-effects.md), [Impact Style](../../styles/impact.md).

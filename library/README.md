@@ -1,31 +1,31 @@
-# Thư viện kiến thức edit
+# Editing Knowledge Library
 
-Kiến thức VFX/Motion Graphics có thể áp dụng cho nhiều project và nguồn asset. Kỹ thuật là nền; style giúp chọn cách phối; case study giữ bằng chứng từ những nguồn đã phân tích. Các ví dụ hiện tập trung vào After Effects, nhưng hướng dẫn chọn resource không phụ thuộc một bộ sưu tập cụ thể.
+VFX and Motion Graphics knowledge that applies across projects and asset sources. Techniques form the foundation; styles guide how to combine them; case studies preserve evidence from analyzed sources. While current examples focus on After Effects, the resource selection guidelines do not depend on any specific asset pack.
 
-## Chọn lối tra cứu
+## Navigation Guide
 
-| Bạn muốn | Bắt đầu ở |
+| If you want to... | Start at |
 | --- | --- |
-| Hiểu timing, easing, alpha và cách kiểm chứng | [Foundations](foundations/README.md) |
-| Làm một chuyển động hoặc hiệu ứng cụ thể | [Techniques](techniques/README.md) |
-| Dựng theo phong cách collage, dreamy, retro hoặc impact | [Styles](styles/README.md) |
-| Nhận biết và chọn overlay, texture, font, footage, SFX | [Resources](resources/README.md) |
-| Chọn plugin, script hoặc preset theo nhiệm vụ | [Tools](tools/README.md) |
-| Đọc comp/layer/keyframe và giới hạn của nguồn | [Case studies](case-studies/README.md) |
-| Bổ sung bài học mới | [Hướng dẫn đóng góp](CONTRIBUTING.md) và [Templates](templates/README.md) |
+| Understand timing, easing, alpha, and verification rules | [Foundations](foundations/README.md) |
+| Build a specific motion or visual effect | [Techniques](techniques/README.md) |
+| Edit in a collage, dreamy, retro, or impact style | [Styles](styles/README.md) |
+| Identify and select overlays, textures, fonts, footage, or SFX | [Resources](resources/README.md) |
+| Choose plugins, scripts, or presets by task | [Tools](tools/README.md) |
+| Inspect comp/layer/keyframe data and source limitations | [Case studies](case-studies/README.md) |
+| Contribute new notes or articles | [Contributing Guide](CONTRIBUTING.md) and [Templates](templates/README.md) |
 
-## Cách các phần liên kết
+## How Sections Connect
 
-Ví dụ: [collage](styles/collage.md) dẫn đến [chữ trễ](techniques/typography/staggered-text.md), [cutout/khung](resources/cutouts-and-frames.md), [font](resources/fonts.md) và [case study Standard](case-studies/standard.md). Không chép bảng keyframe của một project thành setting chung của cả style.
+For example: [collage](styles/collage.md) links to [staggered text](techniques/typography/staggered-text.md), [cutouts and frames](resources/cutouts-and-frames.md), [fonts](resources/fonts.md), and the [Standard case study](case-studies/standard.md). Never copy a single project's keyframe table as a universal setting for an entire style.
 
-Mỗi bài kỹ thuật hoặc resource giữ một chủ đề chính. Style liên kết đến các bài đó để tạo quy trình hoàn chỉnh; bài công cụ giải thích lựa chọn triển khai. Một plugin có thể phục vụ nhiều style và một kỹ thuật có thể làm bằng nhiều công cụ.
+Each technique or resource article focuses on one primary topic. Style guides link to those articles to assemble a complete workflow, while tool pages explain implementation choices. One plugin can serve multiple styles, and one technique can be built with multiple tools.
 
-## Đọc mức kiểm chứng
+## Verification Levels
 
-- **Observed:** đọc/đo trực tiếp từ project, frame, metadata hoặc expression tĩnh.
-- **Inferred:** giải thích thị giác hoặc cách dựng được đề xuất từ bằng chứng.
-- **Unavailable / unsupported / error:** thiếu dữ liệu, chưa hỗ trợ hoặc lỗi đọc; không điền bằng phỏng đoán.
+- **Observed:** Directly read or measured from a project, frame, metadata, or static expression.
+- **Inferred:** Visual interpretation or proposed recreation workflow derived from evidence.
+- **Unavailable / unsupported / error:** Missing data, unsupported format/field, or read failure; never filled in by guesswork.
 
-Hướng dẫn và style hiện là quy trình dựng thử; không mặc định đã có preview AE tách riêng từng bước. [Quy ước bằng chứng](foundations/evidence-and-validation.md) giải thích cách xác nhận.
+Guides and style pages represent proposed working workflows; do not assume every step has been independently verified with an isolated After Effects preview render. See [Evidence and Validation](foundations/evidence-and-validation.md) for verification rules.
 
-Thư viện chứa tài liệu, không kèm project/media/plugin/font của bên thứ ba. Các báo cáo và danh mục riêng của người phân tích được giữ ngoài phần công khai; đọc hướng dẫn không đòi hỏi những file đó. Chưa thiết lập giấy phép mới cho thư viện trong lần tổ chức này.
+This library contains documentation only and does not redistribute third-party projects, media, plugins, or fonts. Private analysis reports and local inventories are kept outside the public tree; reading the guides does not require those files. No new license is established for the library in this reorganization.

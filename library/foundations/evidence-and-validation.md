@@ -1,28 +1,28 @@
-# Bằng chứng và kiểm chứng
+# Evidence and Validation
 
-Thư viện ghi cả dữ liệu đọc được và ý tưởng dựng thử. Hai loại có giá trị khác nhau, cần được gắn nhãn rõ.
+This library records both directly extracted data and proposed recreation workflows. Because the two carry different epistemic weight, they must be labeled explicitly.
 
-| Trạng thái | Ý nghĩa | Ví dụ |
+| Status | Meaning | Example |
 | --- | --- | --- |
-| `observed` | Đọc/đo trực tiếp | Keyframe Amplitude lưu trong AEP; alpha đo từ ảnh |
-| `inferred` | Suy luận có căn cứ | Đề xuất dùng envelope giảm để nhấn beat |
-| `unavailable` | Nguồn không cung cấp | Giá trị expression runtime khi chỉ đọc offline |
-| `unsupported` | Công cụ chưa hỗ trợ | Channel/payload chưa giải mã được |
-| `error` | Thất bại khi đọc | ffprobe timeout; timestamp dự phòng chưa phải PTS gốc |
+| `observed` | Directly read or measured | Keyframe Amplitude stored in `.aep`; alpha channel measured from an image |
+| `inferred` | Evidence-backed inference | Proposing a decaying envelope to accent a beat |
+| `unavailable` | Not provided by the static source | Runtime expression value when reading offline only |
+| `unsupported` | Not yet decoded by the tool | Unparsed proprietary binary channel/payload |
+| `error` | Read or extraction failure | `ffprobe` timeout; fallback timestamp rather than native PTS |
 
-## Một recipe có nguồn phải ghi gì?
+## What a Source-Backed Recipe Must Record
 
-Nguồn và ngày phân tích; comp/layer/property hoặc timestamp/frame; effect order; đơn vị; keyframe/expression/dependency; trạng thái enabled; điều được quan sát; cách áp dụng được đề xuất; kiểm chứng còn thiếu. Hash giúp nhận diện đúng nguồn nhưng không chứng minh chất lượng hoặc quyền phân phối.
+Source identifier and analysis date; comp/layer/property or timestamp/frame; effect stack order; units; keyframes/expressions/dependencies; enabled status; what was directly observed; the proposed application workflow; and any remaining unverified steps. A cryptographic hash identifies an exact source file but does not prove visual quality or redistribution rights.
 
-Trong case study, các mã `evidence:` nhận diện nguồn riêng mà người phân tích giữ. Thư viện không phân phối các payload đó; chỉ dẫn này không phải xác nhận người đọc đã có quyền truy cập nguồn. Nếu tái lập, ghi locator và bằng chứng của lần thử mới thay vì khẳng định đã kiểm tra lại nguồn cũ.
+In case studies, `evidence:` tokens identify private sources retained locally by the analyst. The library does not redistribute those payloads, and citing an identifier does not imply the reader has access to the private source. When reproducing a technique, record the locator and evidence of your new test rather than claiming the original source was re-verified.
 
-## Khi nào nâng mức kiểm chứng?
+## When to Upgrade the Verification Level
 
-1. Đọc đủ nguồn và dependency, xác định timebase/đường render thực tế.
-2. Dựng trên bản làm việc được phép sửa, giữ nguyên nguồn.
-3. Bật/tắt hoặc thay đổi riêng bước cần kiểm chứng và so sánh preview.
-4. Ghi kết quả, điều kiện, artifact và trường hợp thất bại; đính kèm bằng chứng được phép chia sẻ.
+1. Inspect the full source and dependency chain, confirming the active timebase and actual render path.
+2. Work on a disposable working copy, leaving the original source untouched.
+3. Solo/toggle or isolate the specific step under test and compare rendered previews.
+4. Record the outcome, conditions, artifacts, and failure modes, attaching shareable evidence.
 
-Nhìn video không chứng minh tên plugin hoặc setting. Layer có effect không chứng minh effect đang đóng góp: layer có thể tắt, ngoài in/out, bị matte hoặc được thay bằng prerender. Đọc expression tĩnh không đồng nghĩa đã chạy hợp lệ trong host.
+Watching a rendered video never proves an exact plugin name or numeric parameter. A layer carrying an effect does not prove that effect contributes to the final render: the layer may be disabled, trimmed outside its `in`/`out` range, masked by a matte, or superseded by a prerender. Reading a static expression string does not guarantee it evaluates without error in the host.
 
-**Đọc tiếp:** [mẫu technique](../templates/technique.md), [mẫu case study](../templates/case-study.md).
+**Further Reading:** [Technique Template](../templates/technique.md), [Case Study Template](../templates/case-study.md).

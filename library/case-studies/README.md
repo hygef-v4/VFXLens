@@ -1,16 +1,16 @@
-# Case studies — nguồn tham chiếu
+# Case Studies — Reference Sources
 
-Giữ comp/layer, thứ tự effect, keyframe và giới hạn đọc được. Không coi giá trị của một nguồn là setting mặc định cho nhiều footage. Các project, video, archive và tài liệu riêng không được phân phối trong thư viện.
+Preserves extracted composition/layer locators, effect stacking order, keyframes, and known source limitations. Never treat numeric values from a single source as universal defaults across unrelated footage. Original projects, videos, archives, and private analysis reports are not redistributed inside this library.
 
-| Nguồn | Loại bằng chứng | Chủ đề |
+| Source | Evidence Type | Primary Topics |
 | --- | --- | --- |
-| [Takt Op](takt-op.md) | Project + quan sát demo chưa căn chỉnh timeline | Chroma/displacement, shake, glow, text, retime |
-| [White Ferrari](white-ferrari.md) | Project + quan sát render, có timestamp fallback | Shake, một frame, Posterize Time, look, overlays |
-| [The Less I Know the Better](the-less-i-know-the-better.md) | Project + quan sát prerender | Collage, shadow, wipe, camera/Null |
-| [Standard](standard.md) | Project + quan sát prerender | Chữ nảy, sticker matte, RGB lệch thời gian |
-| [Chal7z presets](chal7z-presets.md) | Phân tích FFX tĩnh | Easing/envelope, selector, time units, dependency |
-| [AE Notes](ae-notes.md) | Ghi chú và screenshot | Giả độ dày, overshoot, matte, warp, SFX |
+| [Takt Op](takt-op.md) | Project + unaligned demo video observations | Chromatic/displacement transition, shake, glow, staggered text, retiming |
+| [White Ferrari](white-ferrari.md) | Project + render observations (with nominal-FPS fallback timestamps) | Shake with mirrored edges, 1-frame adjustments, Posterize Time, film look, overlays |
+| [The Less I Know the Better](the-less-i-know-the-better.md) | Project + prerender observations | Collage, drop shadows, wipes, 3D camera/Null parent chains |
+| [Standard](standard.md) | Project + prerender observations | Bouncy text selector, sticker matte borders, temporal RGB shift |
+| [Chal7z Presets](chal7z-presets.md) | Static `.ffx` binary analysis | Easing/envelopes, text selectors, raw time units, dependencies |
+| [AE Notes](ae-notes.md) | User notes and static UI screenshots | Faux 3D extrusion, velocity overshoot, luma mattes, warps, SFX |
 
-Case study nguồn ghi chú/preset không có cùng mức bằng chứng với project/frame. Đọc [quy ước](../foundations/evidence-and-validation.md) trước khi tái sử dụng; dùng [techniques](../techniques/README.md) để tra cách áp dụng chung.
+Note-based and preset-based case studies do not carry the same evidentiary weight as directly parsed project files or video frames. Review [Evidence and Validation](../foundations/evidence-and-validation.md) before reusing values, and consult [Techniques](../techniques/README.md) for general application workflows.
 
-[Về thư viện](../README.md)
+[Back to Library](../README.md)

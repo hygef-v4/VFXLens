@@ -1,20 +1,20 @@
-# Cutouts, sticker và frame
+# Cutouts, Stickers, and Frames
 
-## Nhận biết
+## Identification
 
-Cutout tách vật thể khỏi nền; sticker có thể kèm viền/shadow; khung có vùng che và vùng trong suốt; ảnh chữ cắt sẵn không phải text editable. Kiểm tra alpha của cả ảnh palette, không chỉ ảnh RGBA. Nền caro in sẵn khác với alpha thật.
+Cutouts isolate subjects from their background; stickers may include baked-in strokes or drop shadows; frames combine opaque borders with transparent apertures; rasterized ransom/paper-cut letter images are not editable text layers. Check transparency on indexed-palette PNGs as well as RGBA files, and distinguish a baked-in checkerboard pattern from a real alpha channel.
 
-## Chọn và ứng dụng
+## Selection and Application
 
-1. Xem biên trên nền sáng/tối và kiểm tra kích thước dùng cuối, nhất là chữ cắt giấy nhỏ.
-2. Đặt anchor theo cách vật thể cần xoay/scale; giữ đúng tỉ lệ hình.
-3. Dùng Normal để giữ màu và alpha khi thích hợp. Nếu cần viền/shadow, kiểm tra độ dày và hướng sáng nhất quán.
-4. Với collage, animate các mảnh theo nhóm hoặc Null rồi thêm độ trễ có chủ đích.
-5. Với split screen, đặt clip dưới vùng lỗ và mask từng clip để không tràn sang ô khác.
-6. Kiểm tra vị trí mặt/chữ sau khi đặt border; tên Cinemascope không đảm bảo mọi frame đều có thanh đen trên/dưới.
+1. Inspect silhouette edges over both bright and dark backgrounds and check the final display scale, especially for small paper-cut letter graphics.
+2. Position the anchor point around the natural pivot for rotation or scaling while preserving aspect ratio.
+3. Use `Normal` blending when preserving opaque colors and alpha contours. When adding strokes or drop shadows, keep stroke weight and light direction consistent across pieces.
+4. For collages, animate pieces via parent groups or Null controllers first, then introduce deliberate stagger offsets.
+5. For multi-panel frames or split screens, place clips beneath the frame apertures and mask each clip so it does not bleed into adjacent cells.
+6. Re-check face and title placement after adding letterbox or framing borders; a "Cinemascope" filename does not guarantee standard top/bottom matte bars.
 
-## Lỗi thường gặp
+## Common Pitfalls
 
-Phóng ảnh nhỏ quá mức; dùng Screen làm mất nét tối; shadow khác hướng giữa các mảnh; nhầm ba lỗ trong PNG với ba vùng footage tự động; áp TextEvo vào ảnh chữ raster.
+Upscaling low-resolution cutouts excessively; using `Screen` blend mode and losing dark interior details; inconsistent shadow angles across collage pieces; assuming a three-hole PNG frame automatically crops three footage layers without individual masks; or applying text-animator scripts like TextEvo to raster letter images.
 
-**Liên quan:** [collage](../styles/collage.md), [chữ động trễ](../techniques/typography/staggered-text.md), [Standard: viền matte](../case-studies/standard.md), [The Less I Know: shadow/camera](../case-studies/the-less-i-know-the-better.md).
+**Related:** [Collage Style](../styles/collage.md), [Staggered Text](../techniques/typography/staggered-text.md), [Standard: matte borders](../case-studies/standard.md), [The Less I Know: shadow/camera setup](../case-studies/the-less-i-know-the-better.md).

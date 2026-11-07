@@ -1,20 +1,20 @@
-# Transition bằng chroma, invert và displacement
+# Chromatic, Invert, and Displacement Transitions
 
-**Mục đích:** tạo biến dạng và đổi trạng thái màu quanh điểm nối shot. Các bước dưới đây là đề xuất; ví dụ đã đọc tĩnh nằm ở [Takt Op, mục 1](../../case-studies/takt-op.md#1-transition-chroma-invert-và-displacement).
+**Purpose:** Combine spatial warp distortion with brief color/luminance state flips around a cut boundary. The steps below describe a proposed workflow; a statically extracted project example is documented in [Takt Op, Section 1](../../case-studies/takt-op.md#1-chromatic-invert-and-displacement-transition).
 
-## Cách dựng thử
+## Proposed Recreation Workflow
 
-1. Chọn hướng chuyển cảnh và thời điểm cần khôi phục hình ổn định.
-2. Xác định nguồn map, center/trục và cách xử lý biên. Dựng envelope displacement trước.
-3. Thử blur để nối hình chuyển động; nếu cần nhấn ngắt, thêm invert ngắn theo timing đã chọn.
-4. Kiểm tra màu/sáng cuối cùng và xem riêng từng bước trong stack.
+1. Choose the transition direction and the settling frame where the incoming shot stabilizes.
+2. Configure the displacement map source, center/axis, and border wrapping mode. Shape the displacement envelope first.
+3. Layer in directional or vector blur to bridge the motion across the cut; if a sharp visual punctuation is desired, insert a 1–3 frame `HOLD` invert pulse at the peak.
+4. Check final exposure/color balance and inspect each effect stage individually in the stack.
 
-## Điều khiển và dependency
+## Controls and Dependencies
 
-Lượng displacement, map/channel, blur amount, invert luma/chroma, easing và thứ tự effect đều ảnh hưởng kết quả. HOLD đổi trạng thái khác với keyframe liên tục. Plugin chroma và RGB lệch thời gian không phải cùng cơ chế.
+Displacement amount, map/channel selection, blur amount, luma/chroma inversion flags, keyframe interpolation (`HOLD` vs. continuous `LINEAR`/`BEZIER`), and effect stacking order all alter the final look. Spatial chromatic aberration plugins and temporal per-channel RGB frame shifts operate via distinct mechanisms.
 
-## Kiểm chứng và lỗi
+## Verification and Common Pitfalls
 
-Kiểm tra cut, biên đen, hình phản chiếu, vùng mặt/chữ và trạng thái cuối. Không copy lượng displacement theo pixel sang resolution khác mà chưa cân lại. Giữ thứ tự nguồn làm mốc so sánh; thứ tự thử hiệu ứng không tự thay thế thứ tự render.
+Inspect the cut boundary, black border pull-in, mirrored edge reflections, faces/typography, and resting end state. Never copy pixel-based displacement amounts across different composition resolutions without rescaling. Keep the original source effect order as your baseline reference; the order in which you audition effects during setup does not replace the actual render stack order.
 
-**Đối chiếu:** [Standard: warp và RGB lệch frame](../../case-studies/standard.md), [AE Notes: nhóm warp/scatter](../../case-studies/ae-notes.md). **Resource:** [overlays](../../resources/overlays.md). **Công cụ:** [render effects](../../tools/render-effects.md).
+**Cross-References:** [Standard: warp and temporal RGB frame shift](../../case-studies/standard.md), [AE Notes: warp and scatter family](../../case-studies/ae-notes.md). **Resource:** [Overlays](../../resources/overlays.md). **Tools:** [Render Effects](../../tools/render-effects.md).

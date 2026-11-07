@@ -1,17 +1,17 @@
-# Resources — nhận biết và ứng dụng asset
+# Resources — Identifying and Applying Assets
 
-Hướng dẫn theo loại dữ liệu và vai trò trong edit, dùng được với nhiều bộ sưu tập. Chọn resource từ đặc điểm thực tế, không từ vị trí trên một máy hoặc tên người đóng gói.
+Guidance organized by data type and editorial role, applicable across any asset collection. Select resources based on their actual technical characteristics rather than local file paths or pack names.
 
-| Loại | Học cách |
+| Resource Type | What You Will Learn |
 | --- | --- |
-| [Overlays](overlays.md) | Phân biệt ánh sáng, khí quyển, vật thể alpha và matte |
-| [Textures](textures.md) | Chọn chất liệu, blend và mức đóng góp |
-| [Cutouts và frames](cutouts-and-frames.md) | Dựng collage, sticker, khung và split screen |
-| [Fonts](fonts.md) | Chọn dáng chữ, kiểm tra glyph và khả năng đọc |
-| [Footage](footage.md) | Chọn shot, đọc metadata và kiểm tra cadence |
-| [Image sequences](image-sequences.md) | Kiểm tra số frame, fps và channel PNG/EXR |
-| [Sound effects](sound-effects.md) | Nhận biết vai trò âm, canh transient và cân mix |
+| [Overlays](overlays.md) | Distinguish light leaks, atmospheric elements, alpha objects, and mattes |
+| [Textures](textures.md) | Choose surface textures, blending modes, and contribution strength |
+| [Cutouts and Frames](cutouts-and-frames.md) | Build collages, stickers, framing borders, and split-screen layouts |
+| [Fonts](fonts.md) | Select typefaces, inspect glyph coverage, and preserve legibility |
+| [Footage](footage.md) | Select source shots, inspect stream metadata, and verify frame cadence |
+| [Image Sequences](image-sequences.md) | Verify frame numbering, interpreted FPS, and PNG/EXR channels |
+| [Sound Effects](sound-effects.md) | Identify sonic roles, align transients, and balance the mix |
 
-Quy trình chung: xác định mục đích → kiểm tra asset → chọn đoạn/vùng → ghép thử → kiểm tra trong shot → ghi nguồn và kết quả. Các bước là hướng dẫn dựng thử; không đảm bảo một blend/setting phù hợp mọi asset.
+General workflow: define the editorial goal $\rightarrow$ inspect the asset $\rightarrow$ select the active segment/region $\rightarrow$ test composite $\rightarrow$ verify in context $\rightarrow$ record source and outcome. These steps are proposed working guides; no single blending mode or setting fits every asset.
 
-Không kèm media hoặc danh mục asset cá nhân. [Compositing nền tảng](../foundations/compositing.md) · [Về thư viện](../README.md).
+No third-party media or personal asset inventories are bundled. [Compositing Foundations](../foundations/compositing.md) · [Back to Library](../README.md).

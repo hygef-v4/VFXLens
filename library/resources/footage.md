@@ -1,20 +1,20 @@
-# Footage: chọn shot và kiểm tra dữ liệu
+# Footage: Selecting Shots and Inspecting Stream Data
 
-## Nhận biết
+## Identification
 
-Phân biệt footage nguồn, flow pack đã xử lý, prerender, bản demo và render cuối. Một clip có cùng nhân vật hoặc fps chưa chứng minh là asset gốc của project. Tên 4K không thay thế metadata kích thước; fps khai báo chưa chứng minh mọi frame có hình khác nhau.
+Distinguish raw source footage, pre-interpolated "flow" packs, intermediate prerenders, demo edits, and final master renders. Sharing the same character or frame rate does not prove a clip is the original source asset of a project. A "4K" label in a filename does not replace actual resolution metadata, and a high container FPS does not prove every frame contains unique motion.
 
-## Chọn và ứng dụng
+## Selection and Application
 
-1. Chọn shot theo hành động, hướng chuyển động, vùng đặt chữ và cảm xúc cần truyền tải.
-2. Đọc kích thước, aspect ratio, fps/timestamp, duration và audio track.
-3. Xem clip có cut, duplicate frame, retime, LUT/grade, watermark, HUD hoặc text sẵn không.
-4. Xem cả vùng trước/sau action để chọn in/out; giữ hướng chuyển động liên tục nếu đó là mục tiêu nối shot.
-5. Kiểm tra cadence trước khi slow motion; kiểm tra nguồn âm trước khi đưa vào mix.
-6. Crop/reframe có chủ đích, không tự kết luận scale lớn hơn sẽ phục hồi chi tiết đã mất.
+1. Choose shots based on physical action, motion direction, negative space for typography, and emotional tone.
+2. Inspect resolution, aspect ratio, frame rate / presentation timestamps, duration, and audio tracks.
+3. Check whether the clip already contains baked-in cuts, duplicate frames, retiming warps, LUTs/color grades, watermarks, HUDs, or subtitles.
+4. Review handle frames before and after the main action when choosing `in`/`out` points; maintain directional continuity across cuts when desired.
+5. Verify true frame cadence before applying slow motion, and check audio quality before mixing.
+6. Crop or reframe deliberately; never assume upscaling a low-resolution clip restores lost detail.
 
-## Lỗi thường gặp
+## Common Pitfalls
 
-Relink theo basename/hình giống nhau mà không kiểm tra nội dung; dùng prerender để kết luận mọi layer authoring đang render; chuyển thời gian demo sang comp chỉ vì duration gần nhau. Giữ metadata và nhận xét quan sát riêng với suy luận.
+Relinking footage solely by matching basenames or similar thumbnails without verifying content; assuming all authoring layers are actively rendered when a prerender layer sits above them; or mapping demo timestamps directly onto composition time simply because durations look similar. Keep measured metadata and direct visual observations separate from inferences.
 
-**Liên quan:** [timing](../foundations/timing-and-easing.md), [retime](../techniques/retiming/speed-ramp.md), [case study Takt Op](../case-studies/takt-op.md).
+**Related:** [Timing and Easing](../foundations/timing-and-easing.md), [Speed Ramp Retiming](../techniques/retiming/speed-ramp.md), [Takt Op Case Study](../case-studies/takt-op.md).

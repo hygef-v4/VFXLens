@@ -1,10 +1,10 @@
 # Templates
 
-Sao chép mẫu phù hợp và thay các chỗ cần điền; các mẫu không phải recipe đã kiểm chứng.
+Copy the appropriate template and fill in the placeholders; templates are structural scaffolds, not verified recipes.
 
 - [Technique](technique.md)
 - [Style](style.md)
 - [Resource](resource.md)
 - [Case study](case-study.md)
 
-[Quy ước đóng góp](../CONTRIBUTING.md) · [Về thư viện](../README.md).
+[Contributing Guide](../CONTRIBUTING.md) · [Back to Library](../README.md).

@@ -1,89 +1,89 @@
-# AE Notes — kỹ thuật theo dạng edit
+# AE Notes — Editing Techniques from Reference Notes
 
-Tổng hợp từ `evidence:ae-notes-01`, đọc ngày 2026-11-04, bổ sung cho [sổ tay chính](../README.md). Nguồn là ghi chú và ảnh minh họa của người dùng; không phải project có keyframe đã được parser đo hoặc công thức đã render kiểm chứng.
+Compiled from `evidence:ae-notes-01` (inspected 2026-11-04) as a companion to the [main library](../README.md). The source consists of user study notes and static UI screenshots rather than an After Effects project file with parser-measured keyframes or render-verified recipes.
 
-## Nguồn và cách tra
+## Source and Lookup Conventions
 
-- SHA-256 DOCX: `09fb93d63e664d97d895e976595cd1934bd0ed697e12ed5a02dec5b78fc7b16c`.
-- Đã trích 472 đoạn trực tiếp trong body, 105 ảnh PNG, không có bảng Word; có 32 đoạn chứa link YouTube. Đã đọc chữ, xem cả năm bảng ảnh và mở riêng bảy ảnh thông số/impact để đọc rõ; chưa xem video tutorial.
-- `P...` dưới đây là số đoạn trong bản trích, **không phải số trang Word**. Bản trích nguyên văn, image relationship và ảnh nằm ở `evidence:ae-notes-02`.
-- `extracted-text.txt` giữ nội dung và vị trí ảnh; `extracted-notes.json` giữ các relation/hyperlink; thư mục `media/` giữ đủ 105 ảnh. Năm `image-index-*.jpg` chỉ để tra nhanh, không thay thế ảnh gốc khi đọc số.
-- Một số mũi tên/dấu tiếng Anh trong nguồn đã là ký tự lỗi `[ký tự lỗi trong nguồn]`; không tự khôi phục thành lệnh hoặc thông số chắc chắn. Giữ file DOCX nguyên trạng.
-- Phân biệt: **nguồn ghi** là nội dung tài liệu; **đọc từ ảnh** là screenshot tĩnh; **suy luận/đề xuất thử** chưa được chạy trên clip. Chưa thực thi expression nhúng hoặc cài/chạy plugin.
+- DOCX SHA-256: `09fb93d63e664d97d895e976595cd1934bd0ed697e12ed5a02dec5b78fc7b16c`.
+- Extracted 472 body paragraphs and 105 embedded PNG images (0 Word tables; 32 paragraphs contain YouTube links). All text paragraphs, all five contact-sheet index boards, and seven individual parameter/impact screenshots were inspected directly; external YouTube tutorial videos were not watched.
+- `P...` references below denote **paragraph indices in the extracted transcript, not Word page numbers**. The verbatim text extract, image relationships, and media files reside under `evidence:ae-notes-02`.
+- `extracted-text.txt` preserves paragraph text and image positions; `extracted-notes.json` records relationships/hyperlinks; `media/` holds all 105 PNGs. The five `image-index-*.jpg` sheets serve as visual indexes only and never replace reading the full-resolution PNGs for numeric values.
+- Certain arrows or punctuation marks in the original document were already garbled as `[garbled character in source]`; they are never silently guessed or reconstructed into commands or numbers. The original DOCX file was left untouched.
+- Epistemic distinction: **documented in notes** means written in the text body; **read from screenshot** means visible in a static UI capture; **inferred / proposed for testing** means not yet executed on a clip. No embedded expressions or binary plugins were executed.
 
-## 1. Giả độ dày bằng xếp nhiều lớp 3D
+## 1. Faux 3D Extrusion via Stacked 3D Layers
 
-**Nguồn P2–6.** Expression Position cộng offset X/Y theo `index` và Slider `x - offset`, `y - offset`; Z được tạo từ `index + index*z_offset/10`. Nó tham chiếu cứng `comp("Comp 1").layer("Shape Layer 2 controller")`.
+**Source P2–6.** The `Position` expression adds X/Y offsets scaled by `index` and Sliders `x - offset`, `y - offset`, while computing Z as `index + index*z_offset/10`. It hardcodes a reference to `comp("Comp 1").layer("Shape Layer 2 controller")`.
 
-**Bài học:** xếp nhiều bản layer 3D với khoảng cách điều khiển chung để gợi độ dày; đây không phải biến ảnh 2D thành mesh 3D có geometry/bề mặt thật.
+**Takeaway:** Duplicating a 3D layer across multiple Z slices driven by a shared controller creates the illusion of extruded thickness; this does not convert a 2D image into a true 3D polygon mesh.
 
-**Trước khi dùng:** phải có đúng controller/effect names, xác định dùng layer switch 3D thay vì hiểu thành yêu cầu import model 3D. Công thức Z trong nguồn không cộng Z gốc. Dùng `index` tuyệt đối khiến việc chèn layer hoặc thay thứ tự thay đổi hình; khi dựng mới cần chủ động chọn chỉ số tương đối và giữ vị trí nền mong muốn. Chưa kiểm chứng với AE.
+**Before Reusing:** You must create the exact controller layer/effect names and enable the 3D layer switch (do not mistake this for importing a 3D model). Note that the source Z formula ignores the layer's original Z coordinate, and using absolute `index` means inserting or reordering layers shifts the extrusion stack. When building fresh, use relative layer indices and preserve the base position. Not yet verified in a live AE session.
 
-## 2. Chữ cosine tắt dần và overshoot theo vận tốc
+## 2. Damped Cosine Text and Velocity-Driven Overshoot
 
-### Chữ trễ từng ký tự
+### Per-Character Staggered Text
 
-**Nguồn P9–22.** Expression Selector: delay `.05`, freq `2`, amplitude `100`, decay `8`; offset theo `textIndex`, hàm `cos(2π*freq*t)/exp(decay*t)`, trả `[s,s]` khi t không âm, trước đó trả `value`.
+**Source P9–22.** Expression Selector: `delay = .05`, `freq = 2`, `amplitude = 100`, `decay = 8`; offsets time by `textIndex`, evaluates `cos(2π*freq*t)/exp(decay*t)`, returning `[s,s]` when `t >= 0` and `value` beforehand.
 
-**Đối chiếu:** cùng cấu trúc preset [Chal7z smooth text](chal7z-presets.md#3-chữ-smooth-trễ-theo-giây-dao-động-cosine-tắt-dần) nhưng amplitude trong Notes là **100**, preset là **80**. Không hợp nhất thành một giá trị “chuẩn”. Phải mang cả selector và animator properties; hai phần tử trả về chưa chứng minh phù hợp mọi property ba chiều.
+**Cross-Reference:** Shares the exact formula structure of the [Chal7z smooth text preset](chal7z-presets.md#3-smooth-text-per-second-delay-and-damped-cosine-oscillation), except the Notes use `amplitude = 100` whereas the preset stores `80`. Do not merge them into a single "canonical" number. Both the Expression Selector and Animator properties must be transferred together, and returning a 2-element array `[s,s]` is not guaranteed to fit every 3D property without coercion.
 
-### Overshoot từ vận tốc keyframe
+### Overshoot from Keyframe Incoming Velocity
 
-**Nguồn P32–53.** Tìm key gần nhất phía trước thời điểm hiện tại; lấy `velocityAtTime(keyTime - frameDuration/10)`, nhân Slider amplitude và `sin(2π*freq*t)/exp(decay*t)`, cộng vào `value`.
+**Source P32–53.** Locates the most recent keyframe at or before the current time, samples `velocityAtTime(keyTime - frameDuration/10)`, multiplies by an amplitude Slider and `sin(2π*freq*t)/exp(decay*t)`, and adds the result to `value`.
 
-**Bài học:** biên độ dao động phụ thuộc vận tốc đi vào key, khác hẳn cosine với amplitude cố định. Không chỉ chạy sau key cuối: logic nguồn chọn key phía trước hiện tại. Cần có keyframe, ba Slider đúng tên `Position amplitude`, `Position frequency`, `Position decay`; nếu vận tốc đi vào bằng 0 thì thành phần dao động theo công thức cũng bằng 0.
+**Takeaway:** Oscillation amplitude scales with the incoming velocity entering the keyframe—fundamentally different from a fixed-amplitude cosine wave. Because it selects the nearest preceding keyframe, it triggers after each keyframe rather than only the final one. Requires active keyframes plus three Sliders named `Position amplitude`, `Position frequency`, and `Position decay`; if incoming velocity is zero, the oscillation term evaluates to zero.
 
-**Chưa kiểm chứng:** behavior khi có nhiều key, dimensions, key easing và giá trị controller. Không áp công thức như preset độc lập.
+**Unverified:** Behavior across tightly spaced multi-keyframe curves, property dimensions, Bezier easing handles, and controller ranges. Do not apply blindly as a standalone preset.
 
-### Wiggle và liên kết property
+### Wiggle and Property Linking
 
-**Nguồn P25–30, P54–56.** Notes có `position+value`, `wiggle(frequency, amplitude)` và một ví dụ viết `Wiggle(1,10,2,.25)`.
+**Source P25–30, P54–56.** The notes mention `position+value`, `wiggle(frequency, amplitude)`, and one capitalized example `Wiggle(1,10,2,.25)`.
 
-Khi viết expression dùng tên API `wiggle` chữ thường theo [Adobe Expression Language Reference](https://helpx.adobe.com/after-effects/desktop/work-with-expressions/expression-language-reference/expression-language-reference.html). Frequency theo giây; amplitude theo đơn vị property. Không sao chép nguyên ví dụ viết hoa và không xem lời ghi “tối đa ±50 px” là một giới hạn đã được kiểm chứng trong phiên này.
+When writing expressions, always use lowercase `wiggle` per the [Adobe Expression Language Reference](https://helpx.adobe.com/after-effects/desktop/work-with-expressions/expression-language-reference/expression-language-reference.html). Frequency is in cycles per second (Hz) and amplitude is in the target property's units. Do not copy the capitalized `Wiggle` typo or treat the note's "max ±50 px" remark as a verified engine limit.
 
-`position+value` phải xác định expression đặt ở property nào và tham chiếu nào cùng hệ tọa độ; đặt lên chính Position không phải ví dụ liên kết chung có thể áp mù quáng.
+For `position+value`, always verify which property hosts the expression and whether both coordinate spaces match; placing `position+value` directly on `Position` itself doubles the coordinate rather than linking two separate transforms.
 
-## 3. Transition bằng méo hình, giãn hình và scatter
+## 3. Warp, Stretch, and Scatter Transitions
 
-**Nguồn P61–85, P164–216.** Nhóm effect được gợi ý: S_DissolveLuma, S_WipeBlobs, BCC 2D Particles/scatter, S_WarpVortex, Minimax, BCC Scatterize, S_Diffuse, RetroGrade Transition; các warp như FishEye, Magnify, Bubble, Chroma, HeatDistortion, Polar, Puddle, Wave Warp và Warp.
+**Source P61–85, P164–216.** Mentioned effects include `S_DissolveLuma`, `S_WipeBlobs`, `BCC 2D Particles`/scatter, `S_WarpVortex`, `Minimax`, `BCC Scatterize`, `S_Diffuse`, `RetroGrade Transition`, and warps such as `FishEye`, `Magnify`, `Bubble`, `Chroma`, `HeatDistortion`, `Polar`, `Puddle`, `Wave Warp`, and `Warp`.
 
-Các ví dụ có số cần giữ bối cảnh:
+Keep numeric fragments in their exact context:
 
-- P71–75 ghi vortex `0` tới `-20`, nhưng chưa ghi rõ tên property/timing; không đủ dựng curve chính xác.
-- P77–81 ghi chuỗi Minimax `0`, `500`, `0` với dấu nối bị lỗi mã. Ảnh `image8.png` cho thấy Operation Maximum, Radius 500, Channel Color, Direction Just Horizontal. Đây là một mẫu giãn theo trục, không mặc định mọi clip dùng Radius 500.
-- P177–180: FishEye Amount `-1.5` tới `0`; `image41.png` xác nhận tại ảnh Amount `-1.50`, Wrap X/Y Reflect, center `[960,540]`. Chưa có thời lượng hoặc easing.
-- P165 ghi Scale Wipe “same as CC Smear”: giữ như liên tưởng thị giác của người ghi; không coi hai effect là tương đương tham số hoặc thuật toán.
+- **P71–75:** Notes vortex `0` to `-20` without specifying the exact parameter name or keyframe timing—insufficient to reconstruct a complete curve.
+- **P77–81:** Notes a `Minimax` sequence `0`, `500`, `0` (with garbled separator characters). Screenshot `image8.png` confirms `Operation = Maximum`, `Radius = 500`, `Channel = Color`, `Direction = Just Horizontal`. This illustrates horizontal directional block stretching, not a universal rule that every clip needs `Radius = 500`.
+- **P177–180:** Notes `FishEye` `Amount` from `-1.5` to `0`; `image41.png` confirms `Amount = -1.50`, `Wrap X/Y = Reflect`, and `Center = [960, 540]` at that frame, without duration or easing curves.
+- **P165:** Remarks that `Scale Wipe` is "same as CC Smear"—treat this as the author's visual association rather than algorithmic or parameter equivalence.
 
-**Cách học tiếp:** chọn clip, xác định trục/center/edge handling, rồi mới dựng envelope theo nhịp. Đừng suy từ ví dụ screenshot 1920×1080 rằng center `[960,540]` dùng cho mọi resolution.
+**How to Apply:** Pick a target shot, establish the warp center/axis and border wrapping mode first, then shape the envelope to the cut beat. Never hardcode `[960, 540]` from a `1920x1080` screenshot into compositions of different dimensions.
 
-## 4. Luma matte cho ánh sáng và flicker có chọn vùng
+## 4. Luma Mattes for Selective Lighting and Flicker
 
-**Nguồn P92–124.** Hai ý tưởng riêng:
+**Source P92–124.** Two distinct compositing patterns:
 
-1. Chuẩn bị luma của nhân vật bằng Black & White/Levels/Blur; dùng chuyển động/texture ở layer khác và Luma Matte để giới hạn vùng hiện. Ảnh P97 cho thấy chuỗi Black & White → Levels → Gaussian Blur (Blurriness 6.9), không đủ chứng minh toàn bộ setup.
-2. Tạo shape ngẫu nhiên, thêm blur, chỉnh Levels, dùng Luma Inverted Matte với cảnh chính để tạo flicker theo vùng (P117–124).
+1. Prepare a high-contrast luminance map of the subject using `Black & White` $\rightarrow$ `Levels` $\rightarrow$ `Gaussian Blur` (screenshot P97 shows `Blurriness = 6.9`), then use `Luma Matte` to restrict an animated texture/light layer to that luminance region.
+2. Draw random shapes, blur and adjust `Levels`, and pair with `Luma Inverted Matte` over the main scene to create localized regional flicker (P117–124).
 
-**Bài học:** flicker không nhất thiết là tăng/giảm Exposure toàn màn hình; matte có thể chọn vùng hoặc hình dạng. Chưa rõ role từng layer, invert, blend và layer order trong ví dụ nên chưa đưa ra preset hoàn chỉnh.
+**Takeaway:** Flicker does not have to be a full-frame `Exposure` pump; luma mattes can isolate flicker to specific tonal ranges or shapes. Because layer roles, inversion flags, blending modes, and stack order are only partially shown, this is recorded as a compositing concept rather than a fixed preset.
 
-CC Blobbylize đi cùng một ghi chú tên blend viết không rõ ở P110–116; ảnh có texture màu và cảnh mẫu. Giữ ý tưởng texture-driven overlay, chưa chuẩn hóa tên blend từ câu mơ hồ đó.
+`CC Blobbylize` appears alongside an ambiguous blend-mode note in P110–116 with a colored texture screenshot; keep the texture-driven overlay concept without guessing the exact blend mode from the garbled text.
 
-## 5. Impact frame và chuỗi invert
+## 5. Impact Frames and Invert Chains
 
-**Nguồn P318–342.** Notes mô tả frame 1 dùng Invert, frame 2 dùng S_Invert tắt chroma. Ảnh P321/P324 cho hai kiểu màu khác nhau với chữ ERROR.
+**Source P318–342.** The notes describe using standard `Invert` on frame 1 and `S_Invert` (with chroma inversion disabled) on frame 2. Screenshots P321 and P324 show two distinct high-contrast looks over `ERROR` typography.
 
-Ảnh `image93.png` (P326) xác nhận trạng thái screenshot: **Invert Luma bật**, Invert Chroma và các Invert Red/Green/Blue/Alpha tắt; Scale Lights 1, Offset Darks 0, Saturation 1. Không có timeline gốc để xác nhận hai ảnh thật sự là hai frame liên tiếp hoặc tổng thời lượng bao nhiêu.
+Screenshot `image93.png` (P326) confirms the `S_Invert` panel state: **`Invert Luma` enabled**, while `Invert Chroma` and `Invert Red/Green/Blue/Alpha` are disabled; `Scale Lights = 1`, `Offset Darks = 0`, `Saturation = 1`. Without an `.aep` timeline, static screenshots cannot confirm whether the two captures are consecutive frames or their exact duration.
 
-P328–334 gợi ý chèn một frame năng lượng trước frame hành động. Đây là ý đồ timing để thử, chưa phải quy luật bắt buộc hoặc dự đoán được tác động hình ảnh từ một screenshot.
+P328–334 suggests inserting a single energy frame immediately before the main impact frame—record this as an editorial timing hypothesis to test rather than a mandatory rule.
 
-P336–342 gợi ý AE Pixel Sorter 2 với Sort by XOR. Ảnh minh họa có kéo vệt màu; cần giới hạn vùng/threshold và đọc đúng plugin version. Không gọi mọi vệt kéo là datamosh.
+P336–342 mentions `AE Pixel Sorter 2` with `Sort by = XOR`. Because pixel sorting pulls long color streaks across the frame, always bound the threshold/mask region and check the exact plugin version; do not conflate pixel sorting with bitstream datamoshing.
 
-## 6. Blur có hướng và DOF
+## 6. Directional Blur and Depth of Field
 
-**Nguồn P226–245.** Có OLM DirectionalBlur, BCC Fast Lens Blur, Radial Blur, FL Depth of Field kèm ý tưởng depth scanner.
+**Source P226–245.** Lists `OLM DirectionalBlur`, `BCC Fast Lens Blur`, `Radial Blur`, and `FL Depth of Field` alongside a depth-scanner workflow.
 
-Ảnh `image61.png` tại P236 đọc rõ OLM DirectionalBlur:
+Screenshot `image61.png` (P236) shows exact `OLM DirectionalBlur` values:
 
-| Tham số tại screenshot | Giá trị |
+| Parameter in Screenshot | Value |
 | --- | ---: |
 | Angle | 35° |
 | Brightness Gain | 1 |
@@ -94,54 +94,54 @@ P336–342 gợi ý AE Pixel Sorter 2 với Sort by XOR. Ảnh minh họa có k�
 | Noise Variation | 0% |
 | Thickness | 10 |
 
-**Bài học:** front/back blur có thể có độ mạnh khác nhau. Chưa có keyframe góc hoặc strength, nên không khẳng định các giá trị này đúng với chuyển động của mọi shot.
+**Takeaway:** `Front Blur Strength` and `Back Blur Strength` can be weighted asymmetrically along the blur axis. Without keyframe data, do not assume `Angle = 35°` or `155 / 75` fits the motion vector of other shots.
 
-**Nguồn P346–348:** screenshot Camera Options (`image98.png`) có Depth of Field On, Focus Distance 1309 px, Aperture 262.3 px, Blur Level 100%, Zoom 2000 px. Đây là camera/scene cụ thể; cần camera distance, layer depth và comp size để tái dùng. Không đồng nhất camera DOF với blur 2D hoặc depth-map plugin.
+**Source P346–348:** Screenshot `image98.png` (`Camera Options`) shows `Depth of Field = On`, `Focus Distance = 1309 px`, `Aperture = 262.3 px`, `Blur Level = 100%`, `Zoom = 2000 px`. These values depend on the specific 3D camera distance, layer Z depths, and composition resolution; never equate 3D Camera DOF with a 2D blur filter or a depth-map post effect.
 
-## 7. Texture, sketch, halftone và pixel
+## 7. Texture, Sketch, Halftone, and Pixel Effects
 
-**Nguồn P88–163, P217–225, P246–280.** Lưu như bản đồ lựa chọn, chưa gán mọi screenshot cho recipe hoàn chỉnh:
+**Source P88–163, P217–225, P246–280.** Cataloged as a visual taxonomy rather than complete recipes:
 
-| Ý định ghi trong tài liệu | Effect/nhóm được nêu |
+| Visual Intent in Notes | Mentioned Effects / Families |
 | --- | --- |
-| Chất lượng nén/hỏng số | S_JpegDamage, S_DigitalDamage, JPEG Glitch |
-| Scanline/TV/analog | BCC Damaged TV/Dissolve, Bad TV, Signal, uni.VHS Transition |
-| Đồ họa/phong cách vẽ | BCC Pencil Sketch, S_AutoPaint, S_Cartoon, S_CartoonPaint |
-| Chấm/pixel/hiển thị | BCC Halftone, BCC Tile Mosaic, BCC LED |
-| Texture/vật liệu | BCC Grunge, Noise HLS, S_FilmDamage |
-| Chia/kéo pixel | AE Pixel Sorter, Pixel Melt, Pixel Stretch, Pixelocybe |
+| Compression / digital corruption | `S_JpegDamage`, `S_DigitalDamage`, `JPEG Glitch` |
+| Scanline / CRT / analog TV | `BCC Damaged TV`/`Dissolve`, `Bad TV`, `Signal`, `uni.VHS Transition` |
+| Sketch / painterly stylization | `BCC Pencil Sketch`, `S_AutoPaint`, `S_Cartoon`, `S_CartoonPaint` |
+| Halftone / dot matrix / display grid | `BCC Halftone`, `BCC Tile Mosaic`, `BCC LED` |
+| Surface grunge / film wear | `BCC Grunge`, `Noise HLS`, `S_FilmDamage` |
+| Pixel sorting / stretching | `AE Pixel Sorter`, `Pixel Melt`, `Pixel Stretch`, `Pixelocybe` |
 
-Ảnh cùng scene với các xử lý khác nhau hữu ích để chọn hướng thị giác, nhưng chưa có render A/B giữ nguyên mọi tham số khác. Mức noise/chroma/edge cần thử theo footage, không mặc định “càng nhiều càng đẹp”.
+Side-by-side screenshots on the same base frame are helpful for browsing visual directions, but lack controlled A/B renders. Always tune noise, chroma shift, and edge thresholds to the specific source footage.
 
-## 8. Thời gian và màu theo thời gian
+## 8. Time-Based and Temporal RGB Effects
 
-**Nguồn P282–304.** Notes mô tả S_TimeWarpRGB lệch R/G/B theo thời gian, phù hợp về cơ chế với các tham số frame shift đã đọc trong [Standard](standard.md#4-rgb-lệch-thời-gian-kết-hợp-threshold-không-phải-chỉ-rgb-lệch-vị-trí).
+**Source P282–304.** Describes `S_TimeWarpRGB` offsetting R, G, and B channels in time—mechanically consistent with the per-channel frame shifts extracted from [Standard](standard.md#4-temporal-rgb-time-shift-combined-with-threshold).
 
-Các hướng thử khác: S_TimeSlice (ghi animate số slice nhưng chưa có tên property chuẩn), S_Trails, S_GetFrame/freeze, CC Wide Time, S_JitterFrames, S_MotionDetect, S_RandomEdits và Posterize Time.
+Other temporal effects noted: `S_TimeSlice` (mentions animating slice count without listing exact property matchNames), `S_Trails`, `S_GetFrame`/freeze, `CC Wide Time`, `S_JitterFrames`, `S_MotionDetect`, `S_RandomEdits`, and `Posterize Time`.
 
-**Phân biệt khi dùng:** freeze giữ frame, trail tích lũy lịch sử, RGB time-shift đổi nguồn thời gian từng kênh, Posterize Time giảm nhịp cập nhật hình. Chưa xem plugin/version và setting nên không xem tất cả tương đương retime hoặc speed ramp.
+**Operational Distinctions:** Freeze holds a single frame, trails accumulate historical frames, temporal RGB shifts sample channels at different frame offsets, and `Posterize Time` reduces the frame update cadence. Do not treat them as interchangeable with optical-flow speed ramps.
 
-## 9. Colorama, Tritone và blend
+## 9. Colorama, Tritone, and Blending
 
-**Nguồn P105–109:** Colorama và gợi ý blend Hue; ảnh cho thấy remap màu mạnh. Chưa ghi đủ Input Phase/Output Cycle để tái tạo.
+**Source P105–109:** `Colorama` paired with `Hue` blending mode; the screenshot shows aggressive palette remapping without full `Input Phase` / `Output Cycle` wheels.
 
-**Nguồn P393–395:** làm tối midtone bằng Tritone, thêm Deep Glow/Curves/Levels, đặt blend Screen để gợi ý làm chủ thể nổi bật. Đây là hướng compositing cần mask/matte hoặc layer tách chủ thể; không khẳng định nó tự nhận biết chủ thể hay tương đương mọi lần gặp Tritone + Glow trong project.
+**Source P393–395:** Darkening midtones via `Tritone`, stacking `Deep Glow` / `Curves` / `Levels`, and setting the layer blend mode to `Screen` to make a subject pop. In practice, isolating a subject requires a mask, matte, or rotoscoped layer—`Tritone` + `Screen` does not automatically segment foreground subjects on its own.
 
-**Đối chiếu bằng chứng:** White Ferrari có layer Screen chứa Tritone + PEDG nhưng có cả bản bật và tắt. Có chung nhóm công cụ không chứng minh dùng đúng recipe Notes.
+**Evidence Cross-Check:** [White Ferrari](white-ferrari.md) contains `Screen` layers with `Tritone + PEDG`, including both enabled and disabled duplicates. Sharing the same tool pair does not prove an identical recipe.
 
-## 10. Particle và mô phỏng phá vỡ
+## 10. Particles and Shatter Simulations
 
-**Nguồn P352–364:** Particular, chọn emitter type, Particles/sec, Emitter Size XYZ Individual, direction/spread, velocity. Nguồn gợi Box, Uniform/Disc và spread khoảng 25–40; lưu như điểm bắt đầu thử, không phải thông số bắt buộc hoặc mọi loại emitter đều dùng được cùng chế độ.
+**Source P352–364:** `Trapcode Particular` setup notes covering emitter type, `Particles/sec`, `Emitter Size XYZ -> Individual`, direction/spread, and velocity (suggesting a `Box` emitter, `Uniform`/`Disc`, and spread around `25–40` as a starting point rather than fixed universal constants).
 
-**Nguồn P307–317:** CC Pixel Polly, CC Cylinder và BCC 3D Image Shatter; các ảnh có mảnh vỡ hoặc uốn mặt giấy. Chưa có source geometry, alpha, force/easing hoặc camera. Không gọi Cylinder là mô phỏng nếp gấp giấy vật lý chỉ từ tên ví dụ.
+**Source P307–317:** `CC Pixel Polly`, `CC Cylinder`, and `BCC 3D Image Shatter` illustrated with shattering fragments or curved paper cylinders. Without source geometry, alpha channels, force fields, or camera data, treat these as effect leads rather than physical paper-folding simulations.
 
-## 11. SFX lọc âm và reverb
+## 11. SFX Filtering and Reverb
 
-**Nguồn P365–390.** Ý tưởng làm âm nghẹt trước điểm nhấn bằng High-Low Pass, kết hợp Reverb và audio level. Ghi chú có chuỗi cutoff `4000`, `800`, `4000` với dấu lỗi mã, không có timestamp/easing; giữ là đề xuất thử chứ không là envelope đã đo.
+**Source P365–390.** Proposes muffling audio before an impact hit using `High-Low Pass` combined with `Reverb` and level keyframes. The text mentions a cutoff sequence `4000`, `800`, `4000` (with garbled separators and no timestamps/easing), which should be treated as a conceptual sweep rather than a measured curve.
 
-Ảnh `image104.png` tại P370 đọc rõ:
+Screenshot `image104.png` (P370) shows the following static inspector values:
 
-| Effect / tham số | Giá trị tại screenshot |
+| Effect / Parameter | Value in Screenshot |
 | --- | --- |
 | High-Low Pass / Filter Options | Low Pass |
 | Cutoff Frequency | 2400 |
@@ -150,16 +150,16 @@ Các hướng thử khác: S_TimeSlice (ghi animate số slice nhưng chưa có 
 | Diffusion / Decay / Brightness | 75% / 25% / 10% |
 | Reverb Dry/Wet Out | 86% / 16% |
 
-Đây là trạng thái tại một thời điểm, khác chuỗi cutoff trong câu ghi chú; không sửa hai nguồn thành cùng một giá trị.
+This single-frame snapshot differs from the `4000 -> 800 -> 4000` text note; both are preserved without conflating them.
 
-Theo [Adobe Audio Effects](https://helpx.adobe.com/after-effects/desktop/apply-effects-and-animation-presets/list-of-effects/audio-effects.html), Dry/Wet điều khiển phần gốc và phần xử lý; 0% dry/100% wet là cấu hình thường dùng khi lọc bỏ tần số. Không áp câu “always decrease dryout” trong Notes thành quy tắc trộn âm phổ quát; cần nghe, kiểm tra gain và tránh clipping. Chưa nghe âm mẫu hoặc dựng SFX.
+Per [Adobe Audio Effects](https://helpx.adobe.com/after-effects/desktop/apply-effects-and-animation-presets/list-of-effects/audio-effects.html), `Dry Out` and `Wet Out` control the unprocessed and processed signal mix (`0% Dry / 100% Wet` is standard for a full low-pass filter). Do not generalize the note's "always decrease dryout" remark into a universal mixing rule—always audition in context and watch output headroom.
 
-## 12. Tutorial và cách học tiếp
+## 12. Tutorials and Next Learning Steps
 
-32 đoạn chứa link YouTube vẫn giữ trong `extracted-text.txt` (P397–470), gồm title card, 3D VHS text, vector blur, dissolve, print copy, shockwave, glitch/VHS, DOF, smoke, 3D, audio và pacing/scene selection. **Chưa mở hoặc xem các tutorial**, nên không ghi nội dung video thành kiến thức đã kiểm chứng.
+All 32 paragraphs containing YouTube links are preserved in `extracted-text.txt` (P397–470), covering title cards, 3D VHS typography, vector blur, dissolves, print-copy looks, shockwaves, glitch/VHS, DOF, smoke, 3D cameras, audio transitions, and scene selection. **Because those external videos were not opened or watched**, their contents are not claimed as verified library knowledge.
 
-Khi dùng một mục: lấy đúng ảnh/source, xác định property, đơn vị, layer order, controls và plugin version; thử trên project mới được ủy quyền, xem hoặc nghe kết quả rồi ghi lại recipe có thời gian/easing/điều kiện áp dụng. Chưa thay đổi DOCX gốc.
+When testing any item above: inspect the source image, identify exact property names, units, layer order, controllers, and plugin versions, and test inside an authorized working project before recording a verified recipe. The original DOCX file remains untouched.
 
-## Đọc nguồn và tái sử dụng
+## Source Provenance and Reuse
 
-Bài này giữ số đo/tham chiếu từ lần phân tích đã ghi nhận; project, ảnh bằng chứng và báo cáo riêng không được phân phối cùng thư viện. Các mã `evidence:` là định danh nguồn, không phải file cần có để đọc bài. Người giữ nguồn tra chúng trong hồ sơ local; người đóng góp khác phải ghi nguồn và mức kiểm chứng của chính mình. Xem [quy ước bằng chứng](../foundations/evidence-and-validation.md).
+This case study preserves measurements and references from the recorded analysis run; private projects, evidence images, and raw reports are not redistributed with the library. `evidence:` tokens serve as source identifiers rather than files required to read the article. See [Evidence and Validation](../foundations/evidence-and-validation.md).

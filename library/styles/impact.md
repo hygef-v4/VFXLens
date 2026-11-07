@@ -1,17 +1,17 @@
 # Impact
 
-**Dấu hiệu định hướng:** nhịp hành động/cut được nhấn bằng thay đổi chuyển động, sáng, hình hoặc âm thanh trong thời gian ngắn. Không cần mọi điểm nhấn đều có đầy đủ flash, shake và energy.
+**Defining Characteristics:** Action beats and cuts accented by rapid motion, luminance spikes, spatial warps, or transient sound design over a short window. Not every accent requires simultaneous flash, camera shake, and energy overlays.
 
-## Chuỗi dựng đề xuất
+## Proposed Assembly Workflow
 
-1. Chọn action frame và khoảng nghỉ sau điểm nhấn.
-2. Dựng cut/retime nếu cần; kiểm tra action còn rõ trước khi thêm effect.
-3. Chọn một cơ chế chính: [shake giảm](../techniques/camera-and-motion/shake-envelope.md), [warp/chroma](../techniques/transitions/chromatic-displacement.md) hoặc thay đổi sáng.
-4. Nếu dùng energy/hit overlay, đặt origin theo hành động và kiểm tra nền/alpha.
-5. Canh [SFX](../resources/sound-effects.md) theo transient nghe được; kiểm tra tổng mix và frame sau impact.
+1. Identify the exact action frame and the settling recovery window after the hit.
+2. Cut or retime the base shot first; verify the physical action reads clearly before stacking effects.
+3. Choose one primary accent mechanism: a [decaying shake envelope](../techniques/camera-and-motion/shake-envelope.md), [chromatic/displacement warp](../techniques/transitions/chromatic-displacement.md), or luminance impulse.
+4. When using energy or hit overlays, align the emitter/origin with the point of action and verify alpha/blending.
+5. Align [SFX transients](../resources/sound-effects.md) to the audible/visual hit; check the overall mix and recovery frames.
 
-## Kiểm tra
+## Inspection Checklist
 
-Biên đen, hình phản chiếu, flash quá dài, mất mặt/chữ và nhiều envelope chồng lên nhau. Thời lượng theo frame phải xét fps; không gọi một số giây hoặc amplitude plugin là chuẩn cho mọi edit.
+Watch for black border pull-in, mirrored edge artifacts, overly long flashes, obscured faces/text, and competing shake envelopes stacked together. Frame-based durations must account for composition FPS; never treat a single duration in seconds or plugin amplitude value as universal across all edits.
 
-**Case study:** [Takt Op](../case-studies/takt-op.md), [Standard](../case-studies/standard.md), [AE Notes](../case-studies/ae-notes.md). Các nguồn cung cấp ví dụ và giới hạn, chưa xác nhận mọi điểm nhấn khớp beat.
+**Case Studies:** [Takt Op](../case-studies/takt-op.md), [Standard](../case-studies/standard.md), and [AE Notes](../case-studies/ae-notes.md) provide concrete examples and source limitations without claiming every accent is beat-locked.

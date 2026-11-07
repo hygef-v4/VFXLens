@@ -1,26 +1,26 @@
-# Fonts: chọn dáng chữ và kiểm tra ngôn ngữ
+# Fonts: Selecting Typefaces and Verifying Language Support
 
-## Nhận biết theo hình dáng
+## Identifying by Letterform Style
 
-| Dáng | Ứng dụng nên thử | Cần chú ý |
+| Classification | Suggested Editorial Role | Watch Out For |
 | --- | --- | --- |
-| Sans rõ, nét vừa | Caption/lyric và chữ phụ | Độ rộng, khoảng cách và cỡ xuất |
-| Condensed cao/hẹp | Tiêu đề ngắn | Dấu và chữ hoa có bị chật không |
-| Display rất đậm | Từ khóa impact/sticker | Không gian âm và độ đọc khi blur |
-| Serif | Mood editorial/hoài niệm | Chi tiết chân chữ ở cỡ nhỏ |
-| Script/brush | Nhấn từ, chữ trang trí | Nét nối, khoảng thở, mapping ký tự |
-| Pixel/block | Retro/game | Giữ cấu trúc pixel khi scale |
+| Clean neutral sans-serif | Captions, lyrics, and secondary labels | Character width, tracking, and export legibility |
+| Tall narrow condensed | Short punchy titles | Diacritic collisions and tight uppercase kerning |
+| Heavy display / ultra-bold | Impact keywords and sticker callouts | Counter spaces closing up under glow or motion blur |
+| Serif | Editorial or nostalgic moods | Thin hairlines and serifs disappearing at small sizes |
+| Script / brush | Accent words and decorative overlays | Connecting strokes, breathing room, and glyph mapping |
+| Pixel / block | Retro, arcade, or HUD motifs | Preserving crisp pixel grids when scaling |
 
-Đây là hướng lựa chọn mỹ thuật, không phải quy định phong cách. Tên có chữ Glitch không đủ để kết luận hình dáng là nhiễu số.
+These are art-direction guidelines rather than rigid stylistic rules. A font filename containing "Glitch" does not automatically mean its outlines carry digital distortion.
 
-## Quy trình chọn
+## Selection Workflow
 
-1. Render **đúng câu cần dùng**, có dấu, số, punctuation và các chữ hoa/thường cần thiết.
-2. Kiểm tra glyph thiếu, ô vuông, dấu sai vị trí hoặc fallback làm lệch style.
-3. Xem ở kích thước xuất, trên background thật và trong chuyển động.
-4. Kiểm tra line break, tracking, stroke, shadow và khả năng đọc ở peak blur.
-5. Kiểm tra phạm vi sử dụng của font trước khi đưa file font vào một bản phân phối.
+1. Render the **exact target phrase**, including diacritics, numerals, punctuation, and required casing.
+2. Check for missing glyphs, `.notdef` tofu boxes, misplaced diacritics, or silent system-font fallbacks that break the visual style.
+3. Inspect at final export resolution, over the actual background, and during motion.
+4. Check line breaks, tracking, stroke weights, drop shadows, and legibility at peak motion blur.
+5. Verify font licensing before embedding or redistributing font files in a project package.
 
-Bảng Unicode cmap có đủ ký tự là bước lọc, chưa xác nhận shaping, dấu tổ hợp hoặc render trong AE. Không chuyển kết quả của một file/style sang mọi file cùng family. Các glyph logo/demo có thể xuất hiện ở vị trí chữ/số; phải kiểm tra câu thực tế.
+Checking a Unicode `cmap` table is only an initial filter; it does not confirm OpenType shaping, combining diacritic placement, or rendering inside After Effects. Never assume all weights/styles in a family share identical glyph coverage, and watch out for novelty fonts that map logos or demo icons onto standard letter/number codepoints.
 
-**Liên quan:** [typography](../techniques/typography/staggered-text.md), [collage](../styles/collage.md), [công cụ easing/text](../tools/easing-and-typography.md).
+**Related:** [Staggered Text Typography](../techniques/typography/staggered-text.md), [Collage Style](../styles/collage.md), [Easing and Typography Tools](../tools/easing-and-typography.md).

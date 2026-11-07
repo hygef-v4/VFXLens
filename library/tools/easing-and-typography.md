@@ -1,21 +1,21 @@
-# Công cụ easing và typography
+# Easing and Typography Tools
 
-## Chọn theo thao tác
+## Selecting by Operation
 
-| Nhiệm vụ | Công cụ tham khảo | Dependency/giới hạn cần kiểm tra |
+| Task | Reference Tool | Dependencies / Limitations to Check |
 | --- | --- | --- |
-| Thiết kế và tái dùng curve easing | [Flow](https://aescripts.com/flow/) | Curve và property đích; phiên bản hỗ trợ |
-| Copy easing riêng với giá trị | [EaseCopy](https://aescripts.com/easecopy/) | Keyframe đích và chế độ copy |
-| Nội suy bằng expression | [Ease and Wizz](https://aescripts.com/ease-and-wizz/) | File phương trình, keyframe, expression cũ |
-| Delay text theo ký tự/từ/dòng | [TextEvo](https://aescripts.com/textevo/) | Control/pseudo-effect và text animator liên kết |
-| Tách text thành layer riêng | [TextExploder](https://aescripts.com/textexploder/) | Font/style, bố cục và host/version |
+| Design and reuse easing curves | [Flow](https://aescripts.com/flow/) | Target curve and property compatibility; supported AE versions |
+| Copy easing independently of values | [EaseCopy](https://aescripts.com/easecopy/) | Target keyframes and copy mode (ease vs. value) |
+| Interpolate via expressions | [Ease and Wizz](https://aescripts.com/ease-and-wizz/) | External equation files, keyframe count, existing expressions |
+| Stagger text by character/word/line | [TextEvo](https://aescripts.com/textevo/) | Pseudo-effect controls and linked text animator selectors |
+| Split text into separate layers | [TextExploder](https://aescripts.com/textexploder/) | Font/style preservation, spatial layout, and host/version |
 
-Flow chỉnh curve, EaseCopy sao chép easing, Ease and Wizz gắn expression: chọn theo loại thao tác, không coi là ba preset look tương đương. Có thể dùng keyframe/Graph Editor hoặc text animator của AE nếu đáp ứng mục đích; xem [timing](../foundations/timing-and-easing.md) và [chữ trễ](../techniques/typography/staggered-text.md).
+Flow shapes Bezier curves, EaseCopy transfers easing handles, and Ease and Wizz injects expressions: choose based on the workflow operation rather than treating them as interchangeable visual presets. Native After Effects keyframes/Graph Editor or built-in text animators can be used whenever they meet the goal; see [Timing and Easing](../foundations/timing-and-easing.md) and [Staggered Text](../techniques/typography/staggered-text.md).
 
-## Điều học từ nguồn script
+## Lessons from Static Script Inspection
 
-Một bản Ease and Wizz 2.6.1 đã đọc tĩnh nạp phương trình từ `easingExpressions`, rồi gán expression vào property có ít nhất hai key và cho phép expression. Điều đó cho thấy JSX rời có thể thiếu dependency, và thao tác áp expression có thể thay expression trước đó. Không khẳng định mọi phiên bản đều giống mã đã đọc; chưa thực thi bản nguồn trong lần phân tích.
+Static inspection of an Ease and Wizz 2.6.1 script showed that it loads equation files from `easingExpressions` and assigns an expression to properties that have at least two keyframes and support expressions. This demonstrates that standalone `.jsx` files can fail if companion directories are missing, and applying an expression tool can overwrite an existing expression on the property. Do not assume all versions behave identically to the inspected script; the script was not executed during static analysis.
 
-TextEvo selector và TextExploder layer rời phục vụ hai cấu trúc khác nhau. Nếu chỉ cần thay đổi thời gian lấy mẫu của từng ký tự thì giữ animator/control; nếu cần parent/shadow độc lập từng mảnh thì cân nhắc layer rời.
+TextEvo selectors and TextExploder split layers serve two distinct structural needs. If you only need per-character time offsets, keep a single text layer with an animator/controller; if each fragment needs independent parenting, 3D depth, or custom drop shadows, consider splitting into separate layers.
 
-**Nguồn project:** [Standard](../case-studies/standard.md), [Takt Op](../case-studies/takt-op.md), [AE Notes](../case-studies/ae-notes.md). Các tài liệu hãng liên kết bên trên mô tả sản phẩm, chưa xác thực bộ cài của người đọc.
+**Project Sources:** [Standard](../case-studies/standard.md), [Takt Op](../case-studies/takt-op.md), [AE Notes](../case-studies/ae-notes.md). Vendor links above describe the commercial products without certifying the reader's local installation.
