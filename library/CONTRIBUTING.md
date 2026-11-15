@@ -2,6 +2,7 @@
 
 ## Placing Articles in the Right Section
 
+- `content-writing`: Hooks, narrative structure, explanation and writing for visuals; source-specific transcript findings belong in case studies and raw transcripts remain private.
 - `foundations`: Core principles reused across multiple techniques.
 - `techniques`: A single actionable task; link to source evidence rather than duplicating raw tables.
 - `styles`: Visual/rhythmic traits and how to combine technique and resource articles.

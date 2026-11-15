@@ -28,6 +28,15 @@ assumption is 1080×1920 at 30 fps: 300 frames. This is a contract for that film
 not a setting to inherit from a PDF or overwrite in an existing production.
 Study supplied references through `workflows/study-reference.md` as needed.
 
+For hooks, the narrative outline and narration written for visuals, read
+[Content Writing](../library/content-writing/README.md) before locking the script
+and storyboard. Keep the current script in the production checkpoint or its linked draft.
+
+For AI-assisted motion graphics, isometric or cartoon explainers, or infographic videos,
+follow [the specialized production route](ai-assisted-motion-graphics.md) for
+classification, scene planning and tool selection, then use this workflow's
+shared render/review and handoff steps.
+
 ## Choose and prepare local tools
 
 Use the existing `<repo>/studio/`, its package lock and package scripts. For any

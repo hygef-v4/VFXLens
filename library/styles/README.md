@@ -6,5 +6,7 @@ Style guides describe visual characteristics and editorial pacing, then link to 
 - [Dreamy / Atmospheric](dreamy.md): Soft lighting, bokeh, atmospheric overlays, and gentle motion.
 - [Retro / VHS](retro-vhs.md): Analog textures, scanlines/noise, and deliberate stepped timing.
 - [Impact](impact.md): Action accents driven by timing, camera shake, flash/warp transitions, and sound design.
+- [Isometric Explainer — AI-Assisted Motion Graphics](isometric-explainer.md): Spatial illustrations, progressive diagrams, evidence/status cards and a code-driven production route.
+- [Character-Led 2D Cartoon Explainer](cartoon-explainer.md): Expressive characters/props, staged locations, layered lighting and transcript-led narrative planning.
 
 No universal preset pack or canonical preview render is assumed for any style. [Back to Library](../README.md).

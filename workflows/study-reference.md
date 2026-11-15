@@ -39,6 +39,25 @@ Do not inherit the source's duration, fps, asset rights or software assumptions.
 
 ## Video or AE project
 
+For learning a long video's style, scene design, lighting and audio, begin with
+about the first ten minutes (or the whole source when shorter). Inspect sparse
+overview samples, then a few representative consecutive-frame windows. Bound
+audio/ASR work to the same study interval. Extend coverage when the user requests
+it or a specific unanswered question needs another segment; record what remains
+unexamined. This learning pass does not require an uncapped full-source VFX run.
+
+Extract a timestamped transcript for the studied interval when local ASR is
+available. Save readable TXT, SRT and structured JSON privately, preserving the
+original language; keep Vietnamese summaries separate. Use it to study the hook,
+questions, metaphors, explanation order, evidence and narrative transitions as
+well as images. Label ASR text/times as inferred and record missing coverage,
+recognition errors and listening checks; a source's factual claims remain claims
+until independently verified. If transcription is unavailable, state that limit.
+
+For reusable writing lessons, use [Content Writing](../library/content-writing/README.md).
+Keep exact source examples/locators in the case study and private transcript;
+promote the writing method to the matching guide instead of duplicating the script.
+
 Use the existing `analyze-video` / `analyze-project` commands in the shared skill;
 do not invent a PDF or production command under `vfx`. Read JSON and Markdown
 reports, timeline and actual contact sheets/frames. If analysis was capped with

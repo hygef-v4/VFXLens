@@ -1,14 +1,16 @@
 # Editing Knowledge Library
 
-VFX and Motion Graphics knowledge that applies across projects and asset sources. Techniques form the foundation; styles guide how to combine them; case studies preserve evidence from analyzed sources. While current examples focus on After Effects, the resource selection guidelines do not depend on any specific asset pack.
+Content writing, VFX and Motion Graphics knowledge that applies across projects and asset sources. Content guides support the explanation and script; techniques support execution, styles combine them visually, and case studies preserve source evidence. The resource selection guidelines do not depend on any specific asset pack.
 
 ## Navigation Guide
 
 | If you want to... | Start at |
 | --- | --- |
+| Write a hook, narrative outline or visually drawable script | [Content Writing](content-writing/README.md) |
 | Understand timing, easing, alpha, and verification rules | [Foundations](foundations/README.md) |
 | Build a specific motion or visual effect | [Techniques](techniques/README.md) |
 | Edit in a collage, dreamy, retro, or impact style | [Styles](styles/README.md) |
+| Produce an isometric or cartoon explainer with AI-assisted motion graphics | [Production workflow](../workflows/ai-assisted-motion-graphics.md) and its linked style guides |
 | Identify and select overlays, textures, fonts, footage, or SFX | [Resources](resources/README.md) |
 | Choose plugins, scripts, or presets by task | [Tools](tools/README.md) |
 | Inspect comp/layer/keyframe data and source limitations | [Case studies](case-studies/README.md) |

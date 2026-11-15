@@ -6,6 +6,8 @@ Use [the requirements guide](ai-video-requirements.md) for the source repository
 
 ## Quy trình đầu-cuối
 
+Nhánh **AI-assisted motion graphics → explainer** có [workflow sản xuất riêng](../workflows/ai-assisted-motion-graphics.md), với hai hướng [isometric/2.5D](../library/styles/isometric-explainer.md) và [cartoon 2D có nhân vật](../library/styles/cartoon-explainer.md). Các style guide liên kết tới case study và bằng chứng tương ứng.
+
 Theo [skill VFXLens dùng chung](../skills/vfxlens/SKILL.md), rồi chọn nhánh [nghiên cứu](../workflows/study-reference.md) hoặc [sản xuất](../workflows/create-video.md):
 
 1. **Nghiên cứu:** kiểm tra tư liệu video/AE, ghi bằng chứng và giới hạn; tra bài học phù hợp trong thư viện.

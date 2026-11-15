@@ -10,6 +10,8 @@ Preserves extracted composition/layer locators, effect stacking order, keyframes
 | [Standard](standard.md) | Project + prerender observations | Bouncy text selector, sticker matte borders, temporal RGB shift |
 | [Chal7z Presets](chal7z-presets.md) | Static `.ffx` binary analysis | Easing/envelopes, text selectors, raw time units, dependencies |
 | [AE Notes](ae-notes.md) | User notes and static UI screenshots | Faux 3D extrusion, velocity overshoot, luma mattes, warps, SFX |
+| [Internet Global Explainer](internet-global-explainer.md) | Exact-PTS video samples and selected consecutive frames | Isometric illustration, evidence/status cards, progressive diagrams, chapter colors, fast stamp entrance and readable holds |
+| [Nvidia Chips Cartoon Explainer](nvidia-chips-cartoon-explainer.md) | First-ten-minute visual samples, dense filmstrips and offline ASR | Character/prop storytelling, narrative questions, layered lighting, intertitles and separating promotion from the main story |
 
 Note-based and preset-based case studies do not carry the same evidentiary weight as directly parsed project files or video frames. Review [Evidence and Validation](../foundations/evidence-and-validation.md) before reusing values, and consult [Techniques](../techniques/README.md) for general application workflows.
 
