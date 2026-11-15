@@ -15,7 +15,7 @@ from rich.table import Table
 from ..core.config import EngineConfig
 from ..core.doctor import run_environment_doctor
 from ..core.logging import console, setup_logging
-from ..core.safety import SUPPORTED_VIDEO_EXTENSIONS, UnsafeFileError
+from ..core.safety import SUPPORTED_VIDEO_EXTENSIONS, UnsafeFileError, validate_output_path
 from ..project_analyzer.analyzer import analyze_ae_project
 from ..reports.project_reporter import write_project_reports
 from ..reports.video_reporter import write_video_reports
@@ -267,6 +267,11 @@ def cmd_analyze_folder(
     batch_summary["errors"] = err_list
 
     summary_path = out_dir / "batch-summary.json"
+    try:
+        validate_output_path(summary_path)
+    except UnsafeFileError as exc:
+        console.print(f"[bold red]Safety Refusal:[/bold red] {exc}")
+        raise typer.Exit(code=2) from exc
     summary_path.write_text(json.dumps(batch_summary, indent=2, ensure_ascii=False), encoding="utf-8")
 
     console.print(

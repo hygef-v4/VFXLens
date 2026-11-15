@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from ..core.safety import validate_output_path
 from ..schemas.project_schema import ProjectAnalysisResult
 
 
@@ -18,6 +19,9 @@ def write_project_reports(
 
     json_path = out / "project-analysis.json"
     md_path = out / "project-report.md"
+
+    for path in (json_path, md_path):
+        validate_output_path(path)
 
     json_path.write_text(
         json.dumps(result.model_dump(mode="json"), indent=2, ensure_ascii=False),

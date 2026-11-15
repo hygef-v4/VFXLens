@@ -8,6 +8,7 @@ from pathlib import Path
 import cv2
 import numpy as np
 
+from ...core.safety import validate_output_path
 from ...schemas.video_schema import VideoEffectEventSchema
 from ..decoder.ffprobe_decoder import DecodedFrame
 
@@ -28,6 +29,8 @@ def export_evidence_frames_and_contact_sheet(
         Tuple of (`contact_sheet_rel_path`, `evidence_dir_rel_path`, `evidence_frame_rel_paths`).
     """
     output_dir.mkdir(parents=True, exist_ok=True)
+    contact_sheet_path = output_dir / "contact-sheet.jpg"
+    validate_output_path(contact_sheet_path)
     evidence_dir = output_dir / "evidence-frames"
     evidence_dir.mkdir(parents=True, exist_ok=True)
 
@@ -81,6 +84,7 @@ def export_evidence_frames_and_contact_sheet(
         if want_evidence and f_idx not in saved_frames:
             fname = f"frame_{f_idx:05d}_{df.timestamp:.3f}s.jpg"
             fpath = evidence_dir / fname
+            validate_output_path(fpath)
             if not cv2.imwrite(str(fpath), bgr, [int(cv2.IMWRITE_JPEG_QUALITY), 92]):
                 raise OSError(f"Failed to write evidence frame JPEG to '{fpath}'")
             saved_frames[f_idx] = f"evidence-frames/{fname}"
@@ -145,7 +149,6 @@ def export_evidence_frames_and_contact_sheet(
             cv2.LINE_AA,
         )
 
-    contact_sheet_path = output_dir / "contact-sheet.jpg"
     if not cv2.imwrite(str(contact_sheet_path), canvas, [int(cv2.IMWRITE_JPEG_QUALITY), 90]):
         raise OSError(f"Failed to write contact sheet image to '{contact_sheet_path}'")
 

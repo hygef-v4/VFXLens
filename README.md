@@ -1,5 +1,13 @@
 # VFX Learning Engine — Phase 1
 
+## Local video production with Claude Code and Codex
+
+VFXLens also provides a shared [VFXLens skill](skills/vfxlens/SKILL.md) for studying references and creating videos with a separately installed Remotion studio and optional Blender scenes. Follow the [toolchain quickstart and repository requirements](docs/ai-video-requirements.md) to set up both agents, preview the studio, and render a sample. The existing `vfx` CLI below remains the analysis interface; video production uses the studio scripts and [production workflow](workflows/create-video.md).
+
+Machine-specific installation and verification results belong in ignored `local/setup/status.json`. The setup guide describes the supported layout; successful installation alone does not establish that every creative workflow has been tested.
+
+The [full toolchain map](docs/full-toolchain.md) covers the production workflow, shared skills and installed libraries. The [project audit](docs/project-audit.md) records the three analyzer fixes and remaining verification limits.
+
 ## Editing Knowledge Library
 
 Browse the [Markdown Knowledge Library](library/README.md) by technique, style, resource, tool, and case study. Guides are designed to work independently of any personal asset collection, with source parameters and verification levels documented explicitly.

@@ -1,0 +1,45 @@
+{
+  "name": "vfxlens-studio",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local Remotion production workspace for the shared VFXLens skill",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "render": "remotion render src/index.ts",
+    "still": "remotion still src/index.ts",
+    "prepare:smoke": "node scripts/prepare-smoke.mjs",
+    "verify:libraries": "node scripts/verify-libraries.mjs",
+    "verify:render": "npm run prepare:smoke && remotion render src/index.ts SmokeTest ../local/setup/studio-smoke.mp4 --codec=h264 --concurrency=2"
+  },
+  "dependencies": {
+    "@react-three/fiber": "9.8.2",
+    "@remotion/captions": "4.0.543",
+    "@remotion/cli": "4.0.543",
+    "@remotion/media": "4.0.543",
+    "@remotion/three": "4.0.543",
+    "animejs": "4.5.0",
+    "gsap": "3.15.1",
+    "jolt-physics": "1.1.1",
+    "lottie-web": "5.13.0",
+    "motion": "14.14.0",
+    "p5": "2.4.0",
+    "p5.brush": "3.0.0",
+    "postprocessing": "6.39.6",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "remotion": "4.0.543",
+    "three": "0.187.0",
+    "three-gpu-pathtracer": "0.0.28",
+    "three-mesh-bvh": "0.9.18",
+    "three.quarks": "0.17.1",
+    "tweakpane": "4.0.5",
+    "xatlas-web": "0.1.0"
+  },
+  "devDependencies": {
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@types/three": "0.187.0",
+    "typescript": "5.9.3"
+  }
+}

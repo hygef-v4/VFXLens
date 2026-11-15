@@ -9,18 +9,28 @@ import numpy as np
 from ...schemas.video_schema import FrameSignalEntry, SceneBoundarySchema
 
 
-def _run_pyscenedetect_cut_frames(video_path: Path) -> set[int]:
+def _run_pyscenedetect_cut_frames(video_path: Path, end_frame: int) -> set[int]:
     """Run PySceneDetect ContentDetector + AdaptiveDetector with short min_scene_len for fast VFX edits."""
     cut_frames: set[int] = set()
     video = None
     try:
-        from scenedetect import AdaptiveDetector, ContentDetector, SceneManager, open_video
+        from scenedetect import (
+            AdaptiveDetector,
+            ContentDetector,
+            FrameTimecode,
+            SceneManager,
+            open_video,
+        )
 
         video = open_video(str(video_path))
         scene_manager = SceneManager()
         scene_manager.add_detector(ContentDetector(threshold=24.0, min_scene_len=3))
         scene_manager.add_detector(AdaptiveDetector(adaptive_threshold=2.8, min_scene_len=3))
-        scene_manager.detect_scenes(video=video, show_progress=False)
+        scene_manager.detect_scenes(
+            video=video,
+            end_time=FrameTimecode(end_frame, video.frame_rate),
+            show_progress=False,
+        )
         scene_list = scene_manager.get_scene_list(start_in_scene=True)
         for idx, (start_tc, _) in enumerate(scene_list):
             if idx > 0:
@@ -44,7 +54,9 @@ def detect_scenes(
     if not signals:
         return []
 
-    pyscene_cuts = _run_pyscenedetect_cut_frames(video_path)
+    pyscene_cuts = _run_pyscenedetect_cut_frames(
+        video_path, end_frame=signals[-1].frame_index + 1
+    )
 
     diffs = np.array([s.max_channel_diff for s in signals], dtype=np.float32)
 

@@ -15,6 +15,15 @@ local/
 *.mkv
 *.avi
 *.webm
+*.wav
+*.mp3
+*.flac
+*.m4a
+*.aac
+*.ogg
+*.blend
+*.blend1
+*.blend2
 !tests/fixtures/*.aep
 !tests/fixtures/*.aepx
 
@@ -37,7 +46,33 @@ dist/
 .mypy_cache/
 .ruff_cache/
 .coverage
+.coverage.*
 htmlcov/
+*.log
+*.pid
+*.tsbuildinfo
+
+# Local credentials; keep documented configuration examples trackable
+.env
+.env.*
+!.env.example
+!.env.sample
+**/.claude/settings.local.json
+.mcp.local.json
+
+# Model weights and downloaded application bundles belong outside source control
+*.safetensors
+*.ckpt
+*.pt
+*.pth
+*.onnx
+*.gguf
+*.exe
+*.msi
+*.7z
+*.zip
+/models/
+/model-cache/
 
 # OS & IDE files
 .DS_Store
@@ -46,3 +81,12 @@ Thumbs.db
 .idea/
 *.tmp
 *.bak
+
+# Local video-production dependencies, private assets and render caches
+node_modules/
+studio/public/
+studio/out/
+**/.cache/
+**/.remotion/
+**/.agents/skills/
+**/.claude/skills/

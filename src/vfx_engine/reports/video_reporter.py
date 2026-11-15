@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from ..core.safety import validate_output_path
 from ..schemas.video_schema import VideoAnalysisResult, VideoTimelineSchema
 
 
@@ -20,6 +21,9 @@ def write_video_reports(
     analysis_json_path = out / "video-analysis.json"
     timeline_json_path = out / "timeline.json"
     report_md_path = out / "video-report.md"
+
+    for path in (analysis_json_path, timeline_json_path, report_md_path):
+        validate_output_path(path)
 
     analysis_json_path.write_text(
         json.dumps(result.model_dump(mode="json"), indent=2, ensure_ascii=False),

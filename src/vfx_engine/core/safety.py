@@ -30,6 +30,15 @@ def compute_sha256(path: Path, chunk_size: int = 1024 * 1024) -> str:
     return h.hexdigest()
 
 
+def validate_output_path(path: Path) -> None:
+    """Refuse linked output files: writing them can alter read-only reference data."""
+    if path.is_symlink() or (path.exists() and path.stat().st_nlink > 1):
+        raise UnsafeFileError(
+            f"Refusing to overwrite linked output '{path}'. "
+            "Choose a regular output file or a fresh output directory."
+        )
+
+
 def validate_project_file_safety(path: Path, max_size_mb: int = 512) -> tuple[str, int, str]:
     """Validate that a path is a readable .aep or .aepx project and never an .aex plugin.
 

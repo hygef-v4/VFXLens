@@ -13,11 +13,8 @@ import cv2
 import numpy as np
 
 from ...core.config import EngineConfig
-from ...core.logging import get_logger
 from ...core.safety import compute_sha256
 from ...schemas.video_schema import VideoMetadataSchema
-
-logger = get_logger("video_analyzer.decoder")
 
 
 @dataclass
@@ -137,35 +134,30 @@ def probe_video_metadata_and_timestamps(
             encoding="utf-8",
             errors="replace",
         )
-        if proc_pts.returncode == 0 and proc_pts.stdout.strip():
-            pts_json = json.loads(proc_pts.stdout)
-            for f_entry in pts_json.get("frames") or []:
-                t_val = (
-                    f_entry.get("best_effort_timestamp_time")
-                    or f_entry.get("pkt_pts_time")
-                    or f_entry.get("pts_time")
-                )
-                if t_val is not None:
-                    try:
-                        timestamps.append(float(t_val))
-                    except ValueError:
-                        pass
+        if proc_pts.returncode != 0 or not proc_pts.stdout.strip():
+            raise ValueError(proc_pts.stderr.strip() or "ffprobe returned no frame data")
+        pts_json = json.loads(proc_pts.stdout)
+        for f_entry in pts_json.get("frames") or []:
+            t_val = next((
+                f_entry[key] for key in ("best_effort_timestamp_time", "pkt_pts_time", "pts_time")
+                if f_entry.get(key) is not None
+            ), None)
+            timestamp = float(t_val)
+            if not math.isfinite(timestamp):
+                raise ValueError("Non-finite frame timestamp")
+            timestamps.append(timestamp)
+        if not timestamps:
+            raise ValueError("ffprobe returned no frame timestamps")
     except Exception as exc:
-        logger.warning("Frame-level PTS probe fallback triggered: %s", exc)
+        raise ValueError(f"Exact frame timestamps unavailable for '{video_path.name}': {exc}") from exc
 
-    # Ensure monotonic timestamps and compute VFR metrics
-    if timestamps:
-        # Normalize if first frame PTS is offset
-        t0 = timestamps[0]
-        if t0 > 0 and t0 < 1.0:
-            timestamps = [max(0.0, t - t0) for t in timestamps]
-        frame_count = len(timestamps)
-        if duration <= 0.0 and len(timestamps) > 1:
-            duration = timestamps[-1] + (timestamps[-1] - timestamps[-2])
-    else:
-        nb_frames_raw = video_stream.get("nb_frames")
-        frame_count = int(nb_frames_raw) if nb_frames_raw and str(nb_frames_raw).isdigit() else int(round(duration * nominal_fps))
-        timestamps = [i / nominal_fps for i in range(max(1, frame_count))]
+    # Preserve the existing normalization of a small initial PTS offset.
+    t0 = timestamps[0]
+    if t0 > 0 and t0 < 1.0:
+        timestamps = [max(0.0, t - t0) for t in timestamps]
+    frame_count = len(timestamps)
+    if duration <= 0.0 and len(timestamps) > 1:
+        duration = timestamps[-1] + (timestamps[-1] - timestamps[-2])
 
     # Detect VFR by checking inter-frame delta_t variance
     is_vfr = False
@@ -248,11 +240,9 @@ def iter_decoded_frames(
             ret, frame_bgr = cap.read()
             if not ret or frame_bgr is None:
                 break
-            if idx < len(timestamps):
-                ts = timestamps[idx]
-            else:
-                pos_msec = cap.get(cv2.CAP_PROP_POS_MSEC)
-                ts = (pos_msec / 1000.0) if pos_msec > 0 else (prev_ts + default_dt)
+            if idx >= len(timestamps):
+                raise ValueError(f"Exact timestamp unavailable for decoded frame {idx} in '{video_path.name}'")
+            ts = timestamps[idx]
 
             dt = (ts - prev_ts) if idx > 0 and ts > prev_ts else default_dt
             yield DecodedFrame(
