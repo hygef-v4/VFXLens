@@ -25,7 +25,7 @@ Compiled from `evidence:ae-notes-01` (inspected 2026-11-04) as a companion to th
 
 **Source P9–22.** Expression Selector: `delay = .05`, `freq = 2`, `amplitude = 100`, `decay = 8`; offsets time by `textIndex`, evaluates `cos(2π*freq*t)/exp(decay*t)`, returning `[s,s]` when `t >= 0` and `value` beforehand.
 
-**Cross-Reference:** Shares the exact formula structure of the [Chal7z smooth text preset](chal7z-presets.md#3-smooth-text-per-second-delay-and-damped-cosine-oscillation), except the Notes use `amplitude = 100` whereas the preset stores `80`. Do not merge them into a single "canonical" number. Both the Expression Selector and Animator properties must be transferred together, and returning a 2-element array `[s,s]` is not guaranteed to fit every 3D property without coercion.
+**Cross-Reference:** Shares the exact formula structure of the [Chal7z smooth text preset](chal7z-presets.md#3-chữ-smooth-trễ-theo-giây-dao-động-cosine-tắt-dần), except the Notes use `amplitude = 100` whereas the preset stores `80`. Do not merge them into a single "canonical" number. Both the Expression Selector and Animator properties must be transferred together, and returning a 2-element array `[s,s]` is not guaranteed to fit every 3D property without coercion.
 
 ### Overshoot from Keyframe Incoming Velocity
 
@@ -115,7 +115,7 @@ Side-by-side screenshots on the same base frame are helpful for browsing visual 
 
 ## 8. Time-Based and Temporal RGB Effects
 
-**Source P282–304.** Describes `S_TimeWarpRGB` offsetting R, G, and B channels in time—mechanically consistent with the per-channel frame shifts extracted from [Standard](standard.md#4-temporal-rgb-time-shift-combined-with-threshold).
+**Source P282–304.** Describes `S_TimeWarpRGB` offsetting R, G, and B channels in time—mechanically consistent with the per-channel frame shifts extracted from [Standard](standard.md#4-rgb-lệch-thời-gian-kết-hợp-threshold-không-phải-chỉ-rgb-lệch-vị-trí).
 
 Other temporal effects noted: `S_TimeSlice` (mentions animating slice count without listing exact property matchNames), `S_Trails`, `S_GetFrame`/freeze, `CC Wide Time`, `S_JitterFrames`, `S_MotionDetect`, `S_RandomEdits`, and `Posterize Time`.
 

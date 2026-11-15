@@ -418,7 +418,7 @@ def cmd_doctor(
     )
 
     vis = report["vision"]
-    table.add_row("AI Vision Adapter", "CONFIGURED" if vis["configured"] else "LOCAL CV ONLY", vis["note"])
+    table.add_row("AI Vision Adapter", "CONFIGURED / UNTESTED" if vis["request_allowed"] else "LOCAL CV ONLY", vis["note"])
 
     console.print(table)
 

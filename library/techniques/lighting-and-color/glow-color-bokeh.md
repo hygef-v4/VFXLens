@@ -1,6 +1,6 @@
 # Glow, Color, and Bokeh
 
-**Purpose:** Control highlight bloom, color remapping/tinting, and defocus blur as independent, modular stages. No single numeric preset fits all footage; see [Takt Op, Section 4](../../case-studies/takt-op.md#4-glow-color-and-bokeh) for an example where keyframes fall outside a layer's active `in`/`out` trim.
+**Purpose:** Control highlight bloom, color remapping/tinting, and defocus blur as independent, modular stages. No single numeric preset fits all footage; see [Takt Op, Section 4](../../case-studies/takt-op.md#4-glow-màu-và-bokeh) for an example where keyframes fall outside a layer's active `in`/`out` trim.
 
 ## Proposed Recreation Workflow
 

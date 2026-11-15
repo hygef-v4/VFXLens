@@ -1,70 +1,85 @@
-# Workflow and Skill Readiness — 2026-11-15
+# Workflow and Skill Readiness — 2026-11-15 remediation
 
-What this repo does: VFXLens combines local AE/video analysis, a reusable writing/editing library, and an agent-guided production workflow. This review assumes one person using Claude/Codex on the configured Windows workstation, with original reference files kept read-only.
+VFXLens combines offline AE/video analysis, a reusable writing/editing library,
+live technology discovery, and agent-guided Remotion/3D production. This review
+assumes one operator on the configured Windows workstation. It describes the
+current checkout; ignored assets, environments and application sessions are not
+included in a Git clone.
 
-**Verdict:** sufficient for a repo-backed **v1 skill and agent-guided workflow**. Full production readiness is not established: the live AE preview boundary has a confirmed injection issue, and the documented isometric/cartoon production route still needs a representative end-to-end pilot. This is a readiness report; application code was not changed during the review.
+**Verdict:** usable as an agent-guided workflow. The software defects found in
+the earlier readiness review have regression fixes. Live commercial-host behavior,
+real Vision model accuracy and final film quality still need their own checks.
 
-## What Is Ready
+## Resolved regressions
 
-| Area | Evidence and present limit |
+| Earlier defect | Current behavior and regression evidence |
 | --- | --- |
-| Skill packaging and repo location | Skill Creator validation passed with UTF-8 enabled. Both client junctions resolve to the canonical skill; resolving from an unrelated working directory found the repo and workflow files. Fresh interactive invocation in both client UIs remains unchecked. |
-| Knowledge and writing | Content Writing, foundations, techniques, styles, resources and case studies are connected to the workflows. File-link checks across 68 library/docs/workflow pages found no missing local files, but 18 section anchors are broken. |
-| Reference learning | The workflow includes an approximately ten-minute initial scope, source-language TXT/SRT/JSON and separate Vietnamese writing lessons. Two private studies have actual offline transcripts; the latest has 207 segments over 0–600s. ASR quality/timing has not been listening-verified. |
-| Analysis core | Fresh `uv run pytest`: **47 passed**. Fresh Ruff passed. Doctor reports ready for local analysis, FFmpeg/ffprobe and GPU available; live AE bridges are offline. |
-| Installed dependencies | Fresh compatibility checks passed in all six Python environments. Studio TypeScript and library smoke checks passed. This establishes installed package compatibility, not every creative branch's output quality. |
-| Remotion output | A fresh H.264/AAC smoke MP4 rendered: 1080×1920, 30 fps, 300 video frames, about ten seconds. Full decode passed; frames 30/180 were inspected and all four audio cues had measured nonzero RMS. No perceptual listening was performed. |
-| Browser 3D | A fresh Three.js cube still rendered and was visually inspected. This does not validate a complete isometric set or character scene. |
-| Continuation | Workflows specify a production checkpoint, editable sources, actual commands, checked artifacts, open issues and the next action. A full handoff between fresh Claude/Codex sessions has not been demonstrated. |
+| AE preview string injection and unsafe output | Arguments are JSON-serialized; non-finite/negative time, non-PNG, existing/linked files and missing directories are refused before dispatch. Dispatched JSX is checked. The host also refuses existing destinations and times outside the composition. Tests execute captured JSX in an isolated Node VM; no live AE project is opened or saved. |
+| Vision endpoint dropped and configured status misleading | Factory forwards the endpoint. An optional loopback OpenAI-compatible adapter validates image/response budgets, refuses cloud URLs/credentials/redirects/proxies and labels successful model claims inferred/unverified. Doctor separates configuration from a tested connection. Protocol tests use mock transport and a real localhost fixture server; no model inference is claimed. |
+| Broken evidence/recipe anchors | Seventeen broken section links were reproduced and corrected against current headings. The earlier review reported eighteen. A regression check now validates authored local Markdown files and section anchors. |
+| Script-only routing implicit | The shared VFXLens description and route table explicitly cover hooks, outlines, scripts and narration; script-only work stops at writing. |
+| Director absent from Claude discovery | The shared link helper now registers all three authored skills for both project clients. It preserves existing unrelated folders and Director's canonical source. |
 
-## Must Fix Before Live AE Preview Use
+Source regression tests:
+[AE preview](../tests/test_ae_bridge_preview.py),
+[Vision/protocol/reporting](../tests/test_vision.py),
+[documentation links](../tests/test_documentation_links.py), and
+[skill registration](../skills/motion-scout/scripts/test_sync_skill.py).
 
-1. **Preview arguments can escape into executable JSX** — `src/vfx_engine/project_analyzer/ae_bridge/bridge_client.py:337–367`, `ae-scripts/vfx_readonly_extract.jsx:260–268`.
-   - **What this is:** `export_preview_frame` constructs a script from a composition name and output path, then dispatches it through the live AE bridge.
-   - **Problem:** Only double quotes in the composition name are escaped; a backslash/quote combination can break out of the literal. A harmless offline repro captured the actual dispatched payload and executed it with stub objects in a Node VM: a marker assignment ran. The defined read-only validator was called zero times. An existing non-PNG destination was also accepted by the mocked adapter; actual AE file writing was deliberately not tested.
-   - **Smallest fix:** Serialize JS string arguments safely, validate a finite time and a fresh PNG destination before dispatch, and apply the intended script-validation boundary. Keep snapshot/project safety intact; add transport-level regression tests for hostile names and unsafe destinations.
-   - **If skipped:** Composition names or caller-supplied paths can cross from data into host script execution. Do not treat this preview API as a verified read-only boundary. It is not used by the current offline analysis CLI or Remotion workflow.
+## Current production and discovery routes
 
-## Should Fix
+- [VFXLens](../skills/vfxlens/SKILL.md): study, analyze, write, create and continue.
+- [motion-scout](../skills/motion-scout/SKILL.md): live discovery, comparison and a
+  source-backed handoff. Research-only leaves video code/dependencies untouched.
+- [Director](../.agents/skills/remotion-3d-director/SKILL.md): storyboard, renderer,
+  camera/light/material/animation, actual render and visual review.
+- [Production workflow](../workflows/create-video.md): one private checkpoint,
+  sources/assets/timing, implementation, encoded media and delivery checks.
 
-2. **Vision configuration is not a working vision adapter** — `src/vfx_engine/vision/base.py:51–98`, `src/vfx_engine/core/doctor.py:101–109`, `docs/limitations.md:46–48`.
-   - **What this is:** The CLI exposes provider/model/base-URL configuration and a configured adapter class.
-   - **Problem:** The factory does not forward the configured base URL, and the adapter returns `unavailable` even with an endpoint. A local check with a dummy provider/model/base URL confirmed `analyzed=false`, effective endpoint `None`, and no network request. Doctor's configured flag does not establish usable inference.
-   - **Smallest fix:** Make documentation and doctor explicitly distinguish a placeholder/configuration from implemented inference. Implement and test an explicitly authorized provider separately when needed; do not enable external calls as an audit side effect.
-   - **If skipped:** An agent may expect semantic analysis after setting configuration. An assistant can still inspect exported images with its available tools; that is separate from this CLI adapter.
+The studio now registers four compositions: `SmokeTest`, `ThreeCheck`,
+`DirectorSkillDemo` and `EditorialExplainer`. The older statement that only two
+smoke components exist is obsolete. The editorial composition requires private
+assets and is a draft; correct encoding does not establish visual approval.
+Character/isometric component names in the specialized workflow remain proposed
+roles, rather than a complete prebuilt asset/rig library.
 
-3. **Eighteen evidence/recipe section links point to obsolete headings** — examples: `library/techniques/camera-and-motion/shake-envelope.md:17`, `library/case-studies/takt-op.md:9`, `library/case-studies/ae-notes.md:28`.
-   - **What this is:** Local Markdown links use fragments to jump directly to relevant source sections.
-   - **Problem:** Several case-study headings changed language/title while incoming fragments kept older English or different Vietnamese identifiers. Files exist, so a file-only link check misses this failure. The audit recorded 18 exact source-line/target-heading mismatches.
-   - **Smallest fix:** Update the fragments or introduce stable explicit anchors, then check both files and fragments.
-   - **If skipped:** The library is readable, but agents/readers cannot reliably reach the cited recipe or evidence section.
+## Repeatable checks
 
-## Narrow Discovery Improvement
+```powershell
+uv run pytest
+uv run ruff check src tests skills/motion-scout/scripts
+uv run python -m unittest discover -s skills/motion-scout/scripts -p 'test_*.py'
+uv run vfx doctor --json
+npm --prefix studio run typecheck
+npm --prefix studio run verify:libraries
+foreach ($skillName in 'vfxlens', 'motion-scout', 'remotion-3d-director') {
+    uv run python skills/motion-scout/scripts/sync_skill.py --skill $skillName --check
+}
+```
 
-4. **Script-only work is implicit in the entrypoint** — `skills/vfxlens/SKILL.md:3,35–42`.
-   - **What this is:** Content Writing now supports hooks, outlines and narration; production docs also define document-only outcomes.
-   - **Problem:** The skill description and route table name learning, analysis and video creation, without a dedicated video-script/voiceover-writing branch. Explicit skill invocation can reach the material; automatic selection for a script-only request has not been demonstrated.
-   - **Smallest fix:** Add a narrow video-script/outline/narration trigger and route to Content Writing plus the existing production checkpoint. Preserve script-only scope without rendering a video.
-   - **If skipped:** Manual invocation remains usable, but automatic discovery is less explicit than the project's actual writing capability.
+Render the affected composition after studio changes, then inspect actual encoded
+frames and audio. The setup/link check verifies filesystem discoverability, not a
+fresh interactive client UI session. Fresh execution evidence stays under ignored
+`local/setup/`, with the run timestamp and any unverified branch stated separately.
 
-## Production Work Still Needed
+## Remaining production limits
 
-These are capability gaps, not claims that every skill must ship a full application:
+Completed remediation checks on 2026-11-15: **81 pytest cases and 18 helper
+unit tests passed**, plus Ruff, studio typecheck/library checks, all six skill
+frontmatter checks and all three shared-link checks. A fresh 4-second H.264
+Director demo passed dimensions/fps/frame count/audio policy/full decode; one
+encoded frame was visually inspected. This silent demo does not test narration
+or certify the unfinished editorial film.
 
-- **One representative production pilot.** `studio/src/` currently contains registration plus `SmokeTest` and `ThreeCheck`. The component names in `workflows/ai-assisted-motion-graphics.md:64–66` are proposed roles, not implemented asset/character libraries. Build one 10–15-second isometric or cartoon shot from a real brief/script, with the selected voice/captions, render it and record visual/audio review. This proves more than adding further tool families.
-- **Reusable study execution.** The ten-minute sampling, selected-clip mapping and TXT/SRT/JSON extraction used private per-study helpers. The shared CLI remains an analyzer, without a bounded study/transcription command. Promote only the recurring, validated operations into a small shared helper when making the workflow repeatable; preserve scope and exact source locators. This is not necessary for skill format validity, but reduces repeated agent scripting and path mistakes.
-- **A selected narration path.** Cached faster-whisper supports local recognition; it is not speech synthesis. Vietnamese TTS/voice quality, model availability for synthesis branches and complete lip/caption alignment remain unverified. Use an authorized supplied recording or explicitly selected/tested synthesis route for the pilot.
-- **A complete repository snapshot.** Current learning/content-writing/style/workflow additions include uncommitted files. They work in this checkout but are not all present in the last commit; a checkout of that commit does not reproduce the current knowledge base. Review and commit them when packaging this version.
-
-## Recommended Order
-
-1. Close the live-preview script/output boundary and add regression tests before enabling that branch.
-2. Correct the section anchors and capability reporting; clarify script-only routing.
-3. Run one representative script-to-MP4 pilot and a fresh-session continuation. Record the working commands, assets, chosen voice and observed quality limits.
-4. Package the proven study helpers and commit the reviewed knowledge/workflows. Further model/tool additions should follow a concrete production need.
-
-## Verification Scope
-
-The review covered the repo entrypoints/workflows, library Markdown, source analyzer/bridge/vision/report code, tests, studio code/scripts and tool manifests/setup guides. Fresh checks were pytest, Ruff, doctor, six Python dependency checks, studio typecheck/library checks, MP4 rendering/decoding/probing, encoded-frame inspection, a Three.js still, skill validation/path resolution and local file/fragment link checks. Evidence is kept in ignored setup records.
-
-**Not checked:** live After Effects execution or actual preview file writing; fresh skill UI invocation in both clients; new TTS/image-generation inference; complete cartoon/isometric reconstruction; perceptual audio listening; fresh-machine reinstallation of every external application. No paid services, model downloads or original-reference mutations were performed. A passing test suite does not cover the preview injection found by this review.
+- Live AE bridges were offline during verification; host PNG writing was not
+  exercised. The adapter inspects the active project and never opens/closes it;
+  use an isolated copy whenever a host project must be opened.
+- Real model accuracy, pronunciation, word alignment and perceptual listening are
+  separate from package installation and protocol tests. Setup-era model status
+  is not a current cache inventory. No model download or paid call is implied.
+- Native WebGPU capture/seek, full character acting/lip sync and a polished
+  reference-matched episode need representative production tests.
+- Ten-minute study/ASR sampling still uses per-study helpers; the public CLI is
+  an analyzer, not a one-command full video generator.
+- Existing uncommitted studio/skill work is preserved. A clone of the last commit
+  does not include those changes or the ignored private media/environments.

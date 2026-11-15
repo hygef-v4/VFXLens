@@ -1,4 +1,38 @@
-# VFX Learning Engine — Phase 1
+# VFXLens — Reference Analysis and AI-Guided Video Production
+
+VFXLens combines a local After Effects/video analyzer, a reusable editing and
+content-writing library, live technology research, and a Remotion production
+studio. Use it for one operator working with Codex or Claude Code; production is
+agent-guided, with explicit preview, render and review steps.
+
+| Task | Entry point | Current boundary |
+| --- | --- | --- |
+| Analyze `.aep/.aepx` or video | `uv run vfx ...` below | Offline analysis works; live AE requires a connected bridge. |
+| Study a PDF/video and its narration | [Study workflow](workflows/study-reference.md) | Inspect selected images and timestamped transcripts; record coverage and ASR errors. |
+| Write scripts or narration | [Content Writing](library/content-writing/README.md) | Script-only work finishes with writing. |
+| Discover current templates/shaders/skills | [motion-scout](skills/motion-scout/SKILL.md) | Live research when tools are available; no installation in research-only mode. |
+| Direct 3D or cinematic motion | [remotion-3d-director](.agents/skills/remotion-3d-director/SKILL.md) | WebGL/R3F baseline; native WebGPU remains experimental until capture/seek tests pass. |
+| Create, revise and export video | [Production workflow](workflows/create-video.md) | Remotion code and private assets need actual render/visual/audio review. |
+
+The studio registers `SmokeTest` (10s vertical), `ThreeCheck` (1s 3D),
+`DirectorSkillDemo` (4s horizontal product scene) and `EditorialExplainer` (120s
+horizontal). The editorial composition needs its private manifest/audio/fonts in
+ignored `studio/public/media/`; a fresh clone does not include those assets.
+These compositions demonstrate specific branches, not a complete character or
+image-generation pipeline.
+
+Register the three authored skills at both project discovery paths on Windows:
+
+```powershell
+foreach ($skillName in 'vfxlens', 'motion-scout', 'remotion-3d-director') {
+    uv run python skills/motion-scout/scripts/sync_skill.py --skill $skillName
+}
+```
+
+Use `$vfxlens`, `$motion-scout`, `$remotion-3d-director` in Codex and the matching
+`/skill-name` commands in Claude Code. Existing destinations are checked and
+preserved. Refresh client discovery after registration. See
+[setup](skills/motion-scout/references/capabilities-and-setup.md) for link checks.
 
 ## Local video production with Claude Code and Codex
 
@@ -35,7 +69,7 @@ An independent analysis engine for **Adobe After Effects projects (`.aep` / `.ae
 - **Method B — After Effects Read-Only Live Bridge (`ae_bridge`)**:
   - Supports read-only connection to JUNKDOGE `after-effects-mcp` (`http://127.0.0.1:11488/mcp`) or Solomon `aftereffects-mcp` (`http://127.0.0.1:7788/call`) alongside `ae-scripts/vfx_readonly_extract.jsx`.
   - Blocks all project write/save/mutation commands (`FORBIDDEN_JSX_PATTERNS`).
-  - When After Effects or the MCP panel is not running, transparently records `live_bridge_tested = false` and operates standalone via the Offline Parser.
+    - When After Effects or the MCP panel is not running, transparently records `live_bridge_tested = false` and operates standalone via the Offline Parser. Preview arguments are serialized as data and require a fresh PNG destination; actual host rendering needs a separate live check.
 - **Normalizer & Comparator (`normalizer`)**:
   - Normalizes outputs with explicit epistemic provenance: `observed`, `inferred`, `unavailable`, `unsupported`, `error`.
 

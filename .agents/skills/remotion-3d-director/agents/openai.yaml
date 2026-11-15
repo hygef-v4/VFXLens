@@ -1,0 +1,4 @@
+interface:
+  display_name: "Remotion 3D Director"
+  short_description: "Direct cinematic 3D, VFX and explainer videos"
+  default_prompt: "Use $remotion-3d-director to turn my brief into a storyboard, build frame-driven scenes, and deliver an inspected video."

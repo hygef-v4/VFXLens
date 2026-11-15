@@ -22,4 +22,4 @@
 
 The mere presence of Twixtor on a layer does not prove an active speed ramp; always inspect static speed parameters, child property groups, Time Remapping, layer stretch, and parent precompositions. Twixtor retiming and RSMB motion blur solve distinct tasks; see [Render Effects](../../tools/render-effects.md).
 
-**Sources and Limitations:** [Takt Op, Section 6](../../case-studies/takt-op.md#6-retiming-and-speed-ramps), [White Ferrari](../../case-studies/white-ferrari.md), [Chal7z: trails and wide time](../../case-studies/chal7z-presets.md). **Resource:** [Footage](../../resources/footage.md).
+**Sources and Limitations:** [Takt Op, Section 6](../../case-studies/takt-op.md#6-retime-và-speed-ramp), [White Ferrari](../../case-studies/white-ferrari.md), [Chal7z: trails and wide time](../../case-studies/chal7z-presets.md). **Resource:** [Footage](../../resources/footage.md).

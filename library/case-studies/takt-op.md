@@ -6,7 +6,7 @@ Thời gian trong các bảng thuộc composition được ghi tên, không mặ
 
 ## 1. Transition chroma, invert và displacement
 
-**Từ AE Notes:** [warp/scatter và giãn hình](ae-notes.md#3-transition-bằng-méo-hình-giãn-hình-và-scatter), [impact frame/invert](ae-notes.md#5-impact-frame-và-chuỗi-invert); nhiều ví dụ chưa có thời lượng/easing.
+**Từ AE Notes:** [warp/scatter và giãn hình](ae-notes.md#3-warp-stretch-and-scatter-transitions), [impact frame/invert](ae-notes.md#5-impact-frames-and-invert-chains); nhiều ví dụ chưa có thời lượng/easing.
 
 **Đối chiếu Standard:** [warp kết hợp blur/mosaic/brightness](standard.md#3-transition-đầu-shot-warp-nhanh-blurmosaicsáng-giảm-dần) và [RGB lệch thời gian từng kênh](standard.md#4-rgb-lệch-thời-gian-kết-hợp-threshold-không-phải-chỉ-rgb-lệch-vị-trí).
 
@@ -38,7 +38,7 @@ Thời gian trong các bảng thuộc composition được ghi tên, không mặ
 
 ## 2. Shake giảm dần sau điểm nhấn
 
-**Từ AE Notes:** [overshoot theo vận tốc và cách đọc wiggle](ae-notes.md#2-chữ-cosine-tắt-dần-và-overshoot-theo-vận-tốc), phân biệt với envelope amplitude của plugin.
+**Từ AE Notes:** [overshoot theo vận tốc và cách đọc wiggle](ae-notes.md#2-damped-cosine-text-and-velocity-driven-overshoot), phân biệt với envelope amplitude của plugin.
 
 **Ví dụ từ preset:** [S_Shake và S_DissolveShake trong Chal7z](chal7z-presets.md#1-shake-giảm-biên-độ-và-dissolve-shake); chưa xác lập timebase của các keyframe FFX.
 
@@ -74,7 +74,7 @@ Thời gian trong các bảng thuộc composition được ghi tên, không mặ
 
 ## 4. Glow, màu và bokeh
 
-**Từ AE Notes:** [color remap/Tritone và blend](ae-notes.md#9-colorama-tritone-và-blend), [blur có hướng/DOF](ae-notes.md#6-blur-có-hướng-và-dof).
+**Từ AE Notes:** [color remap/Tritone và blend](ae-notes.md#9-colorama-tritone-and-blending), [blur có hướng/DOF](ae-notes.md#6-directional-blur-and-depth-of-field).
 
 **Ví dụ từ preset:** [Bokeh phối hợp Gamma](chal7z-presets.md#2-transition-sáng-và-mờ-có-hai-đường-đồng-bộ); chỉ có envelope tăng được đọc, chưa khẳng định toàn bộ chu kỳ transition.
 
@@ -129,7 +129,7 @@ Expression còn có các nhánh theo tâm, mép, ký tự được chọn và ra
 
 ## 7. Overlay và audio visualizer
 
-**Từ AE Notes:** [luma matte chọn vùng flicker](ae-notes.md#4-luma-matte-cho-ánh-sáng-và-flicker-có-chọn-vùng) và [particle/mô phỏng phá vỡ](ae-notes.md#10-particle-và-mô-phỏng-phá-vỡ).
+**Từ AE Notes:** [luma matte chọn vùng flicker](ae-notes.md#4-luma-mattes-for-selective-lighting-and-flicker) và [particle/mô phỏng phá vỡ](ae-notes.md#10-particles-and-shatter-simulations).
 
 **Đối chiếu White Ferrari:** [overlay lens, fog và bướm theo Screen/Add](white-ferrari.md#6-overlay-ánh-sáng-và-khí-quyển-theo-blend-mode).
 
@@ -143,7 +143,7 @@ Expression còn có các nhánh theo tâm, mép, ký tự được chọn và ra
 
 ## 8. SFX và xử lý âm thanh
 
-[AE Notes: High-Low Pass + Reverb](ae-notes.md#11-sfx-lọc-âm-và-reverb) có thông số screenshot và đề xuất envelope; chưa có bản âm thanh đã nghe/đo để xác nhận hiệu quả. Khi học các project tiếp theo, ghi cả âm nguồn, timing, cutoff, dry/wet, gain và kết quả nghe.
+[AE Notes: High-Low Pass + Reverb](ae-notes.md#11-sfx-filtering-and-reverb) có thông số screenshot và đề xuất envelope; chưa có bản âm thanh đã nghe/đo để xác nhận hiệu quả. Khi học các project tiếp theo, ghi cả âm nguồn, timing, cutoff, dry/wet, gain và kết quả nghe.
 
 ## Nguồn và giới hạn chung
 

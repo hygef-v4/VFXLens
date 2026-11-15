@@ -39,6 +39,13 @@ shared render/review and handoff steps.
 
 ## Choose and prepare local tools
 
+When the brief requires discovering or choosing new animation technology, use
+[motion-scout](../skills/motion-scout/SKILL.md) for a live research-only pass first.
+Reuse adequate local code; otherwise record its selected source/commit, license,
+dependencies and adaptation/tests in the existing production checkpoint. The
+Director consumes that handoff for the authorized build; it does not recursively
+restart scouting. Research alone does not authorize installation.
+
 Use the existing `<repo>/studio/`, its package lock and package scripts. For any
 Remotion work, explicitly read
 `<repo>/studio/.agents/skills/remotion-best-practices/SKILL.md` **when it exists**;
@@ -66,6 +73,11 @@ session before acting; preserve existing and unsaved work. Generate a new scene
 in a separate file/process as needed, save it inside the production directory,
 and never clear or overwrite the user's scene. Reference AE projects remain
 read-only; make new production sources separately.
+
+For cinematic 3D, procedural shaders/particles, image-based procedural modeling,
+or 3D explainers, read the project [Remotion 3D Director skill](../.agents/skills/remotion-3d-director/SKILL.md).
+Use its relevant references with this workflow's existing production checkpoint;
+it does not replace the shared study, privacy or delivery rules.
 
 Keep production code under `studio/src/`, private scene/media/documents under
 `local/productions/<slug>/`, and renderer copies under ignored

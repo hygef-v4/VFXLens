@@ -12,6 +12,6 @@
 
 ## Current Evidence Level
 
-[Takt Op, Section 7](../../case-studies/takt-op.md#7-overlays-and-audio-visualizer) records an active `BCC_AUDIOVISUALIZER` instance on a solid layer, but static offline analysis has not confirmed which graphic lines in the demo video originate from that effect or react to audio. It is therefore not yet a complete, verified visualizer recipe.
+[Takt Op, Section 7](../../case-studies/takt-op.md#7-overlay-và-audio-visualizer) records an active `BCC_AUDIOVISUALIZER` instance on a solid layer, but static offline analysis has not confirmed which graphic lines in the demo video originate from that effect or react to audio. It is therefore not yet a complete, verified visualizer recipe.
 
 **Used In:** [Dreamy Style](../../styles/dreamy.md) and [Collage Style](../../styles/collage.md). **Foundations:** [Compositing](../../foundations/compositing.md).

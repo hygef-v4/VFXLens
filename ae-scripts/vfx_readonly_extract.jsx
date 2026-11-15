@@ -4,7 +4,7 @@
  * SAFETY GUARANTEES:
  * 1. Never modifies any composition, layer, property, or keyframe.
  * 2. Suppresses modal dialogs (missing fonts/plugins/footage) via app.beginSuppressDialogs().
- * 3. Only opens a snapshot copy if requested, closing with CloseOptions.DO_NOT_SAVE_CHANGES.
+ * 3. Inspects the active project only; never opens, closes or saves project files.
  * 4. Exports compositions, layers, property trees, effect stacks (matchName + values),
  *    keyframes (timing, interpolation, easing), expressions, and optional PNG preview frames.
  */
@@ -258,12 +258,21 @@ var VFXReadonlyExtractor = (function () {
     }
 
     function exportPreviewFrame(compName, timeSeconds, outputPngPath) {
+        if (typeof compName !== "string" || !isFinite(timeSeconds) || timeSeconds < 0) {
+            return { ok: false, error: "Invalid composition name or preview time" };
+        }
+        var outFile = new File(outputPngPath);
+        if (!/\.png$/i.test(outputPngPath) || outFile.exists) {
+            return { ok: false, error: "Preview requires a fresh PNG destination" };
+        }
         var proj = app.project;
         if (!proj) { return { ok: false, error: "No project open" }; }
         for (var i = 1; i <= proj.numItems; i++) {
             var item = proj.item(i);
             if (item instanceof CompItem && item.name === compName) {
-                var outFile = new File(outputPngPath);
+                if (timeSeconds >= item.duration) {
+                    return { ok: false, error: "Preview time is outside the composition" };
+                }
                 item.saveFrameToPng(timeSeconds, outFile);
                 return { ok: true, file: outFile.fsName };
             }

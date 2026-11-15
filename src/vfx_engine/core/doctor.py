@@ -98,16 +98,9 @@ def run_environment_doctor(config: EngineConfig | None = None) -> dict[str, Any]
     bridge_status = probe_live_ae_bridges(cfg)
 
     # 6. Vision Provider Config
-    vision_status = {
-        "provider": cfg.vision_provider,
-        "model": cfg.vision_model or "none",
-        "configured": cfg.vision_provider not in ("none", "", "noop"),
-        "note": (
-            "Vision provider configured"
-            if cfg.vision_provider not in ("none", "", "noop")
-            else "Defaulting to local Computer Vision only (NoOpVisionAnalyzer)"
-        ),
-    }
+    from ..vision.base import vision_capabilities
+
+    vision_status = vision_capabilities(cfg)
 
     all_core_ready = (
         ffmpeg_ok

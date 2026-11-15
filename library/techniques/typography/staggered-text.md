@@ -20,4 +20,4 @@
 
 Preserve controller names, property indices, delay units (seconds vs. frames), vector dimensions (`2D` vs. `3D`), and animator properties (`Position`, `Scale`, `Rotation`). A fixed-amplitude damped cosine selector behaves differently from velocity-driven keyframe overshoot. Applying Ease and Wizz can overwrite an existing property expression; select [Easing and Typography Tools](../../tools/easing-and-typography.md) according to the specific task.
 
-**Sources:** [Takt Op, Section 5](../../case-studies/takt-op.md#5-per-character-staggered-text), [Standard](../../case-studies/standard.md), [Chal7z](../../case-studies/chal7z-presets.md), [AE Notes](../../case-studies/ae-notes.md). **Resources:** [Fonts](../../resources/fonts.md), [Cutouts and Frames](../../resources/cutouts-and-frames.md).
+**Sources:** [Takt Op, Section 5](../../case-studies/takt-op.md#5-chữ-động-trễ-từng-ký-tự), [Standard](../../case-studies/standard.md), [Chal7z](../../case-studies/chal7z-presets.md), [AE Notes](../../case-studies/ae-notes.md). **Resources:** [Fonts](../../resources/fonts.md), [Cutouts and Frames](../../resources/cutouts-and-frames.md).

@@ -154,9 +154,12 @@ def render_video_markdown(result: VideoAnalysisResult) -> str:
             f"- **Status**: `{v.status.value}` | **Analyzed**: `{v.analyzed}`",
             f"- **Note**: {v.note}",
             "",
-            "## 7. Global Undetermined Video Aspects",
         ]
     )
+    if v.semantic_observations:
+        observations = json.dumps(v.semantic_observations, ensure_ascii=False, indent=2).replace("`", "\\u0060")
+        lines.extend(["### Model observations (inferred, unverified)", "```json", observations, "```", ""])
+    lines.append("## 7. Global Undetermined Video Aspects")
     for item in result.undetermined_video_aspects:
         lines.append(f"- {item}")
     lines.append("")

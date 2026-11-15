@@ -11,6 +11,7 @@ the user's original `.aep` file, and transparently reports when live AE is not a
 from __future__ import annotations
 
 import json
+import math
 import os
 from pathlib import Path
 from typing import Any
@@ -19,7 +20,7 @@ import httpx
 
 from ...core.config import EngineConfig, discover_after_effects_installations
 from ...core.logging import get_logger
-from ...core.safety import compute_sha256
+from ...core.safety import compute_sha256, validate_output_path
 
 logger = get_logger("project_analyzer.ae_bridge")
 
@@ -300,6 +301,7 @@ class AfterEffectsReadOnlyBridge:
             )
 
         jsx_code = self.jsx_script_path.read_text(encoding="utf-8") + "\nJSON.stringify(VFXReadonlyExtractor.extractProject());"
+        self.validate_script_is_readonly(jsx_code)
 
         if probes["junkdoge_ae_mcp"]["reachable"]:
             with httpx.Client(timeout=30.0) as client:
@@ -338,6 +340,15 @@ class AfterEffectsReadOnlyBridge:
         self, comp_name: str, time_seconds: float, output_png_path: Path
     ) -> dict[str, Any]:
         """Request a single read-only preview frame PNG from a live AE instance."""
+        seconds = float(time_seconds)
+        if not math.isfinite(seconds) or seconds < 0:
+            raise ValueError("Preview time must be finite and nonnegative")
+        target = Path(output_png_path).absolute()
+        validate_output_path(target)
+        if target.suffix.lower() != ".png" or target.exists():
+            raise ValueError("Preview destination must be a fresh PNG file")
+        if not target.parent.is_dir():
+            raise ValueError("Preview destination directory must already exist")
         probes = probe_live_ae_bridges(self.config)
         if not probes["any_live_bridge_online"]:
             return {
@@ -345,12 +356,13 @@ class AfterEffectsReadOnlyBridge:
                 "status": "unavailable",
                 "error": "Live After Effects MCP bridge is not running.",
             }
-        escaped_path = str(output_png_path.resolve()).replace("\\", "/")
-        escaped_comp = comp_name.replace('"', '\\"')
+        arguments = ", ".join(json.dumps(value, ensure_ascii=True, allow_nan=False)
+                              for value in (comp_name, seconds, target.resolve().as_posix()))
         jsx_code = (
             self.jsx_script_path.read_text(encoding="utf-8")
-            + f'\nJSON.stringify(VFXReadonlyExtractor.exportPreviewFrame("{escaped_comp}", {float(time_seconds)}, "{escaped_path}"));'
+            + f"\nJSON.stringify(VFXReadonlyExtractor.exportPreviewFrame({arguments}));"
         )
+        self.validate_script_is_readonly(jsx_code)
         if probes["junkdoge_ae_mcp"]["reachable"]:
             with httpx.Client(timeout=30.0) as client:
                 resp = client.post(

@@ -90,3 +90,12 @@ studio/out/
 **/.remotion/
 **/.agents/skills/
 **/.claude/skills/
+
+# Track the authored director skill; installed/junction skills stay ignored.
+!/.agents/skills/
+/.agents/skills/*
+!/.agents/skills/remotion-3d-director/
+!/.agents/skills/remotion-3d-director/references/
+
+# Canonical cross-agent research skill references are authored source.
+!/skills/motion-scout/references/

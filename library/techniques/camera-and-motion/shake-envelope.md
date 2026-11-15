@@ -14,6 +14,6 @@
 
 A plugin's normalized `Amplitude` parameter does not directly equal pixels. Expression `wiggle()` and keyframed phase curves do not carry the same semantics as an amplitude envelope. Always check the layer's `in`/`out` trim points, keyframes falling outside the active trim range, and additional shake effects applied on parent precompositions.
 
-**Evidence:** [Takt Op, Section 2](../../case-studies/takt-op.md#2-decaying-shake-after-an-accent) documents a decaying `Amplitude` curve; [White Ferrari](../../case-studies/white-ferrari.md) shows `Motion Tile` / `Mirror Edges` placed before `S_Shake`; [Chal7z](../../case-studies/chal7z-presets.md) preserves unscaled `.ffx` time units.
+**Evidence:** [Takt Op, Section 2](../../case-studies/takt-op.md#2-shake-giảm-dần-sau-điểm-nhấn) documents a decaying `Amplitude` curve; [White Ferrari](../../case-studies/white-ferrari.md) shows `Motion Tile` / `Mirror Edges` placed before `S_Shake`; [Chal7z](../../case-studies/chal7z-presets.md) preserves unscaled `.ffx` time units.
 
 **Used In:** [Impact Style](../../styles/impact.md), [Dissolve-Shake Transition](../transitions/dissolve-shake.md).

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Motion Scout"
+  short_description: "Discover and evaluate live creative video technology"
+  default_prompt: "Use $motion-scout to research current open-source video technology, rank evidence-backed candidates, and propose a compatible plan without installing anything."

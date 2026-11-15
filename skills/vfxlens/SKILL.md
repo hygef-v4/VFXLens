@@ -1,6 +1,6 @@
 ---
 name: vfxlens
-description: Use when learning VFX or motion graphics from PDF/docs (đọc tài liệu, học kỹ thuật), analyzing video or AE projects (phân tích video/AEP/AEPX), or creating and continuing a video through MP4 export (tạo video, dựng phim, tiếp tục sản xuất) with VFXLens.
+description: Use when learning VFX or motion graphics from PDF/docs (đọc tài liệu, học kỹ thuật), analyzing video or AE projects (phân tích video/AEP/AEPX), writing video scripts or narration (viết kịch bản, lời dẫn), or creating and continuing a video through MP4 export with VFXLens.
 ---
 
 # VFXLens
@@ -38,6 +38,7 @@ production files and changes before continuing another agent's work.
 | --- | --- |
 | Learn from a PDF, document, article, video or AE reference | Read `<repo>/workflows/study-reference.md`; use the analysis commands below when applicable. |
 | Analyze a video or `.aep`/`.aepx` | Read the study workflow's media section; run the existing analyzer and inspect actual artifacts. |
+| Write a hook, outline, video script or narration | Read `<repo>/library/content-writing/README.md`; draft sourced visual beats in the production checkpoint or its linked script. Finish with the requested writing, without expanding a script-only task into rendering. |
 | Create, recreate, revise or continue a video | Read `<repo>/workflows/create-video.md`; study supplied references first when relevant. |
 
 Read `<repo>/library/README.md` to find canonical techniques, styles, resources and

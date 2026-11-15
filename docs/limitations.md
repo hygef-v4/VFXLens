@@ -25,7 +25,7 @@ This document transparently and comprehensively lists the technical limitations 
    - Therefore, `live_bridge_tested` is honestly recorded as `false` across offline runs.
    - Complete implementations are provided for:
      - `ae-scripts/vfx_readonly_extract.jsx`: Strictly read-only ExtendScript (never calls `app.open()`, never mutates properties, never calls `app.project.save()`).
-     - `AfterEffectsReadOnlyBridge`: HTTP/JSON-RPC adapter for both MCP protocols (`11488` and `7788`) with a strict blocklist (`FORBIDDEN_JSX_PATTERNS`) preventing any write/mutation operations.
+     - `AfterEffectsReadOnlyBridge`: HTTP/JSON-RPC adapter for both MCP protocols (`11488` and `7788`). Dispatched JSX is checked with the read-only blocklist; preview arguments use JSON string serialization, finite nonnegative times and a fresh PNG destination. The host also checks file existence and composition time bounds. The blocklist is defense in depth, not a sandbox for arbitrary third-party scripts.
      - `compare_offline_and_live()`: Automated comparator between offline parser output and live AE bridge payloads.
 
 ---
@@ -46,3 +46,6 @@ This document transparently and comprehensively lists the technical limitations 
 3. **AI Vision Provider (`VisionAnalyzer`)**:
    - By default, the engine runs `NoOpVisionAnalyzer` (100% local, zero paid API calls, zero hallucinated AI descriptions).
    - The engine exports `contact-sheet.jpg` and timestamped `evidence-frames/` ready for consumption by a Vision model when explicitly configured by the user.
+   - Optional inference now supports a running **loopback OpenAI-compatible server**: configure `VFX_VISION_PROVIDER=local`, `VFX_VISION_MODEL` and `VFX_VISION_BASE_URL`, for example `http://127.0.0.1:1234/v1`. Supply/start the local model separately; this code never downloads or starts it. Allowed hosts are `127.0.0.1`, `localhost` (normalized to IPv4 loopback) and `::1`; cloud URLs, URL credentials, queries and redirects are refused. Proxy environment variables are ignored.
+   - Requests include the contact sheet and up to three evidence frames (4 MiB per image, 8 MiB total). Responses are bounded to 2 MiB with a 30s timeout. Model output must be JSON with `observations`, each containing `description` and `evidence`; returned observations are always `inferred`, `verified=false`. Failed requests or invalid output leave computer-vision reports available with an explicit Vision error.
+   - `vfx doctor` distinguishes disabled/incomplete/unsupported/ready-for-request configuration and reports `connection_tested=false`; configuration is not inference verification. Mock transport and local fixture-server tests verify the adapter protocol, not real model accuracy. HTTP transport behavior follows [HTTPX Client](https://www.python-httpx.org/api/#client).
