@@ -40,6 +40,7 @@ production files and changes before continuing another agent's work.
 | Analyze a video or `.aep`/`.aepx` | Read the study workflow's media section; run the existing analyzer and inspect actual artifacts. |
 | Write a hook, outline, video script or narration | Read `<repo>/library/content-writing/README.md`; draft sourced visual beats in the production checkpoint or its linked script. Finish with the requested writing, without expanding a script-only task into rendering. |
 | Create, recreate, revise or continue a video | Read `<repo>/workflows/create-video.md`; study supplied references first when relevant. |
+| Story Short with 3D cartoon characters (three.js picture, ElevenLabs audio, Remotion assembly) | Read `<repo>/workflows/create-video.md`, then `<repo>/workflows/threejs-character-short.md`. |
 
 Read `<repo>/library/README.md` to find canonical techniques, styles, resources and
 case studies. Reuse those articles; keep exact source evidence separate from a

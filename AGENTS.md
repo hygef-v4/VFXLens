@@ -24,6 +24,7 @@ Production uses the shared `skills/vfxlens/` entrypoint, Remotion in `studio/`, 
 ## 3. Task Routing
 
 - **Study, analyze or create video:** Read [`skills/vfxlens/SKILL.md`](skills/vfxlens/SKILL.md); follow its reference-study or production workflow for the requested branch.
+- **Make a story Short with 3D cartoon characters (three.js engine + Remotion assembly):** Read [`workflows/threejs-character-short.md`](workflows/threejs-character-short.md); it lists the skills per stage and the toolkit in `studio/tools/threejs-short/`.
 - **Direct cinematic 3D, procedural VFX or a 3D explainer:** Read [`.agents/skills/remotion-3d-director/SKILL.md`](.agents/skills/remotion-3d-director/SKILL.md) alongside the production workflow; it owns renderer selection, shot direction and visual/render QA.
 - **Discover or choose current video technology:** Read [`skills/motion-scout/SKILL.md`](skills/motion-scout/SKILL.md). Use its live research pass before adopting new animation technology; research-only work does not authorize installation, and selected findings hand off to the existing production/Director workflow.
 - **Write a video script, outline or narration:** Read [`library/content-writing/README.md`](library/content-writing/README.md) through the shared VFXLens skill; keep script-only requests scoped to writing.

@@ -32,6 +32,9 @@ For hooks, the narrative outline and narration written for visuals, read
 [Content Writing](../library/content-writing/README.md) before locking the script
 and storyboard. Keep the current script in the production checkpoint or its linked draft.
 
+For a vertical story Short with 3D cartoon characters rendered by a three.js engine and assembled in
+Remotion, follow [the three.js character short route](threejs-character-short.md) on top of this workflow.
+
 For AI-assisted motion graphics, isometric or cartoon explainers, or infographic videos,
 follow [the specialized production route](ai-assisted-motion-graphics.md) for
 classification, scene planning and tool selection, then use this workflow's
