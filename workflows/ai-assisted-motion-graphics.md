@@ -1,90 +1,90 @@
-# Làm explainer bằng AI-assisted motion graphics
+# Explainers with AI-assisted motion graphics
 
-Đọc sau [workflow sản xuất chung](create-video.md) khi yêu cầu là motion graphics có AI hỗ trợ, explainer bằng sơ đồ, isometric/2.5D hoặc cartoon có nhân vật. Đây là workflow để tạo một video mới; chưa phải một lệnh tự động sinh trọn video.
+Read after the [shared production workflow](create-video.md) when the request is AI-assisted motion graphics, a diagram explainer, isometric/2.5D or a cartoon with characters. This workflow makes a new video; it is not a command that generates a whole video on its own.
 
-## Phân loại và phạm vi
+## Classification and scope
 
-**Motion graphics/animation → explainer → chọn nhánh hình ảnh phù hợp.** Phương pháp sản xuất đề xuất: **AI-assisted, code-driven**. AI viết kịch bản, chuẩn bị dữ liệu cảnh/asset, lập trình chuyển động, chạy render và kiểm tra kết quả. Chọn từng khả năng theo công cụ và đầu vào thực tế.
+**Motion graphics/animation → explainer → pick the visual branch.** Proposed production method: **AI-assisted, code-driven**. The AI writes the script, prepares scene data and assets, programs the motion, runs the render and checks the result. Choose each capability by the tools and inputs actually available.
 
-| Nhánh | Đặc trưng và tài liệu |
+| Branch | Traits and guides |
 | --- | --- |
-| Isometric/2.5D infographic | [Style guide](../library/styles/isometric-explainer.md), [case Internet Global](../library/case-studies/internet-global-explainer.md): đạo cụ không gian, diagram, thẻ nguồn/trạng thái và recap |
-| Cartoon 2D có nhân vật | [Style guide](../library/styles/cartoon-explainer.md), [case Nvidia Chips](../library/case-studies/nvidia-chips-cartoon-explainer.md): biểu cảm, đạo cụ dẫn chuyện, bối cảnh phân lớp, ánh sáng cục bộ và đối thoại/câu hỏi |
+| Isometric/2.5D infographic | [Style guide](../library/styles/isometric-explainer.md), [Internet Global case](../library/case-studies/internet-global-explainer.md): spatial props, diagrams, source/status cards and recaps |
+| 2D cartoon with characters | [Style guide](../library/styles/cartoon-explainer.md), [Nvidia Chips case](../library/case-studies/nvidia-chips-cartoon-explainer.md): expressions, story props, layered backgrounds, local light pools and dialogue/questions |
 
-Ghi cách sản xuất từng loại tài sản: shape/SVG viết bằng code, cảnh 3D dựng bằng code, ảnh AI sinh, giọng tổng hợp hoặc tư liệu nguồn. “Có AI hỗ trợ” không tự chứng minh mọi tài sản của video tham chiếu do AI sinh ra. Công cụ gốc và mức độ dùng AI của nguồn vẫn chưa xác minh.
+Record how each asset type is produced: shapes/SVG written in code, 3D scenes built in code, AI-generated images, synthesized voice or source footage. "AI-assisted" does not prove that every asset of a reference video was AI-generated; the source's original tools and degree of AI use remain unverified.
 
-Các đặc trưng và tiêu chí hình ảnh nằm ở style guide tương ứng; bằng chứng và mốc đo nằm ở case study. Những lựa chọn cho video mới được ghi là quyết định sáng tạo.
+Visual traits and criteria live in the matching style guide; evidence and measured locators live in the case study. Choices made for a new video are recorded as creative decisions.
 
-## Bộ công cụ theo nhiệm vụ
+## Tools by task
 
-| Việc | Lựa chọn trong project | Điều cần xác nhận |
+| Task | Choice in this project | What to confirm |
 | --- | --- | --- |
-| Brief, kịch bản, shot list, code, kiểm tra | Claude/Codex qua skill VFXLens | Dùng chung checkpoint sản xuất; kiểm chứng các phát biểu cần nguồn |
-| Nhãn, thẻ thông tin, UI, timeline, stamp, lắp dựng | Remotion + React + SVG | Animation phụ thuộc frame; đọc skill Remotion của studio |
-| Minh họa isometric góc cố định | SVG/shape nhiều lớp; Three.js/R3F khi cần hình học 3D | Chọn cách đơn giản đáp ứng shot; chữ ưu tiên lớp 2D dễ đọc |
-| Camera, che khuất hoặc ánh sáng 3D | Three.js qua `@remotion/three`, hoặc Blender + MCP | Kiểm tra shot thật; giữ nguyên scene người dùng đang làm |
-| Giọng đọc tiếng Việt | Bản thu được cung cấp; `edge-tts` đã cài là một nhánh tổng hợp online | Online cần được cho phép; kiểm tra giọng khả dụng và phát âm trước khi làm dài |
-| ASR/phụ đề/cue lời | Whisper/faster-whisper; WhisperX khi cần căn chỉnh | Có model phù hợp; sửa chữ/tên riêng và kiểm nghe mốc thời gian |
-| Âm nhấn và phối âm | earshot + FFmpeg; librosa hỗ trợ đo tín hiệu | Nghe xác nhận cue, không coi onset lời nói là beat nhạc |
-| Xuất và kiểm tra tệp | Remotion + FFmpeg/ffprobe | Đúng contract hình/âm thanh và không có lỗi giải mã |
+| Brief, script, shot list, code, checks | Claude/Codex through the VFXLens skill | Use the shared production checkpoint; source every claim that needs one |
+| Labels, info cards, UI, timelines, stamps, assembly | Remotion + React + SVG | Frame-driven animation; read the studio's Remotion skill |
+| Fixed-angle isometric illustration | Layered SVG/shapes; Three.js/R3F when 3D geometry is needed | Pick the simplest route that serves the shot; keep text on a readable 2D layer |
+| 3D camera, occlusion or light | Three.js through `@remotion/three`, or Blender + MCP | Check the real shot; never replace a scene the user is working on |
+| Narration | A supplied recording, or TTS (ElevenLabs, `edge-tts`) when allowed | Online calls need permission; test the voice and pronunciation before a long take |
+| ASR, subtitles, word cues | Whisper (`studio/voice`); ElevenLabs forced alignment | Correct names and spellings; listen to check the timings |
+| Accents and mix | FFmpeg; librosa for signal measurements | Confirm cues by ear; a speech onset is not a music beat |
+| Export and file checks | Remotion + FFmpeg/ffprobe | Match the picture/audio contract and decode without errors |
 
-Tra [toolchain](../docs/full-toolchain.md) và hướng dẫn từng môi trường trước khi chạy. ComfyUI, CosyVoice và Kokoro là các nhánh bổ sung; việc cài package không đồng nghĩa đã có model, giọng Việt hoặc chất lượng phù hợp. Không phát sinh cloud call, tải model lớn hay thay dependency chỉ vì tài liệu nhắc tới chúng.
+Check the [toolchain](../docs/full-toolchain.md) before running anything. ComfyUI, CosyVoice and other local models are optional branches; installing a package does not mean a model, voice or suitable quality is available. Do not make cloud calls, download large models or change dependencies just because a document mentions them.
 
-## Các bước thực hiện
+## Steps
 
-### 1. Chốt contract và lập luận
+### 1. Fix the contract and the argument
 
-Tra [Content Writing](../library/content-writing/README.md) để chọn hook, cấu trúc giải thích và cách chuyển lời dẫn thành ý hình; áp dụng vào kịch bản của production hiện tại.
+Use [Content Writing](../library/content-writing/README.md) to choose the hook, the explanation structure and how narration turns into visual ideas; apply it to the current production's script.
 
-Tạo hoặc cập nhật một `local/productions/<slug>/production.md` theo workflow chung. Ghi thông điệp, người xem, thời lượng, kích thước/fps, composition ID, nguồn, nơi xuất và những đầu vào còn thiếu. Thông số 1920×1080, 30 fps của case study là dữ liệu tham chiếu; chỉ dùng cho video mới khi được chọn rõ.
+Create or update `local/productions/<slug>/production.md` following the shared workflow. Record the message, audience, length, size/fps, composition ID, sources, output location and missing inputs. The case study's 1920×1080 at 30 fps is reference data; use it for a new video only when chosen explicitly.
 
-Chọn cấu trúc theo câu hỏi video và bài học trong Content Writing; các nhánh kể theo vật thể hoặc phân loại bằng chứng có thể cần dàn ý khác nhau. Với mỗi phát biểu, lưu nguồn và trạng thái quan sát/suy luận/chưa biết. Ảnh minh họa không đóng vai bằng chứng tư liệu thật.
+Choose the structure from the video's question and the Content Writing lessons; object-led stories and evidence classifications may need different outlines. For each claim, keep its source and its status (observed, inferred or unknown). Illustrations are not documentary evidence.
 
-**Xong khi:** contract rõ và mỗi ý chính có nguồn/trạng thái hoặc được ghi là thiếu dữ liệu.
+**Done when:** the contract is clear and every main point has a source and status, or is marked as missing data.
 
-### 2. Chuẩn bị lời và storyboard theo cue
+### 2. Prepare the narration and a cue-based storyboard
 
-Nếu có lời dẫn, chuẩn bị bản thu hoặc thử một đoạn TTS ngắn được phép dùng trước. Đo bản audio thực rồi đặt cue hình; nếu chưa có audio, ghi thời gian là ước tính và giữ việc căn chỉnh cuối ở trạng thái chưa xong.
+With narration, prepare the recording or test a short, permitted TTS sample first. Measure the real audio, then place picture cues; without audio, mark times as estimates and keep the final alignment open.
 
-Mỗi shot trong checkpoint có các trường:
+Each shot in the checkpoint has these fields:
 
-| Trường | Nội dung |
+| Field | Content |
 | --- | --- |
-| ID và `[start, end)` | Mốc frame trên timeline sản xuất |
-| Ý/lời dẫn và nguồn | Một ý chính, phần chưa xác minh ghi rõ |
-| Bố cục/asset | Chủ thể, nhãn, diagram và nơi lấy tài sản |
-| Trạng thái hình | Vào → hạ xuống/ổn định → giữ → nhấn/thay đổi → ra |
-| Cue chung | ID và frame cho hình, lời, SFX hoặc điểm cần nghe lại |
-| Kiểm tra | Thời gian đọc, chữ nhỏ, quyền asset và vấn đề còn mở |
+| ID and `[start, end)` | Frame range on the production timeline |
+| Idea/narration and source | One main idea; unverified parts marked |
+| Layout/assets | Subject, labels, diagram and where each asset comes from |
+| Picture states | In → settle → hold → accent/change → out |
+| Shared cues | ID and frame for picture, voice, SFX or points to re-listen |
+| Checks | Reading time, small text, asset rights and open issues |
 
-**Xong khi:** mỗi shot có mục đích và thứ tự đọc; các mốc chưa có audio được đánh dấu ước tính.
+**Done when:** every shot has a purpose and a reading order; times without audio are marked as estimates.
 
-### 3. Dựng một hệ component và một shot mẫu
+### 3. Build a component system and one sample shot
 
-Chọn palette theo nhóm ý/trạng thái, font hỗ trợ tiếng Việt và cách vẽ viền/bóng. Với nhánh isometric, giữ góc nhìn nhất quán; bộ component gợi ý gồm `IsometricPlatform`, `EntityLabel`, `ClaimCard`, `SourceFooter`, `StatusStamp`, `Timeline`, `RecapBoard`. Đây là thiết kế đề xuất, chưa phải các component đã triển khai sẵn trong studio.
+Choose a palette by idea group or state, a font that supports the script's language, and one outline/shadow treatment. For the isometric branch keep one consistent viewing angle; suggested components are `IsometricPlatform`, `EntityLabel`, `ClaimCard`, `SourceFooter`, `StatusStamp`, `Timeline`, `RecapBoard`. These are a proposed design, not components that already exist in the studio.
 
-Với nhánh cartoon, giữ một character sheet về tỷ lệ, silhouette, biểu cảm, pose và điểm gắn đạo cụ. Thay bộ đế/recap bằng các vai trò `CharacterRig`, `ExpressionState`, `Prop`, `BackgroundLayers`, `LightPool`, `Intertitle`, `RouteMap` khi phù hợp. Các lớp gradient/mask, bóng tiếp xúc và nền ít tương phản là cách tái dựng ánh sáng 2D đề xuất; chưa chứng minh source dùng rig hoặc ánh sáng thật. Lấy hook, câu hỏi, ẩn dụ và chuỗi nhân quả từ transcript đã ghi giới hạn nhận dạng; tách đoạn quảng bá khỏi mạch nội dung chính.
+For the cartoon branch keep a character sheet for proportions, silhouette, expressions, poses and prop attachment points. Replace the platform/recap set with `CharacterRig`, `ExpressionState`, `Prop`, `BackgroundLayers`, `LightPool`, `Intertitle` and `RouteMap` where they fit. Gradient/mask layers, contact shadows and low-contrast backgrounds are a proposed way to rebuild 2D lighting; they do not prove the source used a rig or real lights. Take the hook, questions, metaphors and causal chain from the transcript with its recognition limits recorded, and separate sponsor segments from the main story.
 
-Dựng một shot đại diện đủ chứa đạo cụ, chữ và trạng thái. Dùng SVG/shape cho bố cục cố định; thêm 3D ở nơi cần thay đổi không gian. Render still trước, rồi bản chuyển động ngắn. Với video dài, kiểm tra shot mẫu trước khi nhân rộng scene.
+Build one representative shot that holds props, text and states. Use SVG/shapes for fixed layouts and add 3D where space has to change. Render a still first, then a short moving version. For a long video, check the sample shot before multiplying scenes.
 
-**Xong khi:** shot mẫu đã render và được xem; chữ, hướng đọc, góc nhìn và tương phản hoạt động ở kích thước xem mục tiêu.
+**Done when:** the sample shot is rendered and reviewed; text, reading direction, viewing angle and contrast work at the target viewing size.
 
-### 4. Triển khai chuyển động và ghép cảnh
+### 4. Animate and assemble
 
-AI viết code tái dùng trong `studio/src/`, dữ liệu/tài sản riêng theo workspace trong workflow chung. Reveal node/đường nối theo lời giải thích; đổi trạng thái của cùng đạo cụ thay vì liên tục đổi toàn cảnh. Dùng bảng recap để quay lại các nhóm thông tin và đổi palette ở ranh giới chương.
+The AI writes reusable code in `studio/src/` and keeps production data and assets in the workspace defined by the shared workflow. Reveal nodes and connectors in step with the explanation; change the state of the same prop instead of constantly replacing the whole scene. Use a recap board to return to information groups and change the palette at chapter boundaries.
 
-Mốc stamp khoảng chín frame trong case study chỉ là ví dụ đã đo. Chọn thời gian vào, scale, góc nghiêng, easing và khoảng giữ cho bố cục/lời mới; không gọi đó là keyframe gốc. Chữ đã hạ xuống nên giữ ổn định đủ lâu để đọc. Glitch là một lựa chọn nhấn ranh giới, không phải yêu cầu cho mọi lần chuyển cảnh.
+The case study's roughly nine-frame stamp is one measured example. Choose entry time, scale, tilt, easing and hold for the new layout and narration; do not call it an original keyframe. Text that has settled should stay still long enough to read. A glitch is one option for marking a boundary, not a requirement for every transition.
 
-**Xong khi:** các shot chạy đúng frame, chuyển cảnh giữ được ý, timeline/cue khớp bản audio đang dùng và không còn timing ước tính bị trình bày như đã căn chỉnh.
+**Done when:** shots run on the right frames, transitions keep the idea, the timeline and cues match the audio in use, and no estimated timing is presented as aligned.
 
-### 5. Âm thanh, render và bàn giao
+### 5. Sound, render and hand-off
 
-Phối lời, nền và SFX theo cue chung; nghe lại mức âm, chỗ bị che và đuôi chuyển cảnh. Thông số loudness/khoảng nghỉ của nguồn là số đo tham khảo, không phải target bắt buộc. Onset từ phân tích âm thanh chỉ là ứng viên cue.
+Mix voice, bed and SFX on the shared cues; listen for levels, masking and transition tails. The source's loudness and pause figures are reference measurements, not required targets. Onsets from audio analysis are only cue candidates.
 
-Thực hiện phần **Review, render and hand off** trong [workflow chung](create-video.md): typecheck, still/moving preview, render MP4, ffprobe, kiểm tra giải mã, xem frame đã encode và nghe mix. Sửa lỗi quan sát được, ghi riêng các kiểm tra chưa làm.
+Do the **Review, render and hand off** part of the [shared workflow](create-video.md): typecheck, still and moving previews, MP4 render, ffprobe, decode check, encoded-frame review and a listen to the mix. Fix what you observe and list the checks not done.
 
-**Xong khi:** yêu cầu xuất MP4 có tệp thực, đúng contract và kết quả kiểm tra; checkpoint chứa nguồn chỉnh sửa, asset, lệnh render, kết quả, vấn đề còn lại và bước tiếp theo. Yêu cầu chỉ viết tài liệu kết thúc ở tài liệu có quyết định và workflow cụ thể, không tự mở rộng sang sản xuất video.
+**Done when:** a requested MP4 exists as a real, checked file that meets the contract; the checkpoint holds the edit sources, assets, render command, results, open issues and next step. A documentation-only request ends with a document of decisions and a concrete workflow, without starting video production.
 
-## Giới hạn đã biết
+## Known limits
 
-Case study đã có ảnh mẫu xuyên suốt nguồn, hai cửa sổ VFX được phân tích đầy đủ, một chuỗi frame đo dấu đỏ và ASR/audio measurement. Chưa có project gốc, kiểm nghe toàn bộ hoặc bản dựng so sánh hoàn chỉnh. Vì vậy đây là **workflow tái dựng đề xuất**, chưa phải pipeline đã chứng minh tạo được bản sao của nguồn.
+The case study has sample frames across the source, two VFX windows analyzed in full, one measured frame sequence of a red stamp, and ASR/audio measurements. It has no original project, no full listening pass and no complete comparison build. This is therefore a **proposed reconstruction workflow**, not a pipeline proven to reproduce the source.

@@ -1,6 +1,6 @@
 # VFXLens local video toolchain
 
-This guide implements the [accepted installation proposal](ai-video-installation-proposal.md). VFXLens keeps analysis, video rendering and speech dependencies in separate environments. Agent instructions are in [AGENTS.md](../AGENTS.md); the shared entrypoint is [skills/vfxlens/SKILL.md](../skills/vfxlens/SKILL.md).
+VFXLens keeps analysis, video rendering and speech dependencies in separate environments. Agent instructions are in [AGENTS.md](../AGENTS.md); the shared entrypoint is [skills/vfxlens/SKILL.md](../skills/vfxlens/SKILL.md).
 
 The user subsequently requested the **full toolchain**, including the tools initially marked optional. See [full-toolchain setup and routing](full-toolchain.md). Optional/branch labels below describe when a film needs a tool, not a claim that it was omitted from the full installation. Use recorded check results to distinguish installed packages, runnable applications and missing model weights.
 
@@ -16,7 +16,7 @@ The user subsequently requested the **full toolchain**, including the tools init
 | Blender + MCP | Existing Blender if available; scene production for 3D/2.5D shots | [Blender](https://www.blender.org/download/) + [MCP for Blender](https://github.com/ahujasid/mcp-for-blender); community integration |
 | Whisper + CPU PyTorch | Separate Python 3.11 environment in `studio/voice/`; local speech/caption timing | Its `pyproject.toml` / `uv.lock`; published `openai-whisper` package |
 
-The studio pins `remotion`, `@remotion/cli`, `@remotion/media` and `@remotion/captions` to the same version. Use the checked-in manifests and lockfiles as the version authority. Blender is needed for the Blender production branch, not for an analyzer run or a Remotion-only composition. Whisper is needed for transcription, not for rendering a video with supplied caption timing.
+The studio pins `remotion`, `@remotion/cli`, `@remotion/media` and `@remotion/three` to the same version. Optional npm packages in the table below are not installed by default: add one with `npm --prefix studio install <package>` when a shot needs it. Use the checked-in manifests and lockfiles as the version authority. Blender is needed for the Blender production branch, not for an analyzer run or a Remotion-only composition. Whisper is needed for transcription, not for rendering a video with supplied caption timing.
 
 Actual machine paths, installed versions, client configuration backups and observed check results belong in ignored `local/setup/status.json` and neighboring `local/setup/` files. Consult that record for this installation; this document makes no claim that a connected client, downloaded speech model or complete production has been tested.
 
@@ -94,9 +94,9 @@ MCP for Blender is distributed as the published `mcp-for-blender` Python tool pl
 
 Keep the addon socket on localhost. Use one controlling client at a time for a scene. Query scene state before editing; create new production scenes and save only into the designated production workspace. Keep external asset services and AI-generation integrations disabled unless explicitly configured for the request. Verify a real scene query and a temporary production render separately from merely listing the MCP configuration. The analyzer's AE safety rules still apply independently.
 
-## The 20 repositories in PDF 2
+## Reference repositories
 
-These are roles and installation routes. **Core** means needed by the primary workflow; **branch** means used by a named workflow; **optional** means a film can omit it. The later full-install request includes all these tool families. Published packages are preferable to source clones unless modifying upstream code; compatibility-sensitive Python tools use separate environments.
+These are roles and installation routes. **Core** means needed by the primary workflow; **branch** means used by a named workflow; **optional** means a film can omit it and the repository does not install it.
 
 | # | Repository | Role / need | Installation route |
 | --- | --- | --- | --- |
@@ -121,25 +121,24 @@ These are roles and installation routes. **Core** means needed by the primary wo
 | 19 | [mifi/lossless-cut](https://github.com/mifi/lossless-cut) | Optional: quick footage trimming/remux | Official application release; no source clone |
 | 20 | [FFmpeg/FFmpeg](https://github.com/FFmpeg/FFmpeg) | Core: media processing and probing | Existing binary or platform build linked by ffmpeg.org; no source build required |
 
-Whisper is an additional selected component, distinct from PDF 2's WhisperX. Blender's own renderer supplies the initial 3D branch; Three.js, physics, particles and a path tracer are alternatives or additions, not prerequisites. Any animation library brought into Remotion must be driven by composition frames and tested for deterministic seeking/rendering. [Remotion animation model](https://www.remotion.dev/docs/animating-properties).
+Whisper (`studio/voice`) is the local transcription option; WhisperX is an optional alternative for stricter alignment. Blender's own renderer supplies the initial 3D branch; Three.js, physics, particles and a path tracer are alternatives or additions, not prerequisites. Any animation library brought into Remotion must be driven by composition frames and tested for deterministic seeking/rendering. [Remotion animation model](https://www.remotion.dev/docs/animating-properties).
 
-## Additional references from PDF 1
+## Related agent skills
 
-The full profile also installs these creative skill families and toolkit dependencies or keeps the referenced source catalogue locally. Select a specific skill only when its scope matches the production; a repository link alone does not establish Windows compatibility or a complete character rig.
+Install these per machine when a production needs them; they are not part of the repository.
 
-| Source | Use / route |
+| Source | Use |
 | --- | --- |
-| [LottieFiles/motion-design-skill](https://github.com/LottieFiles/motion-design-skill) | Selected project skill; timing/easing/staging guidance via Skills CLI above |
-| [angrypenguinpng/blender-claymation-skill](https://github.com/angrypenguinpng/blender-claymation-skill) | Installed creative skill; use the local Blender executable and review Windows helper assumptions |
-| [tuzhechen2005/opus-video-skills](https://github.com/tuzhechen2005/opus-video-skills) | Installed painted/kinetic skills; kinetic-reel YAML repair is documented in the creative toolkit |
-| [JohnHeibel/ClaudeAnimationBase](https://github.com/JohnHeibel/ClaudeAnimationBase) | Cloned p5.js starter with installed Node dependencies and a still-render check |
-| [Leonxlnx/earshot](https://github.com/Leonxlnx/earshot) | Official Git-pinned package in the analysis environment and installed audio skills; offline sound-bank/MCP checks |
-| [greensock/gsap-skills](https://github.com/greensock/gsap-skills) | Eight installed skills for GSAP production branches |
-| [heygen-com/hyperframes](https://github.com/heygen-com/hyperframes) | Isolated HTML video CLI and nine installed skills |
-| [lemomo-ai/lemo-opuscar](https://github.com/lemomo-ai/lemo-opuscar) | Cloned toolkit, installed skill and isolated core/voice/music dependencies; narration still needs model files |
-| [zhuyansen/awesome-claude-video-skills](https://github.com/zhuyansen/awesome-claude-video-skills) | Cloned discovery catalogue; evaluate its original sources individually |
+| [remotion-dev/skills](https://github.com/remotion-dev/skills) | Remotion guidance (`remotion-best-practices` router) |
+| [LottieFiles/motion-design-skill](https://github.com/LottieFiles/motion-design-skill) | Timing, easing and staging guidance |
+| [thuann-vn/claude-3d-animated-shorts](https://github.com/thuann-vn/claude-3d-animated-shorts) | three.js character engine used by the Short toolkit |
+| [Vincentwei1021/video-shotcraft](https://github.com/Vincentwei1021/video-shotcraft) | Shot recipes and sound-design rules |
+| [greensock/gsap-skills](https://github.com/greensock/gsap-skills) | GSAP animation branches |
+| [lemomo-ai/lemo-opuscar](https://github.com/lemomo-ai/lemo-opuscar) | Code-rendered film styles (Claude Code plugin) |
+| [ANVEAI/motion-pack](https://github.com/ANVEAI/motion-pack) | Story, frame design, publishing copy and render lint (Claude Code plugin) |
+| [zhuyansen/awesome-claude-video-skills](https://github.com/zhuyansen/awesome-claude-video-skills) | Discovery catalogue; evaluate each original source |
 
-The [prior survey](ai-video-skills-survey.md) records the two PDFs and the limits of their claims. Follow [study-reference](../workflows/study-reference.md) for evidence and [create-video](../workflows/create-video.md) for production, rather than treating a PDF's example parameters as measurements of an original pipeline.
+Follow [study-reference](../workflows/study-reference.md) for evidence and [create-video](../workflows/create-video.md) for production, rather than treating a tutorial's example parameters as measurements of an original pipeline.
 
 ## Cost and license boundaries
 

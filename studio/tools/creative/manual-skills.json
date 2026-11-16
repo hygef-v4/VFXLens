@@ -1,9 +1,0 @@
-{
-  "kinetic-reel": {
-    "repository": "https://github.com/tuzhechen2005/opus-video-skills",
-    "commit": "59744a69c7b916cfbe4c4ec84006b0c2f5e2fde1",
-    "source_path": "skills/kinetic-reel",
-    "installation_path": ".agents/skills/kinetic-reel",
-    "local_patch": "Quote the one-line description value in SKILL.md as a YAML string. Upstream unquoted colon causes YAML parse failure; other files unchanged."
-  }
-}

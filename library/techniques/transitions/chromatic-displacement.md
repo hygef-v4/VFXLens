@@ -1,6 +1,6 @@
 # Chromatic, Invert, and Displacement Transitions
 
-**Purpose:** Combine spatial warp distortion with brief color/luminance state flips around a cut boundary. The steps below describe a proposed workflow; a statically extracted project example is documented in [Takt Op, Section 1](../../case-studies/takt-op.md#1-transition-chroma-invert-và-displacement).
+**Purpose:** Combine spatial warp distortion with brief color/luminance state flips around a cut boundary. The steps below describe a proposed workflow; a statically extracted project example is documented in [Takt Op, Section 1](../../case-studies/takt-op.md#1-chroma-invert-and-displacement-transition).
 
 ## Proposed Recreation Workflow
 

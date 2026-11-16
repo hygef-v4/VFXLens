@@ -11,12 +11,12 @@ paths load the same canonical instructions and support explicit research/build m
 > established work, inspect code/visuals/licenses, rank candidates and propose an
 > integration plan. Do not install anything.
 
-**Vietnamese reference-led discovery:**
+**Reference-led discovery:**
 
-> /motion-scout Tìm công nghệ mã nguồn mở phù hợp video explainer có nhân vật,
-> ánh sáng có chiều sâu và camera như video tham chiếu. Tra cả component trong
-> project lẫn nguồn hiện tại trên mạng; phân biệt kỹ thuật tốt với độ viral.
-> Chỉ nghiên cứu, ghi rõ phần chưa xem hoặc chưa chạy.
+> /motion-scout Find open-source technology for a character explainer with deep,
+> layered lighting and a camera like the reference video. Check components already
+> in the project and current sources online; separate strong technique from virality.
+> Research only; state what was not viewed or run.
 
 **Authorized build with a bounded handoff:**
 

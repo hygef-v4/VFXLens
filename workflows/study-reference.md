@@ -48,7 +48,7 @@ unexamined. This learning pass does not require an uncapped full-source VFX run.
 
 Extract a timestamped transcript for the studied interval when local ASR is
 available. Save readable TXT, SRT and structured JSON privately, preserving the
-original language; keep Vietnamese summaries separate. Use it to study the hook,
+original language; keep translated summaries separate. Use it to study the hook,
 questions, metaphors, explanation order, evidence and narrative transitions as
 well as images. Label ASR text/times as inferred and record missing coverage,
 recognition errors and listening checks; a source's factual claims remain claims

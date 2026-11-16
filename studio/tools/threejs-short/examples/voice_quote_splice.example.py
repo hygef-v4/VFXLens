@@ -5,7 +5,8 @@
 # aligned 0.55 s late (clipped 'So') and the last word's tail ran past the file end. QT speeds a slow delivery (atempo, pitch kept).
 import base64, json, subprocess, wave, numpy as np
 from pathlib import Path
-R = Path(__file__).resolve().parent; PROD = R.parent; SR = 44100; LEAD = 0.3; LAUGH = 1.1; QT = 1.25   # question: Ian (narrator voice) [sarcastic]; QT = question tempo (v11: it read slow)
+R = Path(__file__).resolve().parent; PROD = R.parent; SR = 44100; LEAD = 0.3; LAUGH = 1.1; QT = 1.25   # LAUGH = reaction beat after the quote (s); QT = quote tempo (1.0 = as generated)
+QUOTE_FIRST, BEFORE_QUOTE, RESUME = 'so', 'asked', 'jensen'   # quote's first word, narrator word before it, narrator word after the beat
 S = json.loads((PROD / 'script.json').read_text(encoding='utf-8'))
 
 def words_of(al):
@@ -21,10 +22,10 @@ def words_of(al):
 def pcm(mp3):
     raw = subprocess.run(['ffmpeg', '-v', 'error', '-i', str(mp3), '-f', 's16le', '-ac', '1', '-ar', str(SR), '-'], capture_output=True, check=True).stdout
     return np.frombuffer(raw, '<i2').astype(np.float64) / 32768
-nar = json.load(open(R / 'el_full.json', encoding='utf-8')); inv = json.load(open(R / 'el_investor.json', encoding='utf-8'))
-NA, IA = pcm(R / 'el_full.mp3'), pcm(R / 'el_investor.mp3'); NW, IW = words_of(nar['alignment']), words_of(inv['alignment'])
-iso = next(i for i, w in enumerate(NW) if w['w'].lower().startswith('so') and NW[i - 1]['w'].lower().startswith('asked'))
-ije = next(i for i, w in enumerate(NW) if w['w'].lower().startswith('jensen'))
+nar = json.load(open(R / 'el_full.json', encoding='utf-8')); inv = json.load(open(R / 'el_quote.json', encoding='utf-8'))
+NA, IA = pcm(R / 'el_full.mp3'), pcm(R / 'el_quote.mp3'); NW, IW = words_of(nar['alignment']), words_of(inv['alignment'])
+iso = next(i for i, w in enumerate(NW) if w['w'].lower().startswith(QUOTE_FIRST) and NW[i - 1]['w'].lower().startswith(BEFORE_QUOTE))
+ije = next(i for i, w in enumerate(NW) if w['w'].lower().startswith(RESUME))
 cutA, cutC = NW[iso]['t'] - 0.04, NW[ije]['t'] - 0.08
 IW = IW[:next(i for i, w in enumerate(IW) if w['w'].endswith('?')) + 1]   # v12: the take has a filler word after the question so the last word is not truncated
 _r = np.sqrt(np.convolve(IA ** 2, np.ones(441) / 441, 'same'))[::441]; _th = _r.max() * 10 ** (-45 / 20)   # 10 ms RMS
@@ -38,7 +39,7 @@ B = np.frombuffer(subprocess.run(['ffmpeg', '-v', 'error', '-f', 's16le', '-ar',
 gapq = 0.12   # breath between "asked:" and the question
 track = np.concatenate([np.zeros(int(LEAD * SR)), A, np.zeros(int(gapq * SR)), B, np.zeros(int(LAUGH * SR)), Cc, np.zeros(int(0.4 * SR))])
 oB = LEAD + len(A) / SR + gapq; oC = oB + len(B) / SR + LAUGH
-words = [dict(w, t=w['t'] + LEAD, e=w['e'] + LEAD) for w in NW[:iso]] + [dict(w, t=(w['t'] - i0) / QT + oB, e=(w['e'] - i0) / QT + oB, spk='investor') for w in IW] + [dict(w, t=w['t'] - cutC + oC, e=w['e'] - cutC + oC) for w in NW[ije:]]
+words = [dict(w, t=w['t'] + LEAD, e=w['e'] + LEAD) for w in NW[:iso]] + [dict(w, t=(w['t'] - i0) / QT + oB, e=(w['e'] - i0) / QT + oB, spk='quote') for w in IW] + [dict(w, t=w['t'] - cutC + oC, e=w['e'] - cutC + oC) for w in NW[ije:]]
 lines, k = [], 0
 for l in S['lines']:
     n = len(l['vo'].split()); ws = words[k:k + n]; k += n
@@ -48,5 +49,5 @@ for l in S['lines']:
 with wave.open(str(R / 'voice_v3.wav'), 'wb') as w:
     w.setnchannels(1); w.setsampwidth(2); w.setframerate(SR); w.writeframes((np.clip(track, -1, 1) * 32767).astype('<i2').tobytes())
 subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', R / 'voice_v3.wav', '-c:a', 'libmp3lame', '-q:a', '2', PROD / 'voice_raw.mp3'], check=True)
-json.dump({'voice': 'Ian uC1r2TVqMMkHyjSAteKk (narration + sarcastic question take)', 'duration': round(len(track) / SR, 3), 'lines': lines}, open(PROD / 'timing_raw.json', 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+json.dump({'voice': 'narrator take + quote take (same voice)', 'duration': round(len(track) / SR, 3), 'lines': lines}, open(PROD / 'timing_raw.json', 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 print('duration', round(len(track) / SR, 2), '| question', round(oB, 2), '-', round(oB + len(B) / SR, 2), '| Jensen at', round(oC, 2))

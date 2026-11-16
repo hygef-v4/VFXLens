@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - name: Install FFmpeg
+        run: choco install ffmpeg -y --no-progress
+      - name: Install
+        run: uv sync --locked --extra dev
+      - name: Lint
+        run: uv run ruff check src tests
+      - name: Test
+        env:
+          PYTHONUTF8: "1"
+        run: uv run pytest -q
+
+  studio:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: studio/package-lock.json
+      - name: Install
+        run: npm --prefix studio ci
+      - name: Typecheck
+        run: npm --prefix studio run typecheck
+      - name: Transition tests
+        run: node --test studio/tools/threejs-short/qa/transitions.test.mjs

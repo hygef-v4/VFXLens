@@ -1,6 +1,6 @@
-# v3 underscore (procedural; ElevenLabs Music needs a paid API plan, the free MCP queue stayed busy): a warm, sparse bed
+# Procedural underscore (ElevenLabs Music needs a paid plan): a warm, sparse bed
 # that stays out of the voice's way — soft detuned pad chords + a felt-piano note per half bar, no plucky arpeggios.
-# I-vi-IV-V in C at 90 BPM; drops to the pad only at night, stops for the dolly zoom, a slightly fuller last third.
+# I-vi-IV-V in C at 90 BPM; a slightly fuller last third. Free stand-in when no licensed music is available.
 import numpy as np, wave
 from pathlib import Path
 from cues import cues
@@ -27,7 +27,7 @@ bar = 4 * 60 / 90; CH = [(48, [60, 64, 67]), (45, [57, 60, 64]), (41, [57, 60, 6
 MEL = [72, 67, 69, 64, 69, 65, 71, 67]
 k = 0; t = 0.0
 while t < END:
-    root, tri = CH[k % 4]; stop = C['H1'] - 0.1 <= t < C['l8'] - 0.2; night = C['H0'] <= t < C['H1']; late = t >= C['l8']
+    root, tri = CH[k % 4]; stop = night = False; late = t >= END * 0.66   # set stop/night windows from your cues (e.g. silence under a dolly zoom)
     if not stop:
         put(pad([root + 12] + tri, bar + 0.8), t, 0.5 if not night else 0.35, pan=-0.15)
         if not night:

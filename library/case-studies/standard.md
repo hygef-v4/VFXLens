@@ -1,106 +1,106 @@
-# Standard — chữ nảy, sticker và transition nhiều lớp
+# Standard — Bouncing Text, Stickers and Layered Transitions
 
-Bổ sung cho [sổ tay các dạng edit](../README.md), đọc ngày 2026-11-04. Thông số có nguồn từ JSON; mục đích thị giác là suy luận trừ khi được ghi rõ là quan sát ảnh. Chưa render AE tách effect.
+Companion to the [editing handbook](../README.md), read on 2026-11-04. Parameters are sourced from the JSON; visual intent is inferred unless marked as an image observation. AE was not rendered to isolate effects.
 
-## Nguồn và phạm vi
+## Source and Scope
 
 - Project: `evidence:standard-01`.
 - Project JSON/report: `evidence:standard-02`.
-- SHA-256 project: `8810ab59251ceb7c5c0399b2723ad78e7a34f247695d3d928ce5b4e16fd8f6f1`; sau phân tích khớp. Video nguồn phân tích cũng giữ nguyên hash.
-- AE `22.0x111`, màu 8-bit, 17 composition, 137 layer, 5 expression entry được trích xuất.
-- `cc2 standard.mp4` trong `(Footage)`: 1650×1080, 24 fps, 6.916667 giây; đã phân tích đủ 166 frame. Kết quả tại `evidence:standard-03`.
-- Contact sheet quan sát có nền tím, giấy/ảnh chân dung, ký tự collage, mặt trời, mây, kim cương và icon; có thay đổi bố cục/phóng/xoay giữa các frame. Đây là quan sát prerender, chưa xác định effect riêng gây ra từng thay đổi.
-- 50 asset thiếu ở đường dẫn đã lưu; 27 ứng viên trùng basename có trong `(Footage)`. Chưa xác minh nội dung hoặc relink. Report collect cũ ghi một missing item và chỉ collect selected comps; không đồng nghĩa toàn bộ project hiện đủ footage.
-- Thời gian bên dưới theo từng comp. Có hai comp cùng tên `bg`: item 18 là 1650×1080/1 layer; item 857 là 1920×1080/4 layer. Tra bằng item_id và cấu trúc khi cần, không gộp theo tên.
+- Project SHA-256: `8810ab59251ceb7c5c0399b2723ad78e7a34f247695d3d928ce5b4e16fd8f6f1`; it matched after the analysis. The analyzed source video kept its hash as well.
+- AE `22.0x111`, 8-bit colour, 17 compositions, 137 layers, 5 expression entries extracted.
+- `cc2 standard.mp4` in `(Footage)`: 1650×1080, 24 fps, 6.916667 s; all 166 frames analyzed. Results in `evidence:standard-03`.
+- The contact sheet shows a purple background, paper/portrait photos, collage letters, a sun, clouds, diamonds and icons, with layout/zoom/rotation changes between frames. This is an observation of the prerender; the effect behind each change is not identified.
+- 50 assets are missing at their stored paths; 27 basename matches exist in `(Footage)`. Content and relinking are not verified. An older collect report lists one missing item and collected only selected comps; that does not mean the whole project has its footage now.
+- Times below are per comp. Two comps are named `bg`: item 18 is 1650×1080 with 1 layer; item 857 is 1920×1080 with 4 layers. Look them up by item_id and structure, never merge them by name.
 
-## 1. Chữ nảy từng ký tự bằng Expression Selector
+## 1. Per-Character Bouncing Text with an Expression Selector
 
-**Nguồn:** `trans`, layer 11 `i got ` và `trans 2`, layer 11 `Kool-Aid`. Cả hai text layer bật, Animator 1 có Expression Selector Amount bật.
+**Source:** `trans`, layer 11 `i got ` and `trans 2`, layer 11 `Kool-Aid`. Both text layers are enabled; Animator 1 has an enabled Expression Selector Amount.
 
-Expression lưu các hằng số `freq=2.5`, `decay=4`, `duration=0.15`; độ trễ `textIndex * thisComp.frameDuration * 1`. Tính `t = time - (inPoint + retard)`; trước duration, dùng linear từ `[100,100,100]` về `[0,0,0]`; sau đó dùng dao động sin với mẫu số `exp(decay*(t-duration))` và `w=freq*2π`.
+The expression stores the constants `freq=2.5`, `decay=4`, `duration=0.15`; the delay is `textIndex * thisComp.frameDuration * 1`. It computes `t = time - (inPoint + retard)`; before `duration` it goes linearly from `[100,100,100]` to `[0,0,0]`; after that it uses a sine oscillation divided by `exp(decay*(t-duration))` with `w=freq*2π`.
 
-**Animator properties đọc được:** Position `[0,41,0]`, Scale `[0,0,100]`, Rotation `12`. Amount điều tiết tổ hợp các thuộc tính animator này; nó không trực tiếp bằng tọa độ hoặc scale cuối của ký tự.
+**Animator properties read:** Position `[0,41,0]`, Scale `[0,0,100]`, Rotation `12`. Amount scales this combination of animator properties; it is not directly a character's final position or scale.
 
-**Điều rút ra:** một expression dùng chung cho nhiều ký tự, lệch một frame mỗi textIndex rồi dao động tắt dần. textIndex bắt đầu từ 1, nên ký tự đầu cũng có một frame delay so với inPoint, không phải zero delay.
+**Takeaway:** one expression serves many characters, offset by one frame per textIndex, then oscillating with decay. textIndex starts at 1, so the first character is also one frame behind inPoint, not zero delay.
 
-Ở 24 fps, một frame khoảng 0.041667 giây. `duration=0.15` là thời gian biểu thức, không phải số frame nguyên. Chưa thực thi source expression, chưa kiểm tra selector mode/combination, easing cảm nhận hoặc font trên máy. Khi tái dựng phải mang cả animator properties và selector, không chỉ copy Amount.
+At 24 fps one frame is about 0.041667 s. `duration=0.15` is expression time, not a whole number of frames. The expression source was not executed; selector mode/combination, perceived easing and the font on this machine were not checked. A rebuild must carry the animator properties and the selector, not only Amount.
 
-## 2. Viền sticker bằng matte mở rộng và composite lại ảnh
+## 2. Sticker Outline from an Expanded Matte and Re-Composited Image
 
-**Nguồn:** `trans`, layer 4 `discord`: layer/effects bật, thứ tự:
+**Source:** `trans`, layer 4 `discord`: layer and effects enabled, in this order:
 
 `Simple Choker → Fill → CC Composite → S_DropShadow`
 
-| Tham số | Giá trị lưu |
+| Parameter | Stored value |
 | --- | --- |
 | Simple Choker / Choke Matte | -48.5 |
 | Fill / Color | [1,1,1,1] |
 | Fill / Opacity | 1 |
 | CC Composite / Opacity | 100 |
-| CC Composite / Composite Original | enum 3, chưa diễn giải tên |
+| CC Composite / Composite Original | enum 3, name not decoded |
 | CC Composite / RGB Only | 1 |
 
-**Suy luận để dựng thử:** dùng matte mở rộng, tô trắng, composite ảnh gốc và thêm shadow để tạo phân lớp. Phải xác nhận alpha và tên chế độ Composite Original trước khi gọi đây là preset viền hoàn chỉnh.
+**Inference for a test build:** expand the matte, fill it white, composite the original image back and add a shadow to separate the layer. Confirm the alpha and the name of the Composite Original mode before calling this a complete outline preset.
 
-**Biến thể:** `cat cig Comp 1`, layer 2 `saitama`: thứ tự `Fill → Simple Choker → CC Composite`, Choke Matte `-37.2`; không được hoán đổi với stack trên và giả định kết quả giống nhau. `trans` layer 5/6 cũng có stack như layer 4, nhưng không suy ra mọi giá trị giống nhau nếu chưa đọc.
+**Variant:** `cat cig Comp 1`, layer 2 `saitama`: order `Fill → Simple Choker → CC Composite`, Choke Matte `-37.2`; do not swap it with the stack above and assume the same result. `trans` layers 5/6 have the same stack as layer 4, but identical values are not assumed without reading them.
 
-## 3. Transition đầu shot: warp nhanh, blur/mosaic/sáng giảm dần
+## 3. Shot-Opening Transition: Fast Warp with Decaying Blur/Mosaic/Brightness
 
-**Nguồn:** `effects`, 1650×1080, 24 fps, 6.916667 giây. Các layer dưới đây bật và là adjustment layer.
+**Source:** `effects`, 1650×1080, 24 fps, 6.916667 s. The layers below are enabled adjustment layers.
 
-| Layer | Khoảng hiện | Effect và keyframe |
+| Layer | Visible range | Effect and keyframes |
 | --- | --- | --- |
 | 7 `warp` | 0–0.166667 | Warp Bend: 0 → 45; 0.125 → 0 |
-| 6 `blur` | 0–0.291667 | Bokeh Blur Radius: 0 → 20; 0.291667 → 0; Mosaic Pixelate X: 25 → 0 cùng mốc; Brightness: 60 → 0 cùng mốc |
-| 3 `blur 2` | 3.458333–3.75 | Cùng ba đường 20/25/60 về 0 ở 3.75 |
+| 6 `blur` | 0–0.291667 | Bokeh Blur Radius: 0 → 20; 0.291667 → 0; Mosaic Pixelate X: 25 → 0 at the same times; Brightness: 60 → 0 at the same times |
+| 3 `blur 2` | 3.458333–3.75 | The same three curves 20/25/60 to 0 at 3.75 |
 
-Trong dòng layer 6, `0 → 20` nghĩa là tại thời điểm 0 giây giá trị 20, không phải animation từ giá trị 0 lên 20. Mỗi effect có hai key, dùng BEZIER ở in/out.
+In the layer 6 row, `0 → 20` means the value is 20 at 0 s, not an animation from 0 up to 20. Each effect has two keys with BEZIER in/out.
 
-**Thứ tự layer blur:** Bokeh → BCC Mosaic (`Boris3Pixelate`) → Brightness & Contrast. Motion Tile ở các layer warp tồn tại nhưng **effect disabled**; không đưa nó vào stack đang hoạt động.
+**Blur layer order:** Bokeh → BCC Mosaic (`Boris3Pixelate`) → Brightness & Contrast. The warp layers contain Motion Tile but the **effect is disabled**; leave it out of the active stack.
 
-**Điều rút ra:** warp hoàn thành khoảng ba frame, còn blur/pixelation/brightness giảm trong khoảng bảy frame. Dùng envelope có thời lượng khác nhau để nối một nhấn méo nhanh với quá trình trở lại rõ hình dài hơn.
+**Takeaway:** the warp finishes in about three frames while blur/pixelation/brightness decay over about seven. Envelopes of different lengths join a fast distortion accent to a longer return to a clear image.
 
-**Giới hạn:** key cuối layer 6/3 trùng out_point, không nên nói giá trị 0 đã được hiển thị trọn một frame trước khi layer kết thúc. Cần kiểm tra Warp style/axis và toàn bộ giá trị tĩnh. Prerender `cc2 standard.mp4` ở layer 8 là đầu vào của comp `effects`, vì vậy nhìn video này không kiểm chứng được các effect xử lý phía sau nó.
+**Limits:** the last key of layers 6/3 coincides with the out point, so do not claim the 0 value is shown for a whole frame before the layer ends. Warp style/axis and all static values need checking. The prerender `cc2 standard.mp4` on layer 8 is an input to the `effects` comp, so watching that video cannot verify the effects applied after it.
 
-## 4. RGB lệch thời gian kết hợp threshold, không phải chỉ RGB lệch vị trí
+## 4. Time-Offset RGB with Threshold, Not Just Position-Offset RGB
 
-**Nguồn:** `fx`, adjustment layer 7, in/out 0–1.666667; `S_TimeWarpRGB → CC Threshold RGB`, đều bật.
+**Source:** `fx`, adjustment layer 7, in/out 0–1.666667; `S_TimeWarpRGB → CC Threshold RGB`, both enabled.
 
 - S_TimeWarpRGB: Red Shift Frames `1`, Green `0`, Blue `-1`.
-- CC Threshold RGB: Red/Green/Blue Threshold đều `0.5`.
+- CC Threshold RGB: Red/Green/Blue Threshold all `0.5`.
 - Blend w. Original: `0.041667 → 0`, `1.208333 → 1`, BEZIER.
-- Layer 2 là biến thể tiếp theo, in/out 1.666667–3.458333; Blend w. Original `1.708333 → 0`, `2.875 → 1`.
+- Layer 2 is the next variant, in/out 1.666667–3.458333; Blend w. Original `1.708333 → 0`, `2.875 → 1`.
 
-**Điều rút ra:** tách kênh theo frame thời gian khác nhau để có thể tạo viền màu phụ thuộc chuyển động; khác dịch R/G/B theo tọa độ ảnh. Chưa xác minh chiều lấy mẫu tương lai/quá khứ theo dấu shift trong plugin và chưa render đóng góp riêng.
+**Takeaway:** sampling the channels from different frames can create motion-dependent colour fringes; this differs from shifting R/G/B in image coordinates. Whether a positive shift samples the future or the past in this plugin is not verified, and its contribution was not rendered separately.
 
-**Áp dụng suy luận:** phối hợp mức threshold trở về original với một hiệu ứng màu theo thời gian. Chưa xem `record.mp4` nên không mô tả nội dung đầu vào của đoạn này.
+**Inferred application:** combine a threshold level that returns to the original with a time-based colour effect. `record.mp4` was not viewed, so the input content of this section is not described.
 
-## 5. Wipe đồng hồ cho phần trang trí
+## 5. Clock Wipe for Decorations
 
-**Nguồn:** `trans`, layer 16 `flower`; in/out 2.458333–3.458333, layer và effect bật. Stack `S_WipeClock → S_DropShadow`.
+**Source:** `trans`, layer 16 `flower`; in/out 2.458333–3.458333, layer and effect enabled. Stack `S_WipeClock → S_DropShadow`.
 
-Wipe Percent: `2.666667 → 100`, `3.0 → 0`, BEZIER — khoảng tám frame. Đây là wipe riêng cho một lớp trang trí, không cần chuyển toàn bộ composition. Cần đọc center, direction/reverse và softness để mô tả reveal chính xác.
+Wipe Percent: `2.666667 → 100`, `3.0 → 0`, BEZIER — about eight frames. This wipe reveals one decoration layer, not the whole composition. Read centre, direction/reverse and softness to describe the reveal exactly.
 
-## 6. Texture và loop theo thời gian — nguồn lưu nhưng phải xét đường render
+## 6. Time-Based Texture and Loops — Stored in the Source, Check the Render Path
 
-- `bg` item 857, layer 2 `PYn.gif`: Time Remap expression bật `loopOutDuration(type = "cycle", duration = 0)`.
-- Cùng comp, layer 3 `fx`: Roughen Edges / Random Seed có expression bật `time*9`.
-- `got standard`, layer 5 `turbulent`: Random Seed expression `time*7` nhưng **layer disabled**. Layer 6 tham chiếu `bg` cũng tắt.
+- `bg` item 857, layer 2 `PYn.gif`: enabled Time Remap expression `loopOutDuration(type = "cycle", duration = 0)`.
+- Same comp, layer 3 `fx`: Roughen Edges / Random Seed has an enabled expression `time*9`.
+- `got standard`, layer 5 `turbulent`: Random Seed expression `time*7`, but the **layer is disabled**. Layer 6, referencing `bg`, is also off.
 
-**Điều rút ra:** kiểm tra property expression thay vì chỉ đếm keyframe để tìm loop hoặc texture thay đổi theo thời gian. `time*9` là cách điều khiển seed; không khẳng định nó tương đương một bộ random mới chính xác 9 lần/giây nếu chưa kiểm tra plugin. Không mô tả hai expression trong bg là thành phần đang đóng góp vào bản cuối khi đường parent đang tắt.
+**Takeaway:** inspect property expressions, not just keyframe counts, to find loops or textures that change over time. `time*9` drives the seed; it is not claimed to equal exactly nine new random states per second without checking the plugin. Do not describe the two expressions in `bg` as contributing to the final output while the parent path is disabled.
 
-## 7. Hai phiên bản collage cùng khung thời gian
+## 7. Two Collage Versions on the Same Time Frame
 
-`trans` và `trans 2` đều 42 layer, 1650×1080, 24 fps, dài 3.458333 giây. Các vị trí tương ứng có đổi nội dung, ví dụ layer 11 `i got ` ↔ `Kool-Aid`, layer 10 `Standards` ↔ `Jammer`; hai layer 11 dùng cùng expression chữ nảy và animator properties đã đọc ở mục 1.
+`trans` and `trans 2` both have 42 layers, 1650×1080, 24 fps, 3.458333 s long. Matching positions swap content, e.g. layer 11 `i got ` ↔ `Kool-Aid`, layer 10 `Standards` ↔ `Jammer`; both layer 11s use the same bouncing-text expression and the animator properties read in section 1.
 
-**Bài học tái sử dụng:** tách khung timing/animation với nội dung chữ/asset để tạo biến thể. Không mặc định cả 42 layer đều có transform/parameter giống nhau chỉ vì cùng số lượng.
+**Reuse lesson:** separate the timing/animation frame from the text/asset content to make variants. Do not assume all 42 layers share transforms or parameters just because the counts match.
 
-**Trạng thái quan trọng:** trong comp `transition`, hai layer tham chiếu `trans` và `trans 2` đều tắt. Trong `effects`, video `cc2 standard.mp4` bật còn layer `transition` tắt. Trong `got standard`, video `got standard  prefinal.mp4` bật, có các adjustment Deep Glow và Sharpen/Unsharp Mask/Looks/Flicker bật phía trên; chưa tìm được video prefinal trong thư mục đã cung cấp. Không xem MP4 6.9 giây đi kèm là bản hoàn chỉnh 18.29 giây của comp này.
+**Important state:** in the `transition` comp, the two layers referencing `trans` and `trans 2` are both off. In `effects`, the `cc2 standard.mp4` video is on and the `transition` layer is off. In `got standard`, the video `got standard  prefinal.mp4` is on, with enabled Deep Glow and Sharpen/Unsharp Mask/Looks/Flicker adjustments above it; the prefinal video was not found in the supplied folder. Do not treat the accompanying 6.9 s MP4 as the complete 18.29 s output of this comp.
 
-## Cách dựng thử tiếp
+## Next Test Builds
 
-Chọn một kỹ thuật, lấy đầy đủ source alpha/matte, effect settings, animator/selector hoặc dependency thời gian từ JSON rồi dựng trên project mới được ủy quyền. Các ghi chú là cấu trúc có nguồn và giả thuyết thử nghiệm; chỉ nâng thành công thức đã kiểm chứng sau khi có preview so sánh. Không mở/sửa project gốc hoặc thực thi expression nhúng để khám phá.
+Choose one technique, take the full source alpha/matte, effect settings, animator/selector or time dependencies from the JSON, and build it in a new authorized project. These notes are sourced structure and test hypotheses; promote one to a verified recipe only after a comparison preview. Do not open or modify the original project or execute embedded expressions to explore.
 
-## Đọc nguồn và tái sử dụng
+## Reading the Source and Reuse
 
-Bài này giữ số đo/tham chiếu từ lần phân tích đã ghi nhận; project, ảnh bằng chứng và báo cáo riêng không được phân phối cùng thư viện. Các mã `evidence:` là định danh nguồn, không phải file cần có để đọc bài. Người giữ nguồn tra chúng trong hồ sơ local; người đóng góp khác phải ghi nguồn và mức kiểm chứng của chính mình. Xem [quy ước bằng chứng](../foundations/evidence-and-validation.md).
+This article keeps measurements and references from the recorded analysis; the project, evidence images and private reports are not distributed with the library. `evidence:` codes are source identifiers, not files needed to read the article. The source holder resolves them in local records; other contributors record their own sources and verification level. See [evidence conventions](../foundations/evidence-and-validation.md).

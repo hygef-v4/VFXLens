@@ -1,160 +1,160 @@
-# Takt Op — phân tích transition, shake và chữ
+# Takt Op — Transitions, Shake and Text
 
-Case study project/demo, đọc 2026-11-04. Các thông số bên dưới là dữ liệu của nguồn, không phải setting mặc định. [Tra kỹ thuật dùng chung](../techniques/README.md).
+Project/demo case study, read 2026-11-04. The figures below are the source's data, not default settings. [See the shared techniques](../techniques/README.md).
 
-Thời gian trong các bảng thuộc composition được ghi tên, không mặc định là thời gian video demo. Khi đối chiếu cần lần start time, stretch, Time Remap và các precomp cha; fps giống nhau không xác lập hai timeline đã căn chỉnh.
+Times in the tables belong to the named composition and are not assumed to be demo-video times. To compare them, trace start time, stretch, Time Remap and parent precomps; matching fps does not establish that two timelines are aligned.
 
-## 1. Transition chroma, invert và displacement
+## 1. Chroma, Invert and Displacement Transition
 
-**Từ AE Notes:** [warp/scatter và giãn hình](ae-notes.md#3-warp-stretch-and-scatter-transitions), [impact frame/invert](ae-notes.md#5-impact-frames-and-invert-chains); nhiều ví dụ chưa có thời lượng/easing.
+**From AE Notes:** [warp/scatter and stretch](ae-notes.md#3-warp-stretch-and-scatter-transitions), [impact frame/invert](ae-notes.md#5-impact-frames-and-invert-chains); many examples lack duration/easing.
 
-**Đối chiếu Standard:** [warp kết hợp blur/mosaic/brightness](standard.md#3-transition-đầu-shot-warp-nhanh-blurmosaicsáng-giảm-dần) và [RGB lệch thời gian từng kênh](standard.md#4-rgb-lệch-thời-gian-kết-hợp-threshold-không-phải-chỉ-rgb-lệch-vị-trí).
+**Compare Standard:** [warp combined with blur/mosaic/brightness](standard.md#3-shot-opening-transition-fast-warp-with-decaying-blurmosaicbrightness) and [time-offset RGB per channel](standard.md#4-time-offset-rgb-with-threshold-not-just-position-offset-rgb).
 
-**Dạng transition khác:** [circle wipe kết hợp opacity fade](the-less-i-know-the-better.md#5-wipe-tròn-và-fade-để-nối-prerender), có đủ hai đường animation và endpoint wipe không tới 100.
+**Another transition type:** [circle wipe combined with an opacity fade](the-less-i-know-the-better.md#5-circle-wipe-and-fade-to-join-a-prerender), with both animation curves and a wipe endpoint below 100.
 
-**Đối chiếu White Ferrari:** [transition bằng lớp một frame và blur dẫn vào cut](white-ferrari.md#3-transition-bằng-lớp-một-frame).
+**Compare White Ferrari:** [one-frame layer transitions with blur leading into the cut](white-ferrari.md#3-one-frame-layer-transitions).
 
-**Nguồn:** Takt Op → `Pre-comp 11` → layer 106, `a5e631f4dd4b96f69d91af16d23a40ef.mp4 Comp 1`; in/out 3,35–4,05 giây.
+**Source:** Takt Op → `Pre-comp 11` → layer 106, `a5e631f4dd4b96f69d91af16d23a40ef.mp4 Comp 1`; in/out 3.35–4.05 s.
 
-**Đã đọc từ project:** cả bảy effect bật, theo thứ tự:
+**Read from the project:** all seven effects enabled, in this order:
 
 `S_DistortChroma → S_Invert → Motion Tile → Displacement Map → CC Vector Blur → Exposure → Bokeh`
 
-| Thuộc tính | Keyframe: giây → giá trị | Nội suy |
+| Property | Keyframes: seconds → value | Interpolation |
 | --- | --- | --- |
-| S_Invert / Invert Luma | 3,65 → 1; 3,70 → 0 | HOLD |
-| S_Invert / Invert Chroma | 3,65 → 1; 3,80 → 0 | HOLD |
-| Displacement / Max Horizontal Displacement | 3,35 → -323; 3,65 → 57; 4,00 → 57 | LINEAR rồi có tay nắm BEZIER |
-| CC Vector Blur / Amount | 3,35 → 0; 3,65 → 136 | LINEAR |
-| CC Vector Blur / Angle Offset | 3,35 → 0; 3,65 → 60 | LINEAR |
-| Exposure / Exposure | 3,65 → 0; 4,00 → -0,59 | LINEAR |
-| Exposure / Offset | 3,65 → 0; 4,00 → -1,26 | LINEAR |
+| S_Invert / Invert Luma | 3.65 → 1; 3.70 → 0 | HOLD |
+| S_Invert / Invert Chroma | 3.65 → 1; 3.80 → 0 | HOLD |
+| Displacement / Max Horizontal Displacement | 3.35 → -323; 3.65 → 57; 4.00 → 57 | LINEAR, then BEZIER handles |
+| CC Vector Blur / Amount | 3.35 → 0; 3.65 → 136 | LINEAR |
+| CC Vector Blur / Angle Offset | 3.35 → 0; 3.65 → 60 | LINEAR |
+| Exposure / Exposure | 3.65 → 0; 4.00 → -0.59 | LINEAR |
+| Exposure / Offset | 3.65 → 0; 4.00 → -1.26 | LINEAR |
 
-**Điều rút ra:** tác giả xếp nhiều biến đổi trong một layer, dùng HOLD để chuyển trạng thái invert đột ngột và keyframe liên tục cho blur/displacement. Ở 20 fps, hai khoảng invert trên dài tương ứng 1 và 3 khoảng frame.
+**Takeaway:** the author stacks several transforms on one layer, uses HOLD for abrupt invert state changes and continuous keyframes for blur/displacement. At 20 fps the two invert spans last 1 and 3 frame intervals.
 
-**Cách thử áp dụng — suy luận:** dựng displacement/blur trước, thêm invert ngắn ở điểm nhấn, sau đó tinh chỉnh màu và bokeh. Giữ thứ tự source làm mốc so sánh; không xem thứ tự thử từng bước là thứ tự render mới.
+**How to try it — inference:** build displacement/blur first, add a short invert at the accent, then refine colour and bokeh. Keep the source order as the comparison reference; the order of trying steps is not a new render order.
 
-**Còn thiếu:** nguồn map displacement, các thông số tĩnh còn lại, transform/mask/blend và liên kết precomp. Bảng chưa đủ để trở thành preset độc lập.
+**Still missing:** the displacement map source, the remaining static parameters, transform/mask/blend and precomp links. The table is not enough to become a standalone preset.
 
-## 2. Shake giảm dần sau điểm nhấn
+## 2. Decaying Shake after an Accent
 
-**Từ AE Notes:** [overshoot theo vận tốc và cách đọc wiggle](ae-notes.md#2-damped-cosine-text-and-velocity-driven-overshoot), phân biệt với envelope amplitude của plugin.
+**From AE Notes:** [velocity-driven overshoot and reading wiggle](ae-notes.md#2-damped-cosine-text-and-velocity-driven-overshoot), distinct from a plugin's amplitude envelope.
 
-**Ví dụ từ preset:** [S_Shake và S_DissolveShake trong Chal7z](chal7z-presets.md#1-shake-giảm-biên-độ-và-dissolve-shake); chưa xác lập timebase của các keyframe FFX.
+**Preset example:** [S_Shake and S_DissolveShake in Chal7z](chal7z-presets.md#1-decaying-shake-and-dissolve-shake); the timebase of FFX keyframes is not established.
 
-**Đối chiếu White Ferrari:** [shake có Motion Tile 400% và Mirror Edges](white-ferrari.md#1-shake-ngắn-có-xử-lý-mép-hình).
+**Compare White Ferrari:** [shake with Motion Tile 400% and Mirror Edges](white-ferrari.md#1-short-shake-with-edge-handling).
 
-**Nguồn:** Takt Op → `Pre-comp 11` → layer 19, `Adj for a5e631f4dd4b96f69d91af1`; in/out 5,85–6,70 giây.
+**Source:** Takt Op → `Pre-comp 11` → layer 19, `Adj for a5e631f4dd4b96f69d91af1`; in/out 5.85–6.70 s.
 
-**Đã đọc từ project:** layer có `S_Shake` bật. `Amplitude`: 5,85 giây → 1; 6,405566 giây → 0.
+**Read from the project:** the layer has `S_Shake` enabled. `Amplitude`: 5.85 s → 1; 6.405566 s → 0.
 
-**Điều rút ra:** điều khiển độ rung bằng một đường bao giảm về 0 trong khoảng 0,556 giây. Đây là biên độ chuẩn hóa của effect, không có nghĩa là dịch chuyển 1 pixel.
+**Takeaway:** shake intensity is driven by an envelope that decays to 0 over about 0.556 s. This is the effect's normalized amplitude, not a 1-pixel displacement.
 
-**Cách thử áp dụng — suy luận:** đặt biên độ cao tại điểm nhấn rồi hạ về 0 để cảnh ổn định lại. Cần đọc thêm frequency, trục rung, random seed, motion blur và easing trước khi tái tạo đúng source.
+**How to try it — inference:** set a high amplitude at the accent and bring it to 0 so the shot settles. Read frequency, shake axes, random seed, motion blur and easing before reproducing the source exactly.
 
-**Chưa xác nhận:** điểm nhấn này có khớp beat nhạc hay vị trí nào trong demo.
+**Not confirmed:** whether this accent matches a music beat or a position in the demo.
 
-## 3. Dissolve kết hợp rung
+## 3. Dissolve with Shake
 
-**Đối chiếu White Ferrari:** [dissolve-shake chồng envelope rung ngắn](white-ferrari.md#2-dissolve-shake-dài-hơn-chồng-cùng-shot).
+**Compare White Ferrari:** [dissolve-shake stacking a short shake envelope](white-ferrari.md#2-longer-dissolve-shake-stacked-on-the-same-shot).
 
-**Nguồn:** Takt Op → `Pre-comp 3` → layer 1, `ones.`; in/out 0,40–0,95 giây.
+**Source:** Takt Op → `Pre-comp 3` → layer 1, `ones.`; in/out 0.40–0.95 s.
 
-**Đã đọc từ project:** `S_DissolveShake` bật.
+**Read from the project:** `S_DissolveShake` enabled.
 
-| Thuộc tính | Keyframe: giây → giá trị |
+| Property | Keyframes: seconds → value |
 | --- | --- |
-| Dissolve Percent | 0,40 → 33; 0,942188 → 0 |
-| Y Phase | 0,40 → 3; 0,535547 → -0,55; 0,738867 → 0,15; 0,942188 → 0 |
-| Tilt Phase | 0,40 → -1; 0,535547 → 0,35; 0,738867 → -0,02; 0,942188 → 0 |
+| Dissolve Percent | 0.40 → 33; 0.942188 → 0 |
+| Y Phase | 0.40 → 3; 0.535547 → -0.55; 0.738867 → 0.15; 0.942188 → 0 |
+| Tilt Phase | 0.40 → -1; 0.535547 → 0.35; 0.738867 → -0.02; 0.942188 → 0 |
 
-**Điều rút ra:** phase đổi dấu với biên độ giảm, đồng thời dissolve về 0. Không chỉ giảm độ rung: tác giả còn điều chỉnh nhịp/pha rung bằng keyframe.
+**Takeaway:** the phases change sign with decreasing amplitude while the dissolve goes to 0. The author does more than reduce the shake: the shake's rhythm and phase are keyframed too.
 
-**Cách thử áp dụng — suy luận:** dùng dao động qua lại nhỏ dần để tạo cảm giác nảy trước khi ổn định. Cần lấy đầy đủ easing và các tham số Amplitude/Frequency/X/Y/Tilt từ JSON; ba đường trên không phải toàn bộ preset.
+**How to try it — inference:** use a back-and-forth oscillation that shrinks to give a bounce before settling. Take the full easing and the Amplitude/Frequency/X/Y/Tilt parameters from the JSON; the three curves above are not the whole preset.
 
-## 4. Glow, màu và bokeh
+## 4. Glow, Color and Bokeh
 
-**Từ AE Notes:** [color remap/Tritone và blend](ae-notes.md#9-colorama-tritone-and-blending), [blur có hướng/DOF](ae-notes.md#6-directional-blur-and-depth-of-field).
+**From AE Notes:** [color remap/Tritone and blending](ae-notes.md#9-colorama-tritone-and-blending), [directional blur/DOF](ae-notes.md#6-directional-blur-and-depth-of-field).
 
-**Ví dụ từ preset:** [Bokeh phối hợp Gamma](chal7z-presets.md#2-transition-sáng-và-mờ-có-hai-đường-đồng-bộ); chỉ có envelope tăng được đọc, chưa khẳng định toàn bộ chu kỳ transition.
+**Preset example:** [Bokeh paired with Gamma](chal7z-presets.md#2-light-and-blur-transition-with-two-synchronized-curves); only rising envelopes were read, so the whole transition cycle is not established.
 
-**Đối chiếu White Ferrari:** [film look và Blur Radius điều khiển bằng expression](white-ferrari.md#5-vhsfilm-look-bằng-expression-có-biên-độ-giới-hạn).
+**Compare White Ferrari:** [film look and Blur Radius driven by expressions](white-ferrari.md#5-vhsfilm-look-from-expressions-with-bounded-amplitude).
 
-**Nguồn ví dụ:** Takt Op → `Pre-comp 11` → layer 26, `a5e631f4dd4b96f69d91af16d23a40ef.mp4 Comp 3`.
+**Example source:** Takt Op → `Pre-comp 11` → layer 26, `a5e631f4dd4b96f69d91af16d23a40ef.mp4 Comp 3`.
 
-**Đã đọc từ project:** thứ tự `PEDG` (Deep Glow theo classifier) → `ADBE Tritone` → `CROSSPHERE_Bokeh`, đều bật. Deep Glow / Exposure có keys 5,85 → 0,26; 6,25 → 1,23; 6,65 → 0,02.
+**Read from the project:** order `PEDG` (Deep Glow per the classifier) → `ADBE Tritone` → `CROSSPHERE_Bokeh`, all enabled. Deep Glow / Exposure has keys 5.85 → 0.26; 6.25 → 1.23; 6.65 → 0.02.
 
-**Lưu ý quan trọng:** layer này chỉ hiện trong khoảng 6,65–6,70 giây. Hai keyframe đầu nằm ngoài khoảng hiện; không được mô tả toàn bộ đường exposure đó như một flash đã hiển thị trên layer này. Cần truy thêm các layer liên quan trước khi kết luận.
+**Important:** this layer is only visible from 6.65 to 6.70 s. The first two keyframes fall outside its visible range; do not describe that whole exposure curve as a flash shown on this layer. Trace the related layers before concluding.
 
-**Quan sát demo:** contact sheet có các vùng sáng hồng mạnh và khung hình mờ. Chưa tách được phần nào do Glow, Bokeh, footage nguồn hay lớp compositing khác.
+**Demo observation:** the contact sheet has strong pink highlights and blurred frames. Which part comes from Glow, Bokeh, the source footage or other compositing layers is not separated.
 
-**Cách thử áp dụng — suy luận:** kiểm soát sáng, ánh màu và độ mờ riêng từng bước. Không bê giá trị glow sang footage khác trước khi kiểm tra độ sáng đầu vào, bit depth và thứ tự effect.
+**How to try it — inference:** control brightness, colour cast and blur one step at a time. Do not carry glow values to other footage before checking input brightness, bit depth and effect order.
 
-## 5. Chữ động trễ từng ký tự
+## 5. Per-Character Delayed Text
 
-**Ví dụ từ preset:** [delay theo giây và cosine tắt dần](chal7z-presets.md#3-chữ-smooth-trễ-theo-giây-dao-động-cosine-tắt-dần), phân biệt với delay theo frame của Standard.
+**Preset example:** [per-second delay with a decaying cosine](chal7z-presets.md#3-smooth-text-per-second-delay-with-a-decaying-cosine), distinct from Standard's per-frame delay.
 
-**Đối chiếu Standard:** [Expression Selector dao động tắt dần](standard.md#1-chữ-nảy-từng-ký-tự-bằng-expression-selector), [viền matte cho sticker](standard.md#2-viền-sticker-bằng-matte-mở-rộng-và-composite-lại-ảnh), và [hai biến thể collage cùng khung timing](standard.md#7-hai-phiên-bản-collage-cùng-khung-thời-gian).
+**Compare Standard:** [Expression Selector with a decaying oscillation](standard.md#1-per-character-bouncing-text-with-an-expression-selector), [matte outline for stickers](standard.md#2-sticker-outline-from-an-expanded-matte-and-re-composited-image), and [two collage variants on the same timing frame](standard.md#7-two-collage-versions-on-the-same-time-frame).
 
-**Dạng dựng khác:** [icon/ảnh wipe lệch nhịp](the-less-i-know-the-better.md#1-wipe-icon-xuất-hiện-lệch-nhịp), [collage có shadow](the-less-i-know-the-better.md#2-collage-có-shadow-riêng-cho-chữ-và-sticker), và [camera qua chuỗi Null](the-less-i-know-the-better.md#3-camera-chia-chuyển-động-qua-chuỗi-null). Đây là keyframe/parenting ở cấp layer, không phải selector từng ký tự.
+**Other builds:** [staggered icon/image wipes](the-less-i-know-the-better.md#1-staggered-icon-wipe-reveals), [collage with shadows](the-less-i-know-the-better.md#2-collage-with-separate-shadows-for-text-and-stickers), and [camera through a Null chain](the-less-i-know-the-better.md#3-camera-motion-split-across-a-null-chain). These are layer-level keyframes/parenting, not per-character selectors.
 
-**Nguồn:** Takt Op → `juice Comp 1` → layer 1, `juice 2` → `Text/Animators/TextEvo/Selectors/textevo/Amount`.
+**Source:** Takt Op → `juice Comp 1` → layer 1, `juice 2` → `Text/Animators/TextEvo/Selectors/textevo/Amount`.
 
-**Đã đọc expression tĩnh:** đọc control `effect("TextEvo")`, tính offset theo `textIndex`, `textTotal`, `thisComp.frameDuration` và lấy giá trị bằng `v.valueAtTime(time - offset)`.
+**Static expression read:** it reads the `effect("TextEvo")` controls, computes an offset from `textIndex`, `textTotal` and `thisComp.frameDuration`, and samples the value with `v.valueAtTime(time - offset)`.
 
-| Chế độ | Công thức offset đọc được |
+| Mode | Offset formula read |
 | --- | --- |
 | Mode 1 | `(textIndex - 1) * frameDuration * delay` |
 | Mode 2 | `(textTotal - textIndex) * frameDuration * delay` |
 
-Expression còn có các nhánh theo tâm, mép, ký tự được chọn và random; random được seed bằng `textIndex + fx(5)` với tham số timeless bật. Cần đọc đầy đủ từng nhánh khi dùng.
+The expression also has branches by centre, edges, selected characters and random; random is seeded with `textIndex + fx(5)` with the timeless parameter on. Read every branch before using it.
 
-**Điều rút ra:** animate một control chung rồi cho mỗi ký tự lấy mẫu đường animation tại thời điểm trễ khác nhau. Không cần vẽ keyframe riêng cho từng ký tự.
+**Takeaway:** animate one shared control, then let each character sample that animation curve at a different delayed time. No per-character keyframes are needed.
 
-**Cách thử áp dụng — suy luận:** thay đổi chiều chạy và số frame trễ để tạo chữ xuất hiện lần lượt. Control TextEvo, chỉ số tham số và đường animation là dependency bắt buộc; đây chưa phải expression có thể dán độc lập vào project mới. Chưa thực thi expression.
+**How to try it — inference:** change the direction and the number of delay frames to reveal text one character after another. The TextEvo control, parameter indices and animation curve are required dependencies; this is not an expression to paste into a new project on its own. The expression was not executed.
 
-## 6. Retime và speed ramp
+## 6. Retime and Speed Ramp
 
-**Dạng tích lũy thời gian khác:** [S_Trails / CC Wide Time](chal7z-presets.md#4-trail-và-wide-time-khác-posterize-thời-gian); không đồng nhất trail, posterize màu, posterize thời gian và speed ramp.
+**Another time-accumulation type:** [S_Trails / CC Wide Time](chal7z-presets.md#4-trail-and-wide-time-differ-from-time-posterization); trail, colour posterize, time posterize and speed ramp are different things.
 
-**Đối chiếu White Ferrari:** [phân biệt nhịp hình Posterize Time](white-ferrari.md#4-thay-đổi-nhịp-hình-bằng-posterize-time) với [dấu vết prerender/interpolation](white-ferrari.md#7-retime-và-prerender--bằng-chứng-còn-hạn-chế).
+**Compare White Ferrari:** [Posterize Time picture cadence](white-ferrari.md#4-changing-picture-cadence-with-posterize-time) versus [prerender/interpolation traces](white-ferrari.md#7-retime-and-prerender--limited-evidence).
 
-**Nguồn:** Takt Op → composition `a5e631f4dd4b96f69d91af16d23a40ef.mp4 Comp 1` → layer 1, footage cùng tên.
+**Source:** Takt Op → composition `a5e631f4dd4b96f69d91af16d23a40ef.mp4 Comp 1` → layer 1, footage of the same name.
 
-**Đã đọc từ project:** `Twixtor 45` bật; layer in/out 3,35–3,70 giây. Lần kiểm tra các tham số trực tiếp của instance này chưa thấy keyframe hoặc expression bật.
+**Read from the project:** `Twixtor 45` enabled; layer in/out 3.35–3.70 s. The direct parameters of this instance showed no keyframes or enabled expressions.
 
-**Chưa đủ bằng chứng:** có Twixtor không đồng nghĩa với có speed ramp. Cần kiểm tra tốc độ tĩnh, group con, time remap, stretch, source fps và các instance khác. Detector video có các ứng viên speed ramp nhưng chưa chứng minh chúng đến từ instance này.
+**Not enough evidence:** having Twixtor does not mean there is a speed ramp. Check static speed, child groups, time remap, stretch, source fps and other instances. The video detector has speed-ramp candidates but does not prove they come from this instance.
 
-**Bài học hiện tại:** chỉ ghi nhận cấu trúc retime; chưa lưu công thức tăng/giảm tốc cụ thể. Không bịa curve hay tỷ lệ tốc độ.
+**Current lesson:** only the retime structure is recorded; no speed-up/slow-down formula is stored. Do not invent a curve or speed ratio.
 
-## 7. Overlay và audio visualizer
+## 7. Overlays and Audio Visualizer
 
-**Từ AE Notes:** [luma matte chọn vùng flicker](ae-notes.md#4-luma-mattes-for-selective-lighting-and-flicker) và [particle/mô phỏng phá vỡ](ae-notes.md#10-particles-and-shatter-simulations).
+**From AE Notes:** [luma mattes for selective flicker](ae-notes.md#4-luma-mattes-for-selective-lighting-and-flicker) and [particles/shatter simulation](ae-notes.md#10-particles-and-shatter-simulations).
 
-**Đối chiếu White Ferrari:** [overlay lens, fog và bướm theo Screen/Add](white-ferrari.md#6-overlay-ánh-sáng-và-khí-quyển-theo-blend-mode).
+**Compare White Ferrari:** [lens, fog and butterfly overlays in Screen/Add](white-ferrari.md#6-light-and-atmosphere-overlays-by-blend-mode).
 
-**Nguồn:** Takt Op → `Pre-comp 11` → layer 34, `Solid for Adj for Watch Takt Op`; in/out 8,20–10,20 giây.
+**Source:** Takt Op → `Pre-comp 11` → layer 34, `Solid for Adj for Watch Takt Op`; in/out 8.20–10.20 s.
 
-**Đã đọc từ project:** `BCC_AUDIOVISUALIZER` bật trên layer solid. Kiểm tra tham số trực tiếp chưa thấy keyframe hoặc expression bật.
+**Read from the project:** `BCC_AUDIOVISUALIZER` enabled on a solid layer. Direct parameters showed no keyframes or enabled expressions.
 
-**Quan sát demo:** có chữ và các đường đồ họa chồng lên nhân vật. Chưa xác nhận đường nào là kết quả của Audio Visualizer hoặc có phản ứng theo âm thanh.
+**Demo observation:** text and graphic lines overlap the character. Which lines come from the Audio Visualizer, or react to sound, is not confirmed.
 
-**Còn thiếu trước khi dựng lại:** audio source được tham chiếu, chế độ visualizer, dải tần, thông số hình học và blend/compositing. Chưa có công thức hoàn chỉnh cho dạng này.
+**Missing before rebuilding:** the referenced audio source, visualizer mode, frequency range, geometry parameters and blend/compositing. There is no complete recipe for this form yet.
 
-## 8. SFX và xử lý âm thanh
+## 8. SFX and Audio Processing
 
-[AE Notes: High-Low Pass + Reverb](ae-notes.md#11-sfx-filtering-and-reverb) có thông số screenshot và đề xuất envelope; chưa có bản âm thanh đã nghe/đo để xác nhận hiệu quả. Khi học các project tiếp theo, ghi cả âm nguồn, timing, cutoff, dry/wet, gain và kết quả nghe.
+[AE Notes: High-Low Pass + Reverb](ae-notes.md#11-sfx-filtering-and-reverb) has screenshot parameters and a proposed envelope; no audio was listened to or measured to confirm the effect. When studying further projects, record the source sound, timing, cutoff, dry/wet, gain and the listening result.
 
-## Nguồn và giới hạn chung
+## Sources and General Limits
 
 - Project: `evidence:takt-op-01`.
-- Project JSON: `evidence:takt-op-02`; báo cáo cùng thư mục `project-report.md`.
-- Demo JSON: `evidence:takt-op-03`; timeline, contact sheet và evidence frames cùng thư mục.
-- Project có 46 composition, 290 layer và 82 expression entry; 82 entry không có nghĩa là 82 kỹ thuật khác nhau.
-- Demo 13,2 giây, 20 fps; `Comp 1` dài 42,8 giây. Chưa căn chỉnh hai timeline.
-- 32 asset thiếu tại đường dẫn lưu trong project. Chưa render AE hoặc kiểm chứng riêng đóng góp của từng effect.
-- Nhãn plugin từ classifier và nhãn effect từ detector video cần đối chiếu; không dùng chúng làm kết luận mua/cài plugin.
+- Project JSON: `evidence:takt-op-02`; report `project-report.md` in the same folder.
+- Demo JSON: `evidence:takt-op-03`; timeline, contact sheet and evidence frames in the same folder.
+- The project has 46 compositions, 290 layers and 82 expression entries; 82 entries are not 82 different techniques.
+- Demo 13.2 s at 20 fps; `Comp 1` lasts 42.8 s. The two timelines are not aligned.
+- 32 assets are missing at the paths stored in the project. AE was not rendered and each effect's contribution was not verified separately.
+- Plugin labels from the classifier and effect labels from the video detector need cross-checking; do not use them to decide what to buy or install.
 
-## Đọc nguồn và tái sử dụng
+## Reading the Source and Reuse
 
-Bài này giữ số đo/tham chiếu từ lần phân tích đã ghi nhận; project, ảnh bằng chứng và báo cáo riêng không được phân phối cùng thư viện. Các mã `evidence:` là định danh nguồn, không phải file cần có để đọc bài. Người giữ nguồn tra chúng trong hồ sơ local; người đóng góp khác phải ghi nguồn và mức kiểm chứng của chính mình. Xem [quy ước bằng chứng](../foundations/evidence-and-validation.md).
+This article keeps measurements and references from the recorded analysis; the project, evidence images and private reports are not distributed with the library. `evidence:` codes are source identifiers, not files needed to read the article. The source holder resolves them in local records; other contributors record their own sources and verification level. See [evidence conventions](../foundations/evidence-and-validation.md).

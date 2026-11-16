@@ -3,14 +3,14 @@ requires = ["hatchling>=1.18"]
 build-backend = "hatchling.build"
 
 [project]
-name = "vfx-learning-engine"
+name = "vfxlens"
 version = "0.1.0"
-description = "VFX Learning Engine (Phase 1): After Effects Project Analyzer (.aep/.aepx) and High-Speed Video VFX Analyzer"
+description = "Analyze VFX references (After Effects projects and videos) and produce AI-agent-guided videos with three.js and Remotion"
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.10"
 authors = [
-    { name = "VFX Learning Engine Team" }
+    { name = "chal7z" }
 ]
 keywords = ["vfx", "after-effects", "aep", "aepx", "video-analysis", "computer-vision", "motion-graphics"]
 dependencies = [

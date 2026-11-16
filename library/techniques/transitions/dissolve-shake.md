@@ -1,6 +1,6 @@
 # Dissolve Combined with Shake
 
-**Purpose:** Pair a visibility/dissolve transition with a decaying oscillation to introduce or bridge layers across a cut. No standalone render-verified preset is assumed; see [Takt Op, Section 3](../../case-studies/takt-op.md#3-dissolve-kết-hợp-rung) and [White Ferrari](../../case-studies/white-ferrari.md) for source-extracted parameters.
+**Purpose:** Pair a visibility/dissolve transition with a decaying oscillation to introduce or bridge layers across a cut. No standalone render-verified preset is assumed; see [Takt Op, Section 3](../../case-studies/takt-op.md#3-dissolve-with-shake) and [White Ferrari](../../case-studies/white-ferrari.md) for source-extracted parameters.
 
 ## Proposed Recreation Workflow
 

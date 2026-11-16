@@ -1,6 +1,6 @@
 ---
 name: vfxlens
-description: Use when learning VFX or motion graphics from PDF/docs (đọc tài liệu, học kỹ thuật), analyzing video or AE projects (phân tích video/AEP/AEPX), writing video scripts or narration (viết kịch bản, lời dẫn), or creating and continuing a video through MP4 export with VFXLens.
+description: Use when learning VFX or motion graphics from PDF/docs, analyzing video or AE projects (.aep/.aepx), writing video scripts or narration, or creating and continuing a video through MP4 export with VFXLens.
 ---
 
 # VFXLens
@@ -45,8 +45,8 @@ production files and changes before continuing another agent's work.
 Read `<repo>/library/README.md` to find canonical techniques, styles, resources and
 case studies. Reuse those articles; keep exact source evidence separate from a
 proposed new creative treatment. Follow `library/CONTRIBUTING.md` when adding
-reusable knowledge, including its English article convention. User-facing notes
-and production documents default to Vietnamese unless the user chooses otherwise.
+reusable knowledge, including its English article convention. Write user-facing notes
+and production documents in the user's language.
 
 ## Existing analysis CLI
 

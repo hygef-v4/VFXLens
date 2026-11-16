@@ -1,117 +1,117 @@
-# White Ferrari — các kỹ thuật edit đọc được
+# White Ferrari — Editing Techniques Read from the Project
 
-Tài liệu bổ sung cho [sổ tay theo dạng edit](../README.md). Các giá trị dưới đây đọc từ project `white-ferrari.aep`, ngày 2026-11-04. Đây là ví dụ tham chiếu có nguồn, chưa phải preset hoàn chỉnh hoặc render tách effect đã kiểm chứng.
+Companion to the [editing handbook](../README.md). The values below were read from the project `white-ferrari.aep` on 2026-11-04. These are sourced reference examples, not complete presets or verified per-effect renders.
 
-## Nguồn và trạng thái
+## Source and Status
 
-- Thư mục gốc: `evidence:white-ferrari-01`.
-- Dữ liệu: `evidence:white-ferrari-02` và `project-report.md` trong workspace VFXLens.
-- Project SHA-256: `a98c718b0e37996e6dd68eedc747cf671571eb91e22eceb61792ecce0eb8fe85`; kiểm tra sau phân tích khớp. Không mở AE hoặc sửa project gốc.
-- 82 composition, 816 layer, 73 expression entry; AE lưu phiên bản `25.0x2`, màu 16-bit. Cấu hình CUDA trong project không chứng minh analyzer đang dùng GPU.
-- `Main`: 1920×1080, khoảng 23,976 fps, 18,518519 giây, 65 layer.
-- Bản render có sẵn `final 2.mp4`: 3840×2160, 24000/1001 fps, 18,5185 giây. Thời lượng/fps gần khớp Main nhưng chưa chứng minh cùng revision hoặc căn chỉnh từng shot.
-- Đã phân tích đủ 444 frame của bản render; nguồn giữ nguyên hash. Kết quả tại `evidence:white-ferrari-03`: báo cáo, timeline, contact sheet và ảnh bằng chứng.
-- **Giới hạn timestamp:** ffprobe đọc PTS từng frame bị timeout 120 giây; analyzer dùng timestamp dự phòng theo nominal fps. Vì vậy `VFR=False`, jitter=0 và timestamp trong báo cáo không phải kết quả xác minh PTS gốc. JSON warnings hiện không ghi lại lỗi fallback này; log CLI có ghi.
-- Contact sheet đã xem cho thấy các khung xanh lạnh, vùng sáng mạnh, hình méo và nét viền sáng, sau đó có ký tự rời trên hình. Đây là mô tả ảnh quan sát được, chưa gán chắc chắn cho plugin/layer nào. Sheet hiện chọn nhiều peak sớm nên tập trung khoảng 0–3,63 giây, không đại diện toàn bộ 18,52 giây.
-- 74 asset được báo thiếu tại đường dẫn đã lưu. Tìm trong `(Footage)` có 7 ứng viên trùng basename; chưa xác minh nội dung hoặc relink. Báo cáo collect đi kèm ghi 57 file, khoảng 4,9 GB; không đồng nghĩa đã đủ mọi dependency của toàn bộ project.
-- Các mốc dưới đây theo composition được nêu, dùng dấu chấm thập phân. Với precomp, cần lần start/stretch/time remap của parent trước khi suy ra thời gian Main.
+- Source folder: `evidence:white-ferrari-01`.
+- Data: `evidence:white-ferrari-02` and `project-report.md` in the VFXLens workspace.
+- Project SHA-256: `a98c718b0e37996e6dd68eedc747cf671571eb91e22eceb61792ecce0eb8fe85`; it matched after the analysis. AE was not opened and the original project was not modified.
+- 82 compositions, 816 layers, 73 expression entries; AE stores version `25.0x2`, 16-bit colour. The CUDA setting stored in the project does not prove the analyzer used the GPU.
+- `Main`: 1920×1080, about 23.976 fps, 18.518519 s, 65 layers.
+- Existing render `final 2.mp4`: 3840×2160, 24000/1001 fps, 18.5185 s. Its duration/fps nearly match Main but that does not prove the same revision or shot alignment.
+- All 444 frames of the render were analyzed; the source kept its hash. Results in `evidence:white-ferrari-03`: report, timeline, contact sheet and evidence images.
+- **Timestamp limit:** ffprobe timed out after 120 s reading per-frame PTS; the analyzer fell back to nominal-fps timestamps. So `VFR=False`, jitter=0 and the report timestamps are not verified original PTS. The JSON warnings do not currently record this fallback; the CLI log does.
+- The reviewed contact sheet shows cold blue frames, strong highlights, distortion and bright edges, then loose letters over the image. This describes what is visible and is not attributed with certainty to any plugin or layer. The sheet picked many early peaks, so it concentrates on about 0–3.63 s and does not represent all 18.52 s.
+- 74 assets are reported missing at their stored paths. `(Footage)` has 7 basename matches; content and relinking are not verified. The accompanying collect report lists 57 files, about 4.9 GB; that does not mean every dependency of the whole project is present.
+- Times below belong to the named composition. For a precomp, trace the parent's start/stretch/time remap before deriving Main times.
 
-## 1. Shake ngắn có xử lý mép hình
+## 1. Short Shake with Edge Handling
 
-**Nguồn:** `Main` → layer 20 `shake 2`, adjustment layer bật; in/out `14.014014–14.597931` giây, effects active.
+**Source:** `Main` → layer 20 `shake 2`, enabled adjustment layer; in/out `14.014014–14.597931` s, effects active.
 
-**Thứ tự bật:** `ADBE Tile` (Motion Tile) → `S_Shake`.
+**Enabled order:** `ADBE Tile` (Motion Tile) → `S_Shake`.
 
 - Motion Tile: Output Width `400`, Output Height `400`, Mirror Edges `1`; Tile Width/Height `100`.
-- S_Shake / Amplitude: `14.014014 → 0`, `14.055722 → 0.28`, `14.264264 → 0`; các key có in/out BEZIER.
-- Đường bao lên đỉnh sau khoảng một frame, về 0 sau khoảng sáu frame tính từ key đầu tại fps Main. `0.28` là giá trị Amplitude của effect, không phải số pixel.
+- S_Shake / Amplitude: `14.014014 → 0`, `14.055722 → 0.28`, `14.264264 → 0`; keys have BEZIER in/out.
+- The envelope peaks after about one frame and returns to 0 about six frames after the first key at Main's fps. `0.28` is the effect's Amplitude value, not pixels.
 
-**Điều rút ra:** tách việc mở rộng mép ảnh và việc tạo rung thành hai bước có thứ tự rõ ràng. Suy luận mục đích Mirror Edges là hỗ trợ che mép trống khi dịch chuyển; chưa render riêng để xác nhận mức cần thiết.
+**Takeaway:** extending the image edges and creating the shake are two separate, ordered steps. Mirror Edges is inferred to cover empty edges while the image moves; it was not rendered on its own to confirm how much it is needed.
 
-**Trước khi dùng lại:** lấy frequency, trục rung, seed, motion blur và easing speed/influence đầy đủ từ JSON. Không quy mọi shake trong render về layer này.
+**Before reuse:** take frequency, shake axes, seed, motion blur and full easing speed/influence from the JSON. Do not attribute every shake in the render to this layer.
 
-## 2. Dissolve-shake dài hơn chồng cùng shot
+## 2. Longer Dissolve-Shake Stacked on the Same Shot
 
-**Nguồn:** `Main` → layer 21 `shake`, adjustment layer bật; in/out `13.596930–14.764765`.
+**Source:** `Main` → layer 21 `shake`, enabled adjustment layer; in/out `13.596930–14.764765`.
 
-**Thứ tự bật:** Motion Tile → S_Shake → S_DissolveShake. Motion Tile cũng Output Width/Height `400`, Mirror Edges `1`.
+**Enabled order:** Motion Tile → S_Shake → S_DissolveShake. Motion Tile again uses Output Width/Height `400`, Mirror Edges `1`.
 
-S_DissolveShake / Dissolve Percent: `13.596930 → 38`, `14.139139 → 0`, BEZIER ở các key.
+S_DissolveShake / Dissolve Percent: `13.596930 → 38`, `14.139139 → 0`, BEZIER keys.
 
-**Điều rút ra:** layer 20 và 21 có khoảng hiện chồng nhau, với envelope riêng. Có thể học cách tách một chuyển động nền dài hơn và một nhấn rung ngắn; đó là suy luận từ cấu trúc, chưa đo đóng góp từng layer trong render. Cần kiểm tra phạm vi các adjustment layer và các layer bên dưới trước khi tái dựng.
+**Takeaway:** layers 20 and 21 overlap in time, each with its own envelope. One can learn to separate a longer background motion from a short shake accent; this is inferred from structure, and each layer's contribution to the render was not measured. Check the scope of the adjustment layers and the layers below before rebuilding.
 
-## 3. Transition bằng lớp một frame
+## 3. One-Frame Layer Transitions
 
-**Nguồn trực tiếp trong `Main`:**
+**Direct sources in `Main`:**
 
-| Layer | In → out, giây | Effect bật theo thứ tự |
+| Layer | In → out, seconds | Enabled effects in order |
 | --- | --- | --- |
 | 5 `OneFramer for Pre-comp 35` | 14.723056 → 14.764765 | Offset → BCC Directional Blur |
 | 11 `1frame` | 14.055722 → 14.097431 | Median → Mosaic Plane |
 | 17 `OneFramer for Null 23` | 13.596930 → 13.638639 | OLM Directional Blur → Transform |
 | 32 `Adj for Silent Voice Dub.mp4` | 13.555222 → 13.596930 | OLM Directional Blur → Deep Glow (`PEDG`) |
 
-Các layer trên bật, là adjustment layer; độ dài khoảng `0.041709s`, tương đương một frame ở khoảng 23,976 fps. Vì vậy một thay đổi rất ngắn có thể đến từ in/out của layer, không nhất thiết từ cặp keyframe effect.
+These layers are enabled adjustment layers about `0.041709s` long, one frame at about 23.976 fps. A very short change can therefore come from a layer's in/out points, not necessarily from a pair of effect keyframes.
 
-**Ví dụ blur dẫn vào điểm đổi shot:** `Main`, layer 51 `Adj for Pre-comp 22`, in/out `8.883884–9.134134`; S_BlurDirectional / Blur Amount từ `0` ở `8.883884` lên `120` ở `9.092426`, BEZIER. Cần xem thêm hướng blur và layer kế tiếp để xác nhận cách nối shot.
+**Blur leading into a shot change:** `Main`, layer 51 `Adj for Pre-comp 22`, in/out `8.883884–9.134134`; S_BlurDirectional / Blur Amount from `0` at `8.883884` to `120` at `9.092426`, BEZIER. Check the blur direction and the next layer to confirm how the shots join.
 
-**Áp dụng suy luận:** dùng lớp một frame làm điểm nhấn rất ngắn, phân biệt với blur có envelope tăng dần. Đây là kỹ thuật theo thời gian, không phải khuyến nghị dùng mọi plugin trong bảng cùng lúc.
+**Inferred application:** use a one-frame layer as a very short accent, distinct from a blur with a rising envelope. This is a timing technique, not a recommendation to use every plugin in the table at once.
 
-## 4. Thay đổi nhịp hình bằng Posterize Time
+## 4. Changing Picture Cadence with Posterize Time
 
-**Nguồn trong `Main`, adjustment layer và effect đều bật:**
+**Sources in `Main`; adjustment layers and effects enabled:**
 
-| Layer | Khoảng hiện, giây | Frame Rate trong Posterize Time |
+| Layer | Visible range, seconds | Posterize Time frame rate |
 | --- | --- | --- |
 | 60 `Adj for Pre-comp 18` | 1.835169–2.335669 | 12 |
 | 54 `Adj for Pre-comp 18` | 5.839173–6.798465 | 16 |
 
-**Điều rút ra:** tác giả đặt mức lấy mẫu thời gian riêng cho từng đoạn, dù composition chính vẫn khoảng 23,976 fps. Posterize Time thay đổi nhịp cập nhật hình, không tự chứng minh video bị đổi tốc độ phát.
+**Takeaway:** the author sets a separate time-sampling rate per section while the main composition stays at about 23.976 fps. Posterize Time changes how often the picture updates; it does not prove the playback speed changed.
 
-**Trước khi tái dựng:** kiểm tra độ chồng layer, vị trí adjustment và chuyển động footage. Không đánh đồng Posterize Time, Twixtor và speed ramp.
+**Before rebuilding:** check layer overlap, adjustment position and footage motion. Posterize Time, Twixtor and speed ramps are different things.
 
-## 5. VHS/film look bằng expression có biên độ giới hạn
+## 5. VHS/Film Look from Expressions with Bounded Amplitude
 
-**Đã đọc expression tĩnh, chưa thực thi:**
+**Static expressions read, not executed:**
 
-- `Main` → layer 6 `Adj for Null 27`: in/out `14.347681–14.472806`, Universe VHS bật; Opacity có expression bật `random(0,60)`.
-- `Pre-comp 13` → layer 16 `vhs`: in/out `0.208542–0.333667`, Universe VHS bật; Opacity `random(0,50)`.
-- `Pre-comp 17` → layer 26 `Pre-comp 4`: Fast Bokeh / Blur Radius `random(0,5)`. Stack bật Motion Tile → FC NITRATE → Curves → Colorista IV → Fast Bokeh.
+- `Main` → layer 6 `Adj for Null 27`: in/out `14.347681–14.472806`, Universe VHS enabled; Opacity has an enabled expression `random(0,60)`.
+- `Pre-comp 13` → layer 16 `vhs`: in/out `0.208542–0.333667`, Universe VHS enabled; Opacity `random(0,50)`.
+- `Pre-comp 17` → layer 26 `Pre-comp 4`: Fast Bokeh / Blur Radius `random(0,5)`. Enabled stack Motion Tile → FC NITRATE → Curves → Colorista IV → Fast Bokeh.
 
-**Điều rút ra:** mức hiện VHS và blur được điều khiển bằng expression thay vì nhất thiết có keyframe. Giá trị static/pre-expression trong JSON không phải giá trị cuối khi render.
+**Takeaway:** the VHS visibility and blur are driven by expressions rather than necessarily by keyframes. Static/pre-expression values in the JSON are not the final rendered values.
 
-**Cách áp dụng suy luận:** giới hạn khoảng biến thiên của texture/blur để tạo độ bất định có kiểm soát. Chưa xác nhận tần suất cảm nhận, seed, kết quả theo subframe hoặc mức độ giống film thật. Đọc và tái viết expression chỉ trong bài dựng mới được ủy quyền; không chạy expression nhúng của project để khám phá.
+**Inferred application:** bound the range of texture/blur variation to get controlled randomness. Perceived frequency, seed, subframe behaviour and how film-like it looks are not confirmed. Read and rewrite expressions only in a new authorized build; do not run the project's embedded expressions to explore.
 
-## 6. Overlay ánh sáng và khí quyển theo blend mode
+## 6. Light and Atmosphere Overlays by Blend Mode
 
-| Nguồn | Trạng thái và dữ liệu đã đọc |
+| Source | State and data read |
 | --- | --- |
-| `Pre-comp 17`, layer 3 `LENS 25 .mp4` | Bật, SCREEN, in/out 0.041708–1.084418; Opacity expression bật `random(50,65)` |
-| `Pre-comp 14`, layer 41 và 42 `1 Fog Atmosphere Side.mp4` | Cả hai bật, ADD, in/out 0–1.042709; Curves bật, Opacity lưu 100 |
-| `Pre-comp 13`, layer 12 `D2 Butterflies (1).mp4 Comp 1` | Bật, SCREEN, in/out 0–0.959293; Posterize Time → Curves → Hue/Saturation bật |
+| `Pre-comp 17`, layer 3 `LENS 25 .mp4` | Enabled, SCREEN, in/out 0.041708–1.084418; enabled Opacity expression `random(50,65)` |
+| `Pre-comp 14`, layers 41 and 42 `1 Fog Atmosphere Side.mp4` | Both enabled, ADD, in/out 0–1.042709; Curves enabled, stored Opacity 100 |
+| `Pre-comp 13`, layer 12 `D2 Butterflies (1).mp4 Comp 1` | Enabled, SCREEN, in/out 0–0.959293; Posterize Time → Curves → Hue/Saturation enabled |
 
-**Điều rút ra:** cùng một bài dựng sử dụng overlay footage với nhiều blend mode, có layer điều khiển opacity bằng expression và layer xử lý màu riêng. Không được suy ra mọi overlay đều dùng Screen hoặc mọi bướm đều là particle plugin.
+**Takeaway:** one edit uses overlay footage with several blend modes, some layers driving opacity with expressions and others with their own colour treatment. Do not infer that every overlay uses Screen or that every butterfly is a particle plugin.
 
-**Còn thiếu:** xem nội dung footage/alpha, transform, parent và layer order đầy đủ để giải thích đóng góp từng bản fog lặp. Chưa xác nhận vì sao tác giả cần cả hai layer.
+**Still missing:** the footage content/alpha, transforms, parents and full layer order needed to explain each duplicated fog layer's contribution. Why the author needed both layers is not confirmed.
 
-## 7. Retime và prerender — bằng chứng còn hạn chế
+## 7. Retime and Prerender — Limited Evidence
 
-Project có các instance `Twixtor 45`; lần rà tham số trực tiếp của các instance bật chưa tìm được keyframe tốc độ để ghi thành recipe speed ramp.
+The project has `Twixtor 45` instances; a review of the enabled instances' direct parameters found no speed keyframes to record as a speed-ramp recipe.
 
-Thư mục footage và report có các tên chứa `8x-RIFE-RIFE4.0-191.8082fps`, cùng nhiều file `Pre-comp ...` đã render. **Tên file chỉ là dấu vết workflow**, chưa xác minh quá trình tạo, fps thật của từng clip hoặc thiết lập interpolation. Không dùng tên file để kết luận RIFE đã tạo frame chuẩn hay render hiện tại còn cần Twixtor.
+The footage folder and report contain names with `8x-RIFE-RIFE4.0-191.8082fps` and many rendered `Pre-comp ...` files. **File names are only traces of a workflow**; how they were made, each clip's real fps and the interpolation settings are not verified. Do not use file names to conclude that RIFE produced clean frames or that the current render still needs Twixtor.
 
-**Bài học có thể lưu:** tách việc nghiên cứu prerender/interpolation của footage nguồn khỏi việc nghiên cứu chuyển động/effect trong AE. Muốn có recipe retime đầy đủ phải đọc đúng instance, group con, tham số tĩnh và nguồn clip.
+**Lesson worth keeping:** study the prerender/interpolation of source footage separately from the motion/effects inside AE. A complete retime recipe needs the right instance, child groups, static parameters and clip source.
 
-## 8. Tránh học nhầm effect đang tắt
+## 8. Avoid Learning from Disabled Effects
 
-`Main` layer 1 `cc` có nhiều effect bật riêng lẻ nhưng **layer enabled=false**; expression Position `wiggle(6,2)` nằm trên layer này. Không ghi nó là camera shake đang đóng góp vào render hiện tại.
+`Main` layer 1 `cc` has several individually enabled effects but **layer enabled=false**; the Position expression `wiggle(6,2)` sits on this layer. Do not record it as a camera shake contributing to the current render.
 
-`Main` layer 2 có Posterize Time nhưng layer tắt. Layer 40 `tritione 2` blend Screen cũng tắt, trong khi layer 42 `tritione` bật. Cần kiểm tra đồng thời layer enabled, effects_active, từng effect enabled, in/out và đường đi từ Main tới precomp. Precomp tồn tại không đồng nghĩa đang được render.
+`Main` layer 2 has Posterize Time but the layer is off. Layer 40 `tritione 2` with Screen blend is also off, while layer 42 `tritione` is on. Check layer enabled, effects_active, each effect's enabled state, in/out and the path from Main to the precomp together. A precomp existing does not mean it is rendered.
 
-## Kiểm chứng tiếp theo
+## Next Verification
 
-Đối chiếu contact sheet/render với các mốc Main để chọn shot cần học sâu, sau đó đọc đầy đủ dependency của shot. Chỉ ghi nhận một effect gây ra hình ảnh cụ thể khi đã đối chiếu preview trên bản sao an toàn; không tự mở hoặc thay đổi project gốc.
+Compare the contact sheet/render with Main's times to pick shots worth deeper study, then read each shot's full dependencies. Attribute a specific image to an effect only after comparing a preview on a safe copy; never open or change the original project on your own.
 
-## Đọc nguồn và tái sử dụng
+## Reading the Source and Reuse
 
-Bài này giữ số đo/tham chiếu từ lần phân tích đã ghi nhận; project, ảnh bằng chứng và báo cáo riêng không được phân phối cùng thư viện. Các mã `evidence:` là định danh nguồn, không phải file cần có để đọc bài. Người giữ nguồn tra chúng trong hồ sơ local; người đóng góp khác phải ghi nguồn và mức kiểm chứng của chính mình. Xem [quy ước bằng chứng](../foundations/evidence-and-validation.md).
+This article keeps measurements and references from the recorded analysis; the project, evidence images and private reports are not distributed with the library. `evidence:` codes are source identifiers, not files needed to read the article. The source holder resolves them in local records; other contributors record their own sources and verification level. See [evidence conventions](../foundations/evidence-and-validation.md).
