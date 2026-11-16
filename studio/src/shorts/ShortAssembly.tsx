@@ -3,6 +3,8 @@
 // ambience beds and peak-aligned SFX. The manifest lives in the ignored public/media/<slug>/ (private production data).
 import {Audio, Video} from '@remotion/media';
 import React, {useEffect, useState} from 'react';
+import {z} from 'zod';
+import {Iris, irisRadius, Whip, whipMotion} from './transitions';
 import {
   AbsoluteFill, CalculateMetadataFunction, cancelRender, continueRender, delayRender, interpolate, Sequence, spring,
   staticFile, useCurrentFrame, useVideoConfig,
@@ -17,9 +19,20 @@ type Leak = {src: string; from: number; durationInFrames: number; opacity: numbe
 export type ShortManifest = {
   fps: number; durationInFrames: number; width: number; height: number; video: string; font: string; captionY: number;
   voice: {src: string; volume: number}; music: {src: string; volumes: number[]}; beds: Bed[]; sfx: Sfx[]; leaks: Leak[];
-  words: Word[]; cards: Card[];
+  words: Word[]; cards: Card[]; irises?: Iris[]; whips?: Whip[];
 };
-export type ShortAssemblyProps = {manifestFile: string; music?: boolean};
+// Studio controls: per-layer trims in dB on top of the manifest's levels (0 = as built). Drag in the Props panel, listen, render.
+export const shortSchema = z.object({
+  manifestFile: z.string(),
+  music: z.boolean(),
+  musicDb: z.number().min(-24).max(18),
+  voiceDb: z.number().min(-24).max(12),
+  sfxDb: z.number().min(-24).max(12),
+  ambienceDb: z.number().min(-24).max(18),
+});
+export type ShortAssemblyProps = z.infer<typeof shortSchema>;
+export const shortDefaults = {music: true, musicDb: 0, voiceDb: 0, sfxDb: 0, ambienceDb: 0};
+const dB = (x: number) => Math.pow(10, x / 20);
 
 const safe = (p: string) => p.startsWith('media/') && !p.includes('..');
 const loadManifest = async (file: string): Promise<ShortManifest> => {
@@ -62,7 +75,9 @@ const LeakLayer: React.FC<{leak: Leak}> = ({leak}) => {
   return <Video src={staticFile(leak.src)} muted style={{position: 'absolute', inset: 0, width: '100%', height: '100%', mixBlendMode: 'screen', opacity: o}} />;
 };
 
-export const ShortAssembly: React.FC<ShortAssemblyProps> = ({manifestFile, music = true}) => {
+export const ShortAssembly: React.FC<ShortAssemblyProps> = ({manifestFile, music = true, musicDb = 0, voiceDb = 0, sfxDb = 0, ambienceDb = 0}) => {
+  const frame = useCurrentFrame();
+  const {width, height} = useVideoConfig();
   const [m, setM] = useState<ShortManifest | null>(null);
   const [handle] = useState(() => delayRender('Loading short manifest'));
   useEffect(() => {
@@ -74,18 +89,26 @@ export const ShortAssembly: React.FC<ShortAssemblyProps> = ({manifestFile, music
     return () => {off = true;};
   }, [manifestFile, handle]);
   if (!m) return null;
+  const iris = m.irises?.find((i) => frame >= i.from && frame <= i.to);
+  const whip = m.whips?.find((w) => Math.abs(frame - w.at) < 3);
+  const motion = whip ? whipMotion(frame, whip, width) : {x: 0, blur: 0};
   return (
     <AbsoluteFill style={{backgroundColor: '#000'}}>
-      <Video name="three.js render" src={staticFile(m.video)} muted style={{width: '100%', height: '100%'}} />
-      {m.leaks.map((l, i) => <Sequence key={`leak${i}`} name={`Light leak ${i + 1}`} from={l.from} durationInFrames={l.durationInFrames}><LeakLayer leak={l} /></Sequence>)}
-      <Cards cards={m.cards} />
-      <Captions words={m.words} y={m.captionY} />
-      <Audio name="Voice" src={staticFile(m.voice.src)} volume={m.voice.volume} />
-      {music && <Audio name="Music (ducked)" src={staticFile(m.music.src)} volume={(f) => m.music.volumes[Math.min(f, m.music.volumes.length - 1)] ?? 0} />}
-      {m.beds.map((b, i) => <Sequence key={`bed${i}`} name={`Ambience ${i + 1}`} from={b.from} durationInFrames={b.durationInFrames}><Audio src={staticFile(b.src)} volume={b.volume} loop /></Sequence>)}
+      <svg width="0" height="0" style={{position: 'absolute'}}><defs><filter id="short-whip" x="-30%" y="-5%" width="160%" height="110%"><feGaussianBlur stdDeviation={`${motion.blur} 0`} /></filter></defs></svg>
+      <AbsoluteFill style={{clipPath: iris ? `circle(${irisRadius(frame, iris, width, height)}px at ${iris.cx * 100}% ${iris.cy * 100}%)` : undefined}}>
+        <AbsoluteFill style={{transform: `translateX(${motion.x}px) scale(${whip ? 1.3 : 1})`, filter: whip ? 'url(#short-whip)' : undefined}}>
+          <Video name="three.js render" src={staticFile(m.video)} muted style={{width: '100%', height: '100%'}} />
+          {m.leaks.map((l, i) => <Sequence key={`leak${i}`} name={`Light leak ${i + 1}`} from={l.from} durationInFrames={l.durationInFrames}><LeakLayer leak={l} /></Sequence>)}
+          <Cards cards={m.cards} />
+        </AbsoluteFill>
+        <Captions words={m.words} y={m.captionY} />
+      </AbsoluteFill>
+      <Audio name="Voice" src={staticFile(m.voice.src)} volume={m.voice.volume * dB(voiceDb)} />
+      {music && <Audio name="Music (ducked)" src={staticFile(m.music.src)} volume={(f) => Math.min(1, (m.music.volumes[Math.min(f, m.music.volumes.length - 1)] ?? 0) * dB(musicDb))} />}
+      {m.beds.map((b, i) => <Sequence key={`bed${i}`} name={`Ambience ${i + 1}`} from={b.from} durationInFrames={b.durationInFrames}><Audio src={staticFile(b.src)} volume={Math.min(1, b.volume * dB(ambienceDb))} loop /></Sequence>)}
       {m.sfx.map((s, i) => (
         <Sequence key={`sfx${i}`} name={`SFX: ${s.note}`} from={s.from} durationInFrames={s.durationInFrames ?? undefined}>
-          <Audio src={staticFile(s.src)} volume={s.volume} trimBefore={s.trimBefore || undefined} />
+          <Audio src={staticFile(s.src)} volume={Math.min(1, s.volume * dB(sfxDb))} trimBefore={s.trimBefore || undefined} />
         </Sequence>
       ))}
     </AbsoluteFill>

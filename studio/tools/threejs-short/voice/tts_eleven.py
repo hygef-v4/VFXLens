@@ -9,12 +9,14 @@ S = json.loads((PROD / 'script.json').read_text(encoding='utf-8'))
 VOICE = sys.argv[1] if len(sys.argv) > 1 else 'uC1r2TVqMMkHyjSAteKk'   # Ian - Deep, Punchy Social Hook Voice
 MODEL = sys.argv[2] if len(sys.argv) > 2 else 'eleven_v3'
 LEAD = 0.3   # fit.py assumes 0.3 s of silence before the first word
+import os
+SPEED = os.environ.get('TTS_SPEED', '1.0')   # ElevenLabs voice_settings.speed (0.7-1.2); a faster read beats heavy atempo
 text = ' '.join(l['vo'] for l in S['lines'])   # the CLI drops everything after a newline in --text
 raw = ROOT / 'el_full.json'
 if not raw.exists():   # never pay twice for the same take
     exe = shutil.which('elevenlabs') or 'elevenlabs'
     r = subprocess.run([exe, 'text-to-speech', 'convert_with_timestamps', '--voice-id', VOICE, '--model-id', MODEL, '--text', text,
-                        '--output-format', 'mp3_44100_128', '--format', 'json'], capture_output=True, text=True, encoding='utf-8')
+                        '--voice-settings.speed', SPEED, '--output-format', 'mp3_44100_128', '--format', 'json'], capture_output=True, text=True, encoding='utf-8')
     if r.returncode != 0 or '"audio_base64"' not in r.stdout: sys.exit('TTS failed: ' + (r.stderr or r.stdout)[:800])
     raw.write_text(r.stdout, encoding='utf-8')
 d = json.loads(raw.read_text(encoding='utf-8'))

@@ -39,10 +39,10 @@ for name in ['node_modules', 'assets']:   # link, never copy or modify the skill
     src, dst = SK / name, E / name
     if os.name == 'nt': subprocess.run(['cmd', '/c', 'mklink', '/J', str(dst), str(src)], check=True, capture_output=True)
     else: os.symlink(src, dst, target_is_directory=True)
-for sub, files in {'voice': ['voice/tts_eleven.py', 'voice/fit.py'], 'audio': ['audio/cues.example.py', 'audio/build_manifest.example.py', 'audio/music_fallback.py'], 'qa': ['qa/grid.py', 'qa/luma.py']}.items():
+for sub, files in {'voice': ['voice/tts_eleven.py', 'voice/tighten.py', 'voice/evenpace.py', 'voice/fit.py', 'voice/align.py', 'examples/voice_quote_splice.example.py'], 'audio': ['audio/cues.example.py', 'audio/build_manifest.example.py', 'audio/music_fallback.py'], 'qa': ['qa/grid.py', 'qa/luma.py', 'qa/audit.py']}.items():
     (P / sub).mkdir(exist_ok=True)
     for f in files: shutil.copy(KIT / f, P / sub / Path(f).name.replace('.example', ''))
-shutil.copy(KIT / 'render_all.sh', P / 'render_all.sh')
+shutil.copy(KIT / 'render_all.sh', P / 'render_all.sh'); shutil.copy(KIT / 'render_fast.example.sh', P / 'render_fast.sh')
 (P / 'assets' / 'sfx' / 'lib').mkdir(parents=True)
 (P / 'script.json').write_text('{\n  "title": "",\n  "voice": "",\n  "lines": [\n    { "id": "l1", "vo": "" }\n  ]\n}\n', encoding='utf-8')
 (P / 'production.md').write_text(f"# {a.slug}\n\nFollow workflows/threejs-character-short.md. Record here: contract, sources/fact-check, creative decisions, voice ids, resource-library path (VFX_RESOURCES), commands run, QA results, open issues, next action.\n", encoding='utf-8')

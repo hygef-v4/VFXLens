@@ -3,7 +3,7 @@ import {SmokeTest} from './SmokeTest';
 import {ThreeCheck} from './ThreeCheck';
 import {EditorialExplainer} from './editorial/EditorialExplainer';
 import {DirectorDemo} from './director/DirectorDemo';
-import {ShortAssembly, calculateShortMetadata} from './shorts/ShortAssembly';
+import {ShortAssembly, calculateShortMetadata, shortDefaults, shortSchema} from './shorts/ShortAssembly';
 
 export const Root = () => (
   <>
@@ -29,23 +29,25 @@ export const Root = () => (
   <Composition
     id="NvidiaCudaShort"
     component={ShortAssembly}
+    schema={shortSchema}
     calculateMetadata={calculateShortMetadata}
     durationInFrames={30}
     fps={30}
     width={1080}
     height={1920}
-    defaultProps={{manifestFile: 'media/nvidia-cuda-bet/manifest.json', music: true}}
+    defaultProps={{...shortDefaults, manifestFile: 'media/nvidia-cuda-bet/manifest.json'}}
   />
   {/* Any three.js short: npx remotion render src/index.ts ThreeShort out.mp4 --props='{"manifestFile":"media/<slug>/manifest.json"}' */}
   <Composition
     id="ThreeShort"
     component={ShortAssembly}
+    schema={shortSchema}
     calculateMetadata={calculateShortMetadata}
     durationInFrames={30}
     fps={30}
     width={1080}
     height={1920}
-    defaultProps={{manifestFile: 'media/nvidia-cuda-bet/manifest.json', music: true}}
+    defaultProps={{...shortDefaults, manifestFile: 'media/nvidia-cuda-bet/manifest.json'}}
   />
   </>
 );
