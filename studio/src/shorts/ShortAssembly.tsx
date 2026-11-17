@@ -4,7 +4,7 @@
 import {Audio, Video} from '@remotion/media';
 import React, {useEffect, useState} from 'react';
 import {z} from 'zod';
-import {Iris, irisRadius, Whip, whipMotion} from './transitions';
+import {Iris, irisRadius} from './transitions';
 import {
   AbsoluteFill, CalculateMetadataFunction, cancelRender, continueRender, delayRender, interpolate, Sequence, spring,
   staticFile, useCurrentFrame, useVideoConfig,
@@ -19,7 +19,7 @@ type Leak = {src: string; from: number; durationInFrames: number; opacity: numbe
 export type ShortManifest = {
   fps: number; durationInFrames: number; width: number; height: number; video: string; font: string; captionY: number;
   voice: {src: string; volume: number}; music: {src: string; volumes: number[]}; beds: Bed[]; sfx: Sfx[]; leaks: Leak[];
-  words: Word[]; cards: Card[]; irises?: Iris[]; whips?: Whip[];
+  words: Word[]; cards: Card[]; irises?: Iris[];
 };
 // Studio controls: per-layer trims in dB on top of the manifest's levels (0 = as built). Drag in the Props panel, listen, render.
 export const shortSchema = z.object({
@@ -90,13 +90,10 @@ export const ShortAssembly: React.FC<ShortAssemblyProps> = ({manifestFile, music
   }, [manifestFile, handle]);
   if (!m) return null;
   const iris = m.irises?.find((i) => frame >= i.from && frame <= i.to);
-  const whip = m.whips?.find((w) => Math.abs(frame - w.at) < 3);
-  const motion = whip ? whipMotion(frame, whip, width) : {x: 0, blur: 0};
   return (
     <AbsoluteFill style={{backgroundColor: '#000'}}>
-      <svg width="0" height="0" style={{position: 'absolute'}}><defs><filter id="short-whip" x="-30%" y="-5%" width="160%" height="110%"><feGaussianBlur stdDeviation={`${motion.blur} 0`} /></filter></defs></svg>
       <AbsoluteFill style={{clipPath: iris ? `circle(${irisRadius(frame, iris, width, height)}px at ${iris.cx * 100}% ${iris.cy * 100}%)` : undefined}}>
-        <AbsoluteFill style={{transform: `translateX(${motion.x}px) scale(${whip ? 1.3 : 1})`, filter: whip ? 'url(#short-whip)' : undefined}}>
+        <AbsoluteFill>
           <Video name="three.js render" src={staticFile(m.video)} muted style={{width: '100%', height: '100%'}} />
           {m.leaks.map((l, i) => <Sequence key={`leak${i}`} name={`Light leak ${i + 1}`} from={l.from} durationInFrames={l.durationInFrames}><LeakLayer leak={l} /></Sequence>)}
           <Cards cards={m.cards} />

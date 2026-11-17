@@ -25,7 +25,7 @@ An isometric appearance can be built from 2D shapes. Use real 3D when changes in
 
 ## Production Route
 
-Follow the [Vietnamese AI-assisted motion-graphics workflow](../../workflows/ai-assisted-motion-graphics.md) alongside the shared [production workflow](../../workflows/create-video.md). The specialized workflow owns the stage order, tool choices and completion criteria; this page owns the visual classification and inspection criteria.
+Follow the [AI-assisted motion-graphics workflow](../../workflows/ai-assisted-motion-graphics.md) alongside the shared [production workflow](../../workflows/create-video.md). The specialized workflow owns the stage order, tool choices and completion criteria; this page owns the visual classification and inspection criteria.
 
 Build a small reusable vocabulary: platform/prop, entity label, claim card, source footer, status stamp, timeline and recap board. Prefer configurable states of a component to a separate custom scene for every sentence.
 
@@ -33,7 +33,7 @@ Related foundations: [timing and easing](../foundations/timing-and-easing.md), [
 
 ## Inspection Criteria and Pitfalls
 
-- Check a stable projection, coherent stroke/shadow treatment, text size, Vietnamese diacritics, source visibility and spacing between labels and props.
+- Check a stable projection, coherent stroke/shadow treatment, text size, diacritics in the script's language, source visibility and spacing between labels and props.
 - Verify changes in reading order against narration. Keep a readable hold after a fast entrance and inspect at the intended viewing size.
 - Treat classification/status as data, not a color-only decoration. Missing values are not zero; uncertain attribution is not a confirmed cause.
 - Generated illustrations or reconstructed UI must be identifiable as illustration. Preserve authentic source material when a shot claims to show a document or screenshot.

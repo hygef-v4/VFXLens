@@ -2,7 +2,7 @@
 # fixes applied. Usage (from the repo root):
 #   python studio/tools/threejs-short/scaffold.py <slug> [--skill-dir <claude-3d-animated-shorts dir>]
 # Result: local/productions/<slug>/ (ignored) with engine/ (copied files; node_modules + assets linked to the skill,
-# never modified), voice/, audio/, qa/, render_all.sh and a film.inc.js to write the shots in.
+# never modified), voice/, audio/, qa/, render_fast.sh and a film.inc.js to write the shots in.
 import argparse, os, shutil, subprocess, sys
 from pathlib import Path
 
@@ -34,15 +34,15 @@ assert m.count('// @@FILM@@') == 1
 (d / 'film.html').write_text((d / 'index.html').read_text(encoding='utf-8').replace('./main.js', './main.film.js'), encoding='utf-8')
 print('built main.film.js')
 """, encoding='utf-8')
-shutil.copy(KIT / 'examples' / 'film_nvidia_cuda.example.inc.js', E / 'film.inc.js')   # start from the worked example; rewrite cast/props/shots
+shutil.copy(KIT / 'examples' / 'starter.film.inc.js', E / 'film.inc.js')   # minimal starter film; rewrite cast/props/shots
 for name in ['node_modules', 'assets']:   # link, never copy or modify the skill's dependencies and CC0 assets
     src, dst = SK / name, E / name
     if os.name == 'nt': subprocess.run(['cmd', '/c', 'mklink', '/J', str(dst), str(src)], check=True, capture_output=True)
     else: os.symlink(src, dst, target_is_directory=True)
-for sub, files in {'voice': ['voice/tts_eleven.py', 'voice/tighten.py', 'voice/evenpace.py', 'voice/fit.py', 'voice/align.py', 'examples/voice_quote_splice.example.py'], 'audio': ['audio/cues.example.py', 'audio/build_manifest.example.py', 'audio/music_fallback.py'], 'qa': ['qa/grid.py', 'qa/luma.py', 'qa/audit.py']}.items():
+for sub, files in {'voice': ['voice/tts_eleven.py', 'voice/tighten.py', 'voice/evenpace.py', 'voice/fit.py', 'voice/align.py', 'voice/silent_timing.py', 'examples/voice_quote_splice.example.py'], 'audio': ['audio/cues.example.py', 'audio/build_manifest.example.py', 'audio/music_fallback.py'], 'qa': ['qa/grid.py', 'qa/luma.py', 'qa/audit.py']}.items():
     (P / sub).mkdir(exist_ok=True)
     for f in files: shutil.copy(KIT / f, P / sub / Path(f).name.replace('.example', ''))
-shutil.copy(KIT / 'render_all.sh', P / 'render_all.sh'); shutil.copy(KIT / 'render_fast.example.sh', P / 'render_fast.sh')
+shutil.copy(KIT / 'render_fast.example.sh', P / 'render_fast.sh')
 (P / 'assets' / 'sfx' / 'lib').mkdir(parents=True)
 (P / 'script.json').write_text('{\n  "title": "",\n  "voice": "",\n  "lines": [\n    { "id": "l1", "vo": "" }\n  ]\n}\n', encoding='utf-8')
 (P / 'production.md').write_text(f"# {a.slug}\n\nFollow workflows/threejs-character-short.md. Record here: contract, sources/fact-check, creative decisions, voice ids, resource-library path (VFX_RESOURCES), commands run, QA results, open issues, next action.\n", encoding='utf-8')

@@ -1,7 +1,0 @@
-{
-  "repository": "https://github.com/QwenAudio/CosyVoice.git",
-  "revision": "074ca6dc9e80a2f424f1f74b48bdd7d3fea531cc",
-  "submodules": { "third_party/Matcha-TTS": "dd9105b34bf2be2230f4aa1e4769fb586a3c824e" },
-  "python": "3.11",
-  "torch_index": "https://download.pytorch.org/whl/cu121"
-}

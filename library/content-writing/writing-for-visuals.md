@@ -34,6 +34,6 @@ For the fictional parcel scenario from [Hooks and Promises](hooks-and-promises.m
 
 ## Review and Limits
 
-Check terminology, spoken rhythm, drawable actions, attribution, cue order and text density before detailed animation. Inspect at the target viewing size and with actual audio. ASR segment boundaries are navigation aids, not exact production cue points. No universal word-count-per-shot, Vietnamese speaking rate or reading-time formula has been established by the current case studies.
+Check terminology, spoken rhythm, drawable actions, attribution, cue order and text density before detailed animation. Inspect at the target viewing size and with actual audio. ASR segment boundaries are navigation aids, not exact production cue points. No universal word-count-per-shot, speaking rate or reading-time formula has been established by the current case studies.
 
 [Back to Content Writing](README.md)

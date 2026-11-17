@@ -1,27 +1,60 @@
-# VFXLens — Reference Analysis and AI-Guided Video Production
+# VFXLens
 
-VFXLens combines a local After Effects/video analyzer, a reusable editing and
-content-writing library, live technology research, and a Remotion production
-studio. Use it for one operator working with Codex or Claude Code; production is
-agent-guided, with explicit preview, render and review steps.
+**Learn from reference edits, then make your own videos with an AI agent.**
+VFXLens analyzes After Effects projects and VFX videos offline, keeps what it learns in an editing knowledge
+library, and gives Claude Code or Codex a production pipeline for vertical Shorts: three.js picture, Remotion
+captions and mix, optional ElevenLabs voice.
 
-| Task | Entry point | Current boundary |
+<p align="center"><img src="docs/media/hello-short.gif" alt="Frames from the hello-short demo: a 3D cartoon presenter at an office desk, wide shot to close-up, with word captions" width="270"></p>
+
+## What is inside
+
+| Part | What it does | Entry point |
 | --- | --- | --- |
-| Analyze `.aep/.aepx` or video | `uv run vfx ...` below | Offline analysis works; live AE requires a connected bridge. |
-| Study a PDF/video and its narration | [Study workflow](workflows/study-reference.md) | Inspect selected images and timestamped transcripts; record coverage and ASR errors. |
-| Write scripts or narration | [Content Writing](library/content-writing/README.md) | Script-only work finishes with writing. |
-| Discover current templates/shaders/skills | [motion-scout](skills/motion-scout/SKILL.md) | Live research when tools are available; no installation in research-only mode. |
-| Direct 3D or cinematic motion | [remotion-3d-director](.agents/skills/remotion-3d-director/SKILL.md) | WebGL/R3F baseline; native WebGPU remains experimental until capture/seek tests pass. |
-| Create, revise and export video | [Production workflow](workflows/create-video.md) | Remotion code and private assets need actual render/visual/audio review. |
+| **Analyzer** (`vfx` CLI) | Reads `.aep`/`.aepx` projects without opening After Effects (layers, effect stacks, keyframes, expressions) and analyzes videos frame by frame (cuts, flashes, shake, speed ramps, glow…) | [CLI usage](#3-cli-usage-vfx) |
+| **Studio** (Remotion) | `ThreeShort` assembles a three.js picture with word captions, light leaks, voice, ducked music and peak-aligned SFX | [`ShortAssembly.tsx`](studio/src/shorts/ShortAssembly.tsx) |
+| **Short toolkit** | Scaffold, starter film, voice timing (`tighten`, `evenpace`, `fit`, `align`), manifest builder, render script, perceptual QA | [three.js Short workflow](workflows/threejs-character-short.md) |
+| **Agent skills** | `vfxlens` (router), `remotion-3d-director`, `motion-scout` for Claude Code and Codex | [`skills/vfxlens`](skills/vfxlens/SKILL.md), [`AGENTS.md`](AGENTS.md) |
+| **Knowledge library** | Techniques, styles, resources and evidence-labelled case studies | [`library/`](library/README.md) |
 
-The studio registers `SmokeTest` (10s vertical), `ThreeCheck` (1s 3D),
-`DirectorSkillDemo` (4s horizontal product scene) and `EditorialExplainer` (120s
-horizontal). The editorial composition needs its private manifest/audio/fonts in
-ignored `studio/public/media/`; a fresh clone does not include those assets.
-These compositions demonstrate specific branches, not a complete character or
-image-generation pipeline.
+## Quick start
 
-Register the three authored skills at both project discovery paths on Windows:
+Requirements: Python ≥ 3.10 with [uv](https://docs.astral.sh/uv/), Node.js ≥ 22, FFmpeg/ffprobe on `PATH`.
+
+```bash
+uv sync --locked --extra dev          # analyzer
+uv run vfx doctor                      # check the environment
+npm --prefix studio ci                 # Remotion studio
+npm --prefix studio run studio         # preview compositions in the browser
+```
+
+**Render the demo Short** (no API key needed; also needs the
+[`claude-3d-animated-shorts`](https://github.com/thuann-vn/claude-3d-animated-shorts) skill installed for its 3D engine):
+
+```bash
+python studio/tools/threejs-short/scaffold.py hello-short   # creates local/productions/hello-short/
+cd local/productions/hello-short                              # write your lines into script.json first
+python voice/silent_timing.py                                 # draft timing + silent voice track (no TTS)
+(cd audio && python music_fallback.py)                        # procedural music
+OUTV=v1 bash render_fast.sh                                   # picture, assembly, loudness, verify, audit
+```
+
+Swap in a real voice later with the ElevenLabs steps in the [workflow](workflows/threejs-character-short.md).
+
+## Workflows
+
+| Task | Start here |
+| --- | --- |
+| Study a reference video, PDF or AE project | [study-reference](workflows/study-reference.md) |
+| Write a script, hook or narration | [Content Writing](library/content-writing/README.md) |
+| Make a story Short with 3D cartoon characters | [threejs-character-short](workflows/threejs-character-short.md) |
+| Make or continue any video | [create-video](workflows/create-video.md) |
+| Diagram/isometric/cartoon explainer | [ai-assisted-motion-graphics](workflows/ai-assisted-motion-graphics.md) |
+| Direct cinematic 3D | [remotion-3d-director](.agents/skills/remotion-3d-director/SKILL.md) |
+| Find current animation technology | [motion-scout](skills/motion-scout/SKILL.md) |
+
+Agents read [`AGENTS.md`](AGENTS.md) (Claude Code loads it through `CLAUDE.md`); it routes each request to a workflow
+and proposes the skills to use. Register the repository skills for both agents:
 
 ```powershell
 foreach ($skillName in 'vfxlens', 'motion-scout', 'remotion-3d-director') {
@@ -29,28 +62,14 @@ foreach ($skillName in 'vfxlens', 'motion-scout', 'remotion-3d-director') {
 }
 ```
 
-Use `$vfxlens`, `$motion-scout`, `$remotion-3d-director` in Codex and the matching
-`/skill-name` commands in Claude Code. Existing destinations are checked and
-preserved. Refresh client discovery after registration. See
-[setup](skills/motion-scout/references/capabilities-and-setup.md) for link checks.
-
-## Local video production with Claude Code and Codex
-
-VFXLens also provides a shared [VFXLens skill](skills/vfxlens/SKILL.md) for studying references and creating videos with a separately installed Remotion studio and optional Blender scenes. Follow the [toolchain quickstart and repository requirements](docs/ai-video-requirements.md) to set up both agents, preview the studio, and render a sample. The existing `vfx` CLI below remains the analysis interface; video production uses the studio scripts and [production workflow](workflows/create-video.md).
-
-Machine-specific installation and verification results belong in ignored `local/setup/status.json`. The setup guide describes the supported layout; successful installation alone does not establish that every creative workflow has been tested.
-
-The [full toolchain map](docs/full-toolchain.md) covers the production workflow, shared skills and installed libraries. The [project audit](docs/project-audit.md) records the three analyzer fixes and remaining verification limits.
-
-## Editing Knowledge Library
-
-Browse the [Markdown Knowledge Library](library/README.md) by technique, style, resource, tool, and case study. Guides are designed to work independently of any personal asset collection, with source parameters and verification levels documented explicitly.
-
-An independent analysis engine for **Adobe After Effects projects (`.aep` / `.aepx`)** and **VFX Videos (`.mp4` / `.mov` / FFmpeg)** on Windows (optimized for hardware with NVIDIA RTX 4060 8GB GPU and full CPU fallback support).
+See [setup](skills/motion-scout/references/capabilities-and-setup.md) for link checks, the
+[requirements guide](docs/ai-video-requirements.md) and the [toolchain map](docs/full-toolchain.md) for optional tools,
+and [docs/limitations.md](docs/limitations.md) for known analyzer limits. Productions and their media stay in ignored
+`local/productions/<slug>/` and `studio/public/media/`; a fresh clone contains none.
 
 ---
 
-## 1. Core Features (Phase 1)
+## 1. Analyzer features
 
 ### A. After Effects Project Analyzer (`project_analyzer`)
 - **Method A — Offline Binary/XML Parser (`offline_py_aep` & `offline_aepx`)**:
@@ -96,11 +115,11 @@ An independent analysis engine for **Adobe After Effects projects (`.aep` / `.ae
 
 ---
 
-## 2. Windows Installation
+## 2. Installation
 
 ### System Requirements
-- Windows 10/11 (64-bit)
-- Python >= 3.11 (tested on Python 3.14)
+- Windows, macOS or Linux (developed and CI-tested on Windows)
+- Python >= 3.10 (tested on Python 3.14)
 - [uv](https://docs.astral.sh/uv/) package manager
 - FFmpeg & FFprobe available in `PATH`
 
@@ -112,7 +131,7 @@ cd VFXLens
 # 2. Initialize the virtual environment and install dependencies
 uv sync --extra dev
 
-# 3. Run environment diagnostics (Python, FFmpeg, RTX 4060 GPU, After Effects, Packages)
+# 3. Run environment diagnostics (Python, FFmpeg, GPU, After Effects, packages)
 uv run vfx doctor
 ```
 
@@ -174,7 +193,19 @@ uv run pytest -v
 
 ---
 
-## 5. Detailed Documentation
-- Research & evaluation of 9 GitHub repositories: [`docs/repository-research.md`](docs/repository-research.md)
+## 5. More documentation
+- Contributing: [`CONTRIBUTING.md`](CONTRIBUTING.md) · Security: [`SECURITY.md`](SECURITY.md) · Changes: [`CHANGELOG.md`](CHANGELOG.md)
 - Technical limitations & untested live scenarios: [`docs/limitations.md`](docs/limitations.md)
 - AI Agent guidelines: [`AGENTS.md`](AGENTS.md)
+
+---
+
+## License
+
+VFXLens is released under the [MIT License](LICENSE) © 2026 chal7z.
+
+- Remotion, which the studio uses to render, has its own [licence](https://www.remotion.dev/license): free for
+  individuals and companies of up to three people; larger companies need a company licence.
+- Adapted code and dependency notes are listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+- Case studies in `library/` describe and measure third-party works for education; their media and source files are not included.
+- Optional services such as ElevenLabs follow their own terms; nothing in the repository calls a paid service by default.

@@ -54,7 +54,7 @@ universal aesthetic rules. A deliberately dark reveal should be reviewed in cont
 ## Asynchronous and compatibility failure checks
 
 - Asset/font errors cancel rendering; release obsolete delay handles on cleanup.
-  Verify the actual longest copy and Vietnamese glyphs with the loaded font.
+  Verify the actual longest copy and non-ASCII glyphs (e.g. Vietnamese diacritics) with the loaded font.
 - For WebGPU, run the extra [initialization/queue/seek tests](webgpu-shaders.md).
   Merely compiling node graphs or rendering a WebGL fallback is not GPU validation.
 - Ensure source visibility, focus, exposure and material values restore on reverse

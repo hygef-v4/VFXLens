@@ -18,7 +18,7 @@ production, maintain one compact
 - Voice/caption timing, implementation/source locations, progress and open issues.
 - Exact commands, observed review/export results and the next executable action.
 
-Write these user-facing notes in Vietnamese by default. Fill real decisions;
+Write these user-facing notes in the user's language. Fill real decisions;
 empty templates are not a handoff. On continuation, check that documented files
 and exports still exist, then advance from the recorded next action. Do not reset
 another agent's work or imply that a handoff automatically runs in the background.
@@ -94,9 +94,9 @@ If narration is required, use the user's actual recording first. Measure its
 pauses and phrase boundaries before finalizing shots/captions; local Whisper can
 assist when installed. Read the voice environment instructions before using it.
 Transcription and word timing require listening/correction, especially for
-Vietnamese. Without actual voice, label timing/caption estimates; choose a silent
+languages other than English. Without actual voice, label timing/caption estimates; choose a silent
 or text-led version only when compatible with the brief. Do not present estimated
-captions as aligned to speech or use English words-per-minute as Vietnamese timing.
+captions as aligned to speech or use English words-per-minute for another language.
 
 Storyboard each shot's entrance, landing, readable hold, action and exit. Share
 event IDs/global frame numbers between picture and audio. Use half-open shot

@@ -44,6 +44,7 @@ overlay/SFX library). Label every choice that is not a measured fact as a creati
 ## 3. Voice and timing
 
 ```powershell
+python voice/silent_timing.py                        # optional first draft: timing + silent voice from script.json, no TTS
 python voice/tts_eleven.py <voice_id> eleven_v3      # whole script in one take: voice_raw.mp3 + timing_raw.json
 python voice/voice_quote_splice.py                   # optional: quoted line from a separate take in the same voice
 python voice/tighten.py --maxgap 0.2 --keep-after-line l3  # shrink silences, keep the reaction beat
@@ -76,7 +77,7 @@ production the user caught a clipped word, a swallowed "So" and a rushed hook by
 
 ## 4. Picture: cast, sets, shots (three.js)
 
-Write the film in `engine/film.inc.js`, starting from the example. Rebuild with `python engine/build.py`.
+Write the film in `engine/film.inc.js`; the scaffold starts it from `examples/starter.film.inc.js` (one presenter, one shot per line). Name each set-change cut in `audio/cues.py` `SETS`. Rebuild with `python engine/build.py`.
 
 - **Cast**: `SR.build({...base, jacket, details, pattern, hat})`. Same head size for everyone; identity comes
   from clothes and hats. Review the cast before shots (the skill's `viewer.html`; skipping this caused
@@ -106,7 +107,7 @@ Write the film in `engine/film.inc.js`, starting from the example. Rebuild with 
   then, from the production folder, `python qa/grid.py engine/out/s engine/out/s/grid.jpg` and `python qa/luma.py engine/out/s`.
   Target luma 100–135 (dark screens and night shots may sit lower by design); heads are the brightest thing.
 - Full picture and assembly: `OUTV=v1 RC=3 bash render_fast.sh` (segments in parallel; `SEQ=1 RC=2` when Windows
-  commit memory is near its limit, which crashed three parallel browsers). `render_all.sh` renders the segments only.
+  commit memory is near its limit, which crashed three parallel browsers).
 - Hold the cut until a quoted line's last word has died away (word end + 0.2 s); reaction SFX start after the cut.
 
 ## 5. Sound
@@ -145,8 +146,8 @@ stream-copied concat made Remotion time out while seeking. Open `npm run studio`
 Optional manifest transitions (frame numbers, normalized `cx`/`cy`):
 `irises: [{from, mid, to, cx, cy}]` closes the picture and captions to black at `mid`, then opens the incoming shot.
 Require `from < mid < to`; align `mid` with the picture cut and the iris SFX peak near the close.
-`whips: [{at, dir: 1}]` (or `-1`) adds translation and horizontal SVG blur within ±3 frames of the cut.
-Avoid it over a still 3D camera: the v7 audit found 2D smears read as jumps; v8 uses `whips: []` and hard cuts on words. Older manifests can omit both arrays.
+The 2D whip smear was removed after the v7 audit (over a still 3D camera it read as a jump): cut on words with continuous
+camera motion instead. Older manifests can omit `irises`.
 For diegetic text use `cards: []`; v7 places captions at `captionY: 0.70`. Check transitions on encoded frames,
 including the intentionally black iris midpoint, rather than suppressing all black-frame warnings.
 
@@ -175,7 +176,6 @@ including the intentionally black iris midpoint, rather than suppressing all bla
 | Sound late against the picture | files placed by their start, peaks 0.3–0.8 s later | peak alignment |
 | Peak-aligned hit never sounds on cue | duration cap ends before the source peak | trim excess source lead, recalculate effective lag; retain source lag in the manifest |
 | Laugh spills into the hero's reply | old fixed offset and a long laugh take survived a faster voice fit | use the measured final word end, shorten/fade the laugh into the actual pause, retime pan and bubbles together |
-| Whip reverses one frame before the cut | nearest-frame rounding vs engine `t >= cue` | use `ceil(cue * fps)` for both whip center and swish target |
 | Background louder than the voice | static music level | per-frame ducking, lower beds |
 | No music audible on a phone | music ducked to −33 dB under near-continuous speech | music relative to measured voice loudness (−14 LU chosen by ear), `musicDb` trim in Studio |
 | Cuts feel broken, "camera stops then lunges" | shot curve eased to zero velocity at both ends | `cm(u) = 0.75u + 0.25·eio(u)`: keep velocity through the cut |
