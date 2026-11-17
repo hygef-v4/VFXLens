@@ -50,7 +50,7 @@ Skills marked *(user plugin)* are installed per machine; when one is missing, sa
 | Publish | `social-video` *(motion-pack)* drafts copy, cover, AI disclosure | `postiz` to schedule; the user approves every post |
 | New animation technology | `motion-scout` | `motion-stack` *(user plugin)* |
 | Promo of a web or desktop product (real page captures) | `video-shotcraft` *(user skill)*: Ink Press template or its 124 shot cards | `remotion-3d-director` for 3D shots |
-| Long-form 2D explainer or story (16:9, 20 s–20 min) | `longform-2d` skill → `workflows/2d-long-form-video.md`: Remotion SVG kit, GSAP text, `@remotion/three` shots, ElevenLabs per-line voices | `remotion-3d-director` for 3D shots, `video-shotcraft` sound design, `humanizer` (narration), `gsap-animation` *(local skill)* for extra GSAP recipes |
+| Long-form 2D explainer or story (16:9, 20 s–20 min) | `longform-2d` skill → `workflows/2d-long-form-video.md`; **ask the user for the style first**: `ink-puppet-night` (character story) or `argument-board` (evidence explainer); Remotion kit, `@remotion/three` shots, ElevenLabs per-line voices | `remotion-3d-director` for 3D shots, `video-shotcraft` sound design, `humanizer` (narration), `gsap-animation` *(local skill)* for extra GSAP recipes |
 | Remotion how-to (captions, render, Studio, upgrade, licence) | `remotion-best-practices` router (`studio/.claude/skills`, also global) | `remotion-render`, `remotion-captions`, `remotion-upgrade` |
 
 **When to use `video-shotcraft`:** (1) sound design for any video: read only its `references/sound-design.md` (peak alignment,

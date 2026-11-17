@@ -51,6 +51,7 @@ by scripts/fetch-assets.sh (Xbot.glb, Horse.glb, Anton, Inter) are not included.
 | [OpenAI Whisper](https://github.com/openai/whisper) | MIT | Optional local transcription (`studio/voice`) |
 | [Caveat Brush](https://fonts.google.com/specimen/Caveat+Brush), [Kalam](https://fonts.google.com/specimen/Kalam) | SIL Open Font License 1.1 | Bundled in `studio/public/fonts/` with their licence files |
 | [Permanent Marker](https://fonts.google.com/specimen/Permanent+Marker) | Apache License 2.0 | Bundled in `studio/public/fonts/` with its licence file |
+| [Be Vietnam Pro](https://fonts.google.com/specimen/Be+Vietnam+Pro), [JetBrains Mono](https://fonts.google.com/specimen/JetBrains+Mono) | SIL Open Font License 1.1 | Bundled in `studio/public/fonts/` with their licence files |
 
 Other Python and npm dependencies are listed with their versions in `uv.lock`, `studio/voice/uv.lock` and
 `studio/package-lock.json`; their licences apply as published by each project.

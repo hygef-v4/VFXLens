@@ -9,6 +9,8 @@ import argparse, base64, hashlib, json, re, shutil, subprocess, sys, wave
 from pathlib import Path
 import numpy as np
 
+sys.stdout.reconfigure(encoding='utf-8', errors='replace')   # Vietnamese lines on a cp1252 Windows console
+
 SR = 48000
 ap = argparse.ArgumentParser()
 ap.add_argument('--silent', action='store_true'); ap.add_argument('--wps', type=float, default=2.6)

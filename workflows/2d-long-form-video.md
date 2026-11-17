@@ -1,47 +1,61 @@
 # 2D long-form video (16:9 explainer, 20 s to 20 min)
 
-Animated explainer or documentary-style story in a flat ink-line paper style: round-head puppet characters with one
-thick outline, moody night lighting, a camera that never stops, hand-lettered labels, in-world infographics, chapter
-cards on black, a narrator plus character voices, music and SFX. The picture is Remotion (SVG/HTML), text motion is
-GSAP seeked by frame, and three.js (`@remotion/three`) takes the shots that need real depth. It extends
-[create-video](create-video.md): keep its production checkpoint, privacy and delivery rules.
+Animated explainer or documentary-style story, 16:9, with a narrator, optional character voices, music and SFX. The
+picture is Remotion (SVG/HTML), text motion is GSAP seeked by frame or frame math, and three.js (`@remotion/three`)
+takes the shots that need real depth. The pipeline is shared; the look comes from one of the styles below, which the
+user chooses. It extends [create-video](create-video.md): keep its production checkpoint, privacy and delivery rules.
 
 | Layer | Owner |
 | --- | --- |
 | Story, script, read-aloud pass | [Content Writing](../library/content-writing/README.md), `humanizer` |
 | Shot direction, camera, light, visual QA | [`remotion-3d-director`](../.agents/skills/remotion-3d-director/SKILL.md) (3D shots), this workflow (2D shots) |
-| Puppets, sets, lighting, labels, map, ending | Kit in [`studio/src/longform/kit/`](../studio/src/longform/kit/index.ts) |
+| Look, shot vocabulary, motion rules | The chosen style article in [`library/styles/`](../library/styles/README.md) |
+| Puppets, sets, lighting, labels, map, ending, board pieces | Kit in [`studio/src/longform/kit/`](../studio/src/longform/kit/index.ts) |
 | Text animation | GSAP through [`useGsapTimeline`](../studio/src/gsap/useGsapTimeline.ts) (paused timeline, seeked to `frame / fps`) |
 | 3D shots (landmarks, globes, product, objects) | `@remotion/three` inside a scene component |
 | Voice per line, SFX, music | ElevenLabs CLI (`text-to-speech`, `sound-effects`, `music` skills) |
 | Timeline, mouth tracks, ducking, manifest | [`studio/tools/longform-2d/`](../studio/tools/longform-2d/README.md) |
 | Assembly and render | Remotion `LongForm-<slug>` composition ([`LongForm.tsx`](../studio/src/longform/LongForm.tsx)) |
 
-Workflow ideas (script structure, shot vocabulary, style rules, line-by-line voice cueing) are adapted from aivxer's
-"2D Animation Long Form" skill; the code here is a separate Remotion implementation.
+Workflow ideas (script structure, shot vocabulary, line-by-line voice cueing) are adapted from aivxer's "2D Animation
+Long Form" skill; the code here is a separate Remotion implementation.
+
+## 0. Choose the style (ask the user)
+
+Before writing the script, ask the user which style the video should use, unless they already named one. Show both
+options with one line each and offer the demo renders; record the choice in `production.md`.
+
+| Style id | Look | Best for | Demo episode |
+| --- | --- | --- | --- |
+| [`ink-puppet-night`](../library/styles/ink-puppet-night.md) | Flat ink-line puppets in dense night sets, pushing camera, hand-lettered labels, polaroid ending | Character-led stories: history, money, true crime, a founder's bet | `demo-2d` ("The Missing Cent") |
+| [`argument-board`](../library/styles/argument-board.md) | Dark board, locked camera, argument rail, question title, line-carry, revise, skeptic card | Evidence-led explainers: technology, science, analysis | `demo-board` ("Vì sao GPU chạy AI nhanh hơn CPU?") |
+
+If neither fits, say so and propose adapting one; a new style gets its own article before the build. Never mix two
+styles in one episode.
 
 ## 1. Start the production
 
 ```powershell
-python studio/tools/longform-2d/scaffold.py <slug> --title "Episode title"
+python studio/tools/longform-2d/scaffold.py <slug> --style ink-puppet-night|argument-board --title "Episode title"
 ```
 
 This creates `local/productions/<slug>/` (`script.json`, `sfx.json`, `production.md`, all ignored by git) and
-`studio/src/longform/episodes/<slug>/episode.tsx` (also ignored; only the `demo-2d` episode is tracked). The slug
-becomes the composition id `LongForm-<slug>`: lowercase letters, digits and dashes.
+`studio/src/longform/episodes/<slug>/episode.tsx` copied from the style's demo (also ignored; only the demos
+`demo-2d` and `demo-board` are tracked). The slug becomes the composition id `LongForm-<slug>`: lowercase letters,
+digits and dashes.
 
 Before any paid step, propose the toolset (AGENTS.md) and say what costs credits: ElevenLabs voice per line, music,
 SFX, and the full render time.
 
 ## 2. Script
 
-- About 150 spoken words per minute: 2 min ≈ 300 words, 12 min ≈ 1,800. Short sentences, about 7 words on average.
-- Structure: cold open in the middle of the action → "here's the strange part" → stakes → a promise → chapters with
-  a black title card each → a short two-character exchange about every 30 s → a callback ending → a teaser line.
+- English: about 150 spoken words per minute (2 min ≈ 300 words, 12 min ≈ 1,800). Vietnamese: about 4.2 words per
+  second for the silent draft (`voice_lines.py --silent --wps 4.2`). Short sentences.
+- Structure: follow the chosen style article ("Script Structure").
 - Give every big number an everyday comparison. Facts: research them or list them under "Facts to check" in
   `production.md`, and tell the user which ones were not checked.
-- Real people appear as generic puppets identified by a name tag, never as a likeness. Never draw brand mascots,
-  logos or another channel's characters; copy the style, not the cast.
+- Real people appear as generic figures identified by a name tag, never as a likeness. Never draw brand mascots,
+  logos or another channel's characters; copy a style, not a cast.
 - Natural spoken language, no headings inside the voice-over. Run the `humanizer` pass on the narration.
 
 `script.json`:
@@ -72,18 +86,8 @@ Optional per line: `gap` (s after it, default 0.26).
 
 ## 3. Shot list
 
-One visual idea per sentence. Shot vocabulary (all in the kit or the demo episode):
-
-| Shot | How |
-| --- | --- |
-| Wide set, small full-body characters | `Room` (or the episode's own set) + `Puppet` at `s` 0.6–1.2, `Night` + `Glow` |
-| Close-up | Same set behind a blur (`<g filter>` or a second `Stage` with CSS blur), `Puppet` at `s` ≈ 2, feet below frame |
-| Top-down table | Paper texture rect, documents and bills sliding in with `back()`, sleeves and hands as simple shapes |
-| Map | `MapGrid`, land as ink-outlined paths, `City`, `Route` with a marker riding the dotted line |
-| Landmark / object in 3D | `@remotion/three`: toon materials + inverted-hull outline, low angle, frame-driven orbit; `Stamp` on top |
-| Chapter card | `ChapterTitle` (SplitText chars) or `TextCard` (words land when the narrator says them) |
-| Street walk | Exterior set, `walkLegs(t * 11)` with `bob = 6·|sin|`, settle with a squash |
-| Ending | `PolaroidEnding`: flash, freeze, tilted instant photo, red marker ring, handwritten payoff line |
+One visual idea per beat, taken from the chosen style's "Shot Vocabulary" table. Mark which beats need a 3D shot
+(`@remotion/three`) and which need real material (screenshots, documents) as evidence.
 
 ## 4. Voice
 
@@ -119,25 +123,12 @@ scene component gets `{scene, lines}` (frames relative to the scene) and the hoo
 `useSpeech(speaker)` and `useScene()`. Cue everything from the voice: `useLine('l5').words[3].from / fps` is the
 second a word is heard.
 
-Style rules:
+Follow the chosen style article for ink, characters, camera, light, sets, text and motion. Shared rules:
 
-- **Ink**: one near-black outline (`INK`, ≈ 6 px at 1080p) on characters, props, buildings and map shapes.
-- **Characters**: invent a new `Look` per cast member (skin, suit, hair, glasses, hat). Expressions: dot / half /
-  wide / closed eyes, smile / smirk / flat / o / mid / open / frown mouths, sweat, brows. Mouths follow
-  `useSpeech(speaker)` while they talk; blink with `blinking(frame, fps, period, phase)`; idle bob; squash at the
-  start of each shot; poses snap with `{from, to, k}` (overshoot), never drift.
-- **Camera**: every shot pushes in 5–10 % (`Camera zoom`), small rotation on table and map shots, `whipOut` /
-  `whipIn` between related shots, `shakes` on stamp hits. No static frame longer than about 2 s.
-- **Light**: draw the set flat, then `Night` (navy multiply with holes for lamps, windows, spill), `Glow` on bulbs,
-  `GroundShadow` under feet, `Vignette` on top.
-- **Sets**: dense with props (window with night city, curtains, clock, calendar, picture, lamp, desk, rug). Copy
-  `Room` into the episode and add the story's own objects.
-- **Info graphics live in the world**: newspapers with a marker circle, documents, bills, price tags, `Stamp`
-  ("SOLD", "TOP SECRET"), counters, maps with routes.
-- **Text**: lime or cream hand-lettered `PopLabel`s; chapter and punchline cards are white handwriting on black;
-  `LowerThird` for names (dark box, gold bar); `LocationTag` lower left.
-- **3D shots**: toon shading with an inverted-hull outline matches the ink look. Build geometry once at module
-  level; drive the camera from the frame in a child component (`useThree`), never with `useFrame`.
+- **3D shots**: build geometry once at module level; drive the camera from the frame in a child component
+  (`useThree`), never with `useFrame`. In `ink-puppet-night`, toon shading with an inverted-hull outline matches the
+  ink look.
+- **Fonts**: the handwriting faces are Latin only; Vietnamese text uses `FONT.sans` / `FONT.mono`.
 
 GSAP rules (from the `gsap-animation` skill): timelines are built paused and seeked to `frame / fps`; no
 `Math.random`, timers, ScrollTrigger or `play()`. For SVG elements inside the camera, use the kit's pieces (they
@@ -156,9 +147,8 @@ Fix framing (labels cut off, characters too low in close-ups, overlapping text) 
 
 ## 7. Sound
 
-- **SFX** (`sfx.json`, ElevenLabs `sound-effects` or `VFX_RESOURCES`): a pop on every pop-in, whooshes on whips,
-  paper rustle on documents, footsteps on walks, a thud for stamps, a shutter on the polaroid, a low boom under
-  black cards. Anchor each one to the voice or a scene so it follows retimes:
+- **SFX** (`sfx.json`, ElevenLabs `sound-effects` or `VFX_RESOURCES`): use the chosen style's sound palette
+  ("Sound" in its article). Anchor each one to the voice or a scene so it follows retimes:
 
   ```json
   [{"src": "sfx/pop.wav", "at": "l2#1", "volume": 0.5, "note": "pop $0.01"},
@@ -211,3 +201,5 @@ Skip loudnorm on a silent draft (it measures −inf). Render one version per req
 | Memory grows over a long render | Geometry or materials created per frame | Build them once at module level |
 | Ring/marker misses the character in the ending | Coordinates were stage units, the shot is zoomed | Convert: `screen = 960 + zoom·(x − focusX)`, same for y with 540 |
 | Music audible on a black card | Scene not marked `card: true` | Mark it and rebuild |
+| Diacritics fall back to another font | A handwriting face without Vietnamese glyphs | Use `FONT.sans` / `FONT.mono`; check a new font's coverage before adopting it |
+| A board label sits on the wrong spot on the first frame | `measure()` ran before the font loaded | Render inside `LongForm` (it waits for `loadFonts()`); never measure at module level |
