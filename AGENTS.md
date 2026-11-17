@@ -25,6 +25,7 @@ Production uses the shared `skills/vfxlens/` entrypoint, Remotion in `studio/`, 
 
 - **Study, analyze or create video:** Read [`skills/vfxlens/SKILL.md`](skills/vfxlens/SKILL.md); follow its reference-study or production workflow for the requested branch.
 - **Make a story Short with 3D cartoon characters (three.js engine + Remotion assembly):** Read [`workflows/threejs-character-short.md`](workflows/threejs-character-short.md); it lists the skills per stage and the toolkit in `studio/tools/threejs-short/`.
+- **Make a long-form 2D explainer or story video (16:9):** Read [`workflows/2d-long-form-video.md`](workflows/2d-long-form-video.md); the kit is `studio/src/longform/`, the scripts `studio/tools/longform-2d/`.
 - **Direct cinematic 3D, procedural VFX or a 3D explainer:** Read [`.agents/skills/remotion-3d-director/SKILL.md`](.agents/skills/remotion-3d-director/SKILL.md) alongside the production workflow; it owns renderer selection, shot direction and visual/render QA.
 - **Discover or choose current video technology:** Read [`skills/motion-scout/SKILL.md`](skills/motion-scout/SKILL.md). Use its live research pass before adopting new animation technology; research-only work does not authorize installation, and selected findings hand off to the existing production/Director workflow.
 - **Write a video script, outline or narration:** Read [`library/content-writing/README.md`](library/content-writing/README.md) through the shared VFXLens skill; keep script-only requests scoped to writing.
@@ -49,6 +50,7 @@ Skills marked *(user plugin)* are installed per machine; when one is missing, sa
 | Publish | `social-video` *(motion-pack)* drafts copy, cover, AI disclosure | `postiz` to schedule; the user approves every post |
 | New animation technology | `motion-scout` | `motion-stack` *(user plugin)* |
 | Promo of a web or desktop product (real page captures) | `video-shotcraft` *(user skill)*: Ink Press template or its 124 shot cards | `remotion-3d-director` for 3D shots |
+| Long-form 2D explainer or story (16:9, 20 s–20 min) | `longform-2d` skill → `workflows/2d-long-form-video.md`: Remotion SVG kit, GSAP text, `@remotion/three` shots, ElevenLabs per-line voices | `remotion-3d-director` for 3D shots, `video-shotcraft` sound design, `humanizer` (narration), `gsap-animation` *(local skill)* for extra GSAP recipes |
 | Remotion how-to (captions, render, Studio, upgrade, licence) | `remotion-best-practices` router (`studio/.claude/skills`, also global) | `remotion-render`, `remotion-captions`, `remotion-upgrade` |
 
 **When to use `video-shotcraft`:** (1) sound design for any video: read only its `references/sound-design.md` (peak alignment,

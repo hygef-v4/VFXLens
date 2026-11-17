@@ -13,8 +13,9 @@ captions and mix, optional ElevenLabs voice.
 | --- | --- | --- |
 | **Analyzer** (`vfx` CLI) | Reads `.aep`/`.aepx` projects without opening After Effects (layers, effect stacks, keyframes, expressions) and analyzes videos frame by frame (cuts, flashes, shake, speed ramps, glow…) | [CLI usage](#3-cli-usage-vfx) |
 | **Studio** (Remotion) | `ThreeShort` assembles a three.js picture with word captions, light leaks, voice, ducked music and peak-aligned SFX | [`ShortAssembly.tsx`](studio/src/shorts/ShortAssembly.tsx) |
+| **Long-form 2D kit** | `LongForm-<slug>`: SVG puppets, night lighting, GSAP text cards and labels, maps, polaroid ending, three.js shots; per-line ElevenLabs voices, timeline and ducking scripts | [2D long-form workflow](workflows/2d-long-form-video.md) |
 | **Short toolkit** | Scaffold, starter film, voice timing (`tighten`, `evenpace`, `fit`, `align`), manifest builder, render script, perceptual QA | [three.js Short workflow](workflows/threejs-character-short.md) |
-| **Agent skills** | `vfxlens` (router), `remotion-3d-director`, `motion-scout` for Claude Code and Codex | [`skills/vfxlens`](skills/vfxlens/SKILL.md), [`AGENTS.md`](AGENTS.md) |
+| **Agent skills** | `vfxlens` (router), `remotion-3d-director`, `longform-2d`, `motion-scout` for Claude Code and Codex | [`skills/vfxlens`](skills/vfxlens/SKILL.md), [`AGENTS.md`](AGENTS.md) |
 | **Knowledge library** | Techniques, styles, resources and evidence-labelled case studies | [`library/`](library/README.md) |
 
 ## Quick start
@@ -41,6 +42,16 @@ OUTV=v1 bash render_fast.sh                                   # picture, assembl
 
 Swap in a real voice later with the ElevenLabs steps in the [workflow](workflows/threejs-character-short.md).
 
+**Render the 2D long-form demo** (no API key, no extra skill):
+
+```bash
+python studio/tools/longform-2d/scaffold.py demo-2d
+cd local/productions/demo-2d
+python ../../../studio/tools/longform-2d/voice_lines.py --silent   # draft voice timing, no credits
+python ../../../studio/tools/longform-2d/build.py                  # timeline + manifest
+cd ../../../studio && npx remotion render src/index.ts LongForm-demo-2d ../local/productions/demo-2d/renders/demo.mp4
+```
+
 ## Workflows
 
 | Task | Start here |
@@ -48,6 +59,7 @@ Swap in a real voice later with the ElevenLabs steps in the [workflow](workflows
 | Study a reference video, PDF or AE project | [study-reference](workflows/study-reference.md) |
 | Write a script, hook or narration | [Content Writing](library/content-writing/README.md) |
 | Make a story Short with 3D cartoon characters | [threejs-character-short](workflows/threejs-character-short.md) |
+| Make a long-form 2D explainer or story (16:9) | [2d-long-form-video](workflows/2d-long-form-video.md) |
 | Make or continue any video | [create-video](workflows/create-video.md) |
 | Diagram/isometric/cartoon explainer | [ai-assisted-motion-graphics](workflows/ai-assisted-motion-graphics.md) |
 | Direct cinematic 3D | [remotion-3d-director](.agents/skills/remotion-3d-director/SKILL.md) |
@@ -57,7 +69,7 @@ Agents read [`AGENTS.md`](AGENTS.md) (Claude Code loads it through `CLAUDE.md`);
 and proposes the skills to use. Register the repository skills for both agents:
 
 ```powershell
-foreach ($skillName in 'vfxlens', 'motion-scout', 'remotion-3d-director') {
+foreach ($skillName in 'vfxlens', 'motion-scout', 'remotion-3d-director', 'longform-2d') {
     uv run python skills/motion-scout/scripts/sync_skill.py --skill $skillName
 }
 ```

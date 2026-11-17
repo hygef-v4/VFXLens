@@ -30,7 +30,7 @@ def create_link(destination: Path, canonical: Path) -> None:
 
 
 SOURCES = {"motion-scout": "skills/motion-scout", "vfxlens": "skills/vfxlens",
-           "remotion-3d-director": ".agents/skills/remotion-3d-director"}
+           "remotion-3d-director": ".agents/skills/remotion-3d-director", "longform-2d": "skills/longform-2d"}
 
 
 def synchronize(project: Path, check: bool = False, skill: str = "motion-scout") -> dict:

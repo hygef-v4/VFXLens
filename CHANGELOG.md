@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- 2D long-form video: `LongForm-<slug>` Remotion assembly and kit (SVG puppets, camera, night lighting, GSAP text
+  cards, labels, stamps, lower thirds, maps, polaroid ending), `@remotion/three` shots, per-line ElevenLabs voices with
+  a free silent draft, timeline/mouth-track/ducking builder, demo episode, workflow and `longform-2d` skill.
+- `gsap` added to the studio; `useGsapTimeline` hook and `GsapThreeDemo` composition.
+- Bundled handwriting fonts (Caveat Brush, Kalam, Permanent Marker).
+
 ## 0.1.0 — 2026-11-17
 
 First open-source release.

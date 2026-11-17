@@ -41,6 +41,7 @@ production files and changes before continuing another agent's work.
 | Write a hook, outline, video script or narration | Read `<repo>/library/content-writing/README.md`; draft sourced visual beats in the production checkpoint or its linked script. Finish with the requested writing, without expanding a script-only task into rendering. |
 | Create, recreate, revise or continue a video | Read `<repo>/workflows/create-video.md`; study supplied references first when relevant. |
 | Story Short with 3D cartoon characters (three.js picture, ElevenLabs audio, Remotion assembly) | Read `<repo>/workflows/create-video.md`, then `<repo>/workflows/threejs-character-short.md`. |
+| Long-form 2D explainer or story video (16:9, Remotion SVG puppets, GSAP text, three.js shots, ElevenLabs voices) | Read `<repo>/workflows/create-video.md`, then `<repo>/workflows/2d-long-form-video.md` (skill `longform-2d`). |
 
 Read `<repo>/library/README.md` to find canonical techniques, styles, resources and
 case studies. Reuse those articles; keep exact source evidence separate from a
