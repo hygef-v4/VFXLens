@@ -44,13 +44,20 @@ by scripts/fetch-assets.sh (Xbot.glb, Horse.glb, Anton, Inter) are not included.
 | Project | Licence | Note |
 | --- | --- | --- |
 | [Remotion](https://www.remotion.dev/license) | Remotion License | Free for individuals and companies of up to 3 people; larger companies need a company licence |
+| [GSAP](https://gsap.com/standard-license/) | GSAP Standard License | Free for commercial use since 2024; `gsap` is an npm dependency of `studio/` |
 | [py-aep](https://github.com/forticheprod/py-aep) | MIT | Reads `.aep` files in the analyzer |
 | [pmndrs/postprocessing](https://github.com/pmndrs/postprocessing) | Zlib | Post effects for three.js scenes |
 | [three.js](https://github.com/mrdoob/three.js) | MIT | 3D rendering |
 | [OpenAI Whisper](https://github.com/openai/whisper) | MIT | Optional local transcription (`studio/voice`) |
+| [Caveat Brush](https://fonts.google.com/specimen/Caveat+Brush), [Kalam](https://fonts.google.com/specimen/Kalam) | SIL Open Font License 1.1 | Bundled in `studio/public/fonts/` with their licence files |
+| [Permanent Marker](https://fonts.google.com/specimen/Permanent+Marker) | Apache License 2.0 | Bundled in `studio/public/fonts/` with its licence file |
 
 Other Python and npm dependencies are listed with their versions in `uv.lock`, `studio/voice/uv.lock` and
 `studio/package-lock.json`; their licences apply as published by each project.
 
 Studies in `library/case-studies/` describe and measure third-party videos and After Effects projects for education
 and commentary. They do not include those works' media, and the analysed source files are not redistributed.
+
+The 2D long-form workflow (`workflows/2d-long-form-video.md`) adapts workflow ideas (script structure, shot
+vocabulary, style rules, line-by-line voice cueing) from aivxer's "2D Animation Long Form" skill. No code or assets from
+that skill are included; the Remotion kit in `studio/src/longform/` is a separate implementation.

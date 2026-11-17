@@ -1,0 +1,26 @@
+{
+ "title": "The Missing Cent",
+ "fps": 30, "width": 1920, "height": 1080,
+ "cast": {
+  "narrator": {"voice": "", "role": "narrator"},
+  "mira": {"voice": "", "role": "character", "pan": 0.22},
+  "boss": {"voice": "", "role": "character", "pan": -0.22}
+ },
+ "music": null,
+ "scenes": [
+  {"id": "s1", "kind": "office", "tail": 0.6},
+  {"id": "s2", "kind": "card", "card": true, "tail": 0.7},
+  {"id": "s3", "kind": "map"},
+  {"id": "s4", "kind": "landmark3d", "tail": 1.0},
+  {"id": "s5", "kind": "ending", "tail": 3.4}
+ ],
+ "lines": [
+  {"id": "l1", "scene": "s1", "speaker": "narrator", "vo": "Every night at nine, Mira checked the bank's books one last time."},
+  {"id": "l2", "scene": "s1", "speaker": "mira", "vo": "One cent is missing. Again."},
+  {"id": "l3", "scene": "s1", "speaker": "boss", "vo": "One cent? Go home, Mira."},
+  {"id": "l4", "scene": "s2", "speaker": "narrator", "vo": "But one cent, every night, adds up."},
+  {"id": "l5", "scene": "s3", "speaker": "narrator", "vo": "She followed the cent from the city bank to a quiet harbor town."},
+  {"id": "l6", "scene": "s4", "speaker": "narrator", "vo": "There, someone had just bought an old lighthouse. With pennies."},
+  {"id": "l7", "scene": "s5", "speaker": "mira", "vo": "Found you."}
+ ]
+}

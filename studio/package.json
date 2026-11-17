@@ -16,6 +16,7 @@
     "@remotion/cli": "4.0.543",
     "@remotion/media": "4.0.543",
     "@remotion/three": "4.0.543",
+    "gsap": "^3.15.1",
     "postprocessing": "6.39.6",
     "react": "19.3.1",
     "react-dom": "19.3.1",

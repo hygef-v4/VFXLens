@@ -84,7 +84,11 @@ Thumbs.db
 
 # Local video-production dependencies, private assets and render caches
 node_modules/
-studio/public/
+studio/public/*
+!studio/public/fonts/
+# Long-form episodes are private per production; only the demo is tracked.
+studio/src/longform/episodes/*
+!studio/src/longform/episodes/demo-2d/
 studio/out/
 **/.cache/
 **/.remotion/
