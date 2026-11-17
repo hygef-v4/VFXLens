@@ -89,6 +89,7 @@ studio/public/*
 # Long-form episodes are private per production; only the demo is tracked.
 studio/src/longform/episodes/*
 !studio/src/longform/episodes/demo-2d/
+!studio/src/longform/episodes/demo-board/
 studio/out/
 **/.cache/
 **/.remotion/

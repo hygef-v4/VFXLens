@@ -7,6 +7,10 @@
   a free silent draft, timeline/mouth-track/ducking builder, demo episode, workflow and `longform-2d` skill.
 - `gsap` added to the studio; `useGsapTimeline` hook and `GsapThreeDemo` composition.
 - Bundled handwriting fonts (Caveat Brush, Kalam, Permanent Marker).
+- Long-form styles: `ink-puppet-night` (the original puppet look) and `argument-board` (argument rail, question title,
+  line-carry, revise, skeptic card, focus dimming) with `kit/Board.tsx`, the `demo-board` episode, library style
+  articles, `scaffold.py --style`, and the skill asking the user which style to use. Be Vietnam Pro and JetBrains Mono
+  bundled for Vietnamese text; the voice and build scripts print UTF-8 on Windows consoles.
 
 ## 0.1.0 — 2026-11-17
 

@@ -7,20 +7,25 @@ export const PALETTE = {
   gold: '#F2C14E', red: '#C8242C', lime: '#B8F04A', cream: '#FFF6DC', paper: '#F3E7C9',
   navy: '#1B2340', night: '#4C5CA0', lamp: '#FFD27A', window: '#FFC25A',
 };
-export const FONT = {hand: 'LF Hand', label: 'LF Label', marker: 'LF Marker'};
+// hand/label/marker: ink-puppet-night (Latin only: they miss most Vietnamese letters).
+// sans/mono: argument-board and any Vietnamese text (Be Vietnam Pro 500/700, JetBrains Mono; full Vietnamese coverage).
+export const FONT = {hand: 'LF Hand', label: 'LF Label', marker: 'LF Marker', sans: 'LF Sans', mono: 'LF Mono'};
 
-const FILES: [string, string][] = [
+const FILES: [string, string, string?][] = [
   [FONT.hand, 'fonts/CaveatBrush-Regular.ttf'],
   [FONT.label, 'fonts/Kalam-Bold.ttf'],
   [FONT.marker, 'fonts/PermanentMarker-Regular.ttf'],
+  [FONT.sans, 'fonts/BeVietnamPro-Medium.ttf', '500'],
+  [FONT.sans, 'fonts/BeVietnamPro-Bold.ttf', '700'],
+  [FONT.mono, 'fonts/JetBrainsMono.ttf', '100 800'],
 ];
 let fontsLoaded: Promise<void> | null = null;
-// Call once at the top of a composition; blocks rendering until the three faces are in document.fonts.
+// Call once at the top of a composition; blocks rendering until every face is in document.fonts.
 export const loadFonts = () => {
   if (!fontsLoaded) {
     const handle = delayRender('long-form fonts');
-    fontsLoaded = Promise.all(FILES.map(async ([family, file]) => {
-      const face = new FontFace(family, `url(${staticFile(file)})`);
+    fontsLoaded = Promise.all(FILES.map(async ([family, file, weight]) => {
+      const face = new FontFace(family, `url(${staticFile(file)})`, weight ? {weight} : undefined);
       await face.load();
       (document.fonts as unknown as {add: (f: FontFace) => void}).add(face);
     })).then(() => continueRender(handle));

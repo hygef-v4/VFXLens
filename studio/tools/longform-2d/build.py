@@ -9,6 +9,8 @@ import argparse, json, re, shutil, sys, wave
 from pathlib import Path
 import numpy as np
 
+sys.stdout.reconfigure(encoding='utf-8', errors='replace')   # Vietnamese lines on a cp1252 Windows console
+
 ap = argparse.ArgumentParser()
 ap.add_argument('--lead', type=float, default=0.3); ap.add_argument('--gap', type=float, default=0.26)
 ap.add_argument('--tail', type=float, default=0.5); ap.add_argument('--hold', type=float, default=1.5)

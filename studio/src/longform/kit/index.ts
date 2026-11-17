@@ -6,5 +6,6 @@ export * from './Text';
 export * from './Map';
 export * from './Room';
 export * from './Ending';
+export * from './Board';
 export {useLine, useScene, useSpeech} from '../context';
 export type {Episode, Line, SceneProps, Word} from '../context';

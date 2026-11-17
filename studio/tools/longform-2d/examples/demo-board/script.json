@@ -1,0 +1,69 @@
+{
+ "title": "Vì sao GPU chạy AI nhanh hơn CPU?",
+ "fps": 30,
+ "width": 1920,
+ "height": 1080,
+ "cast": {
+  "narrator": {
+   "voice": "",
+   "role": "narrator"
+  },
+  "skeptic": {
+   "voice": "",
+   "role": "character",
+   "pan": 0.2
+  }
+ },
+ "music": null,
+ "scenes": [
+  {
+   "id": "s1",
+   "kind": "board",
+   "lead": 0.5,
+   "tail": 2.6
+  }
+ ],
+ "lines": [
+  {
+   "id": "l1",
+   "scene": "s1",
+   "speaker": "narrator",
+   "vo": "Vì sao chip đồ họa chạy AI nhanh hơn CPU?",
+   "gap": 1.5
+  },
+  {
+   "id": "l2",
+   "scene": "s1",
+   "speaker": "narrator",
+   "vo": "Nhiều người nghĩ: vì GPU mạnh hơn.",
+   "gap": 0.6
+  },
+  {
+   "id": "l3",
+   "scene": "s1",
+   "speaker": "skeptic",
+   "vo": "Nhưng từng lõi GPU còn yếu hơn lõi CPU mà?",
+   "gap": 0.7
+  },
+  {
+   "id": "l4",
+   "scene": "s1",
+   "speaker": "narrator",
+   "vo": "CPU có vài chục lõi mạnh. GPU có hàng nghìn lõi nhỏ.",
+   "gap": 0.4
+  },
+  {
+   "id": "l5",
+   "scene": "s1",
+   "speaker": "narrator",
+   "vo": "Mà AI là hàng triệu phép nhân nhỏ, làm cùng lúc được.",
+   "gap": 1.1
+  },
+  {
+   "id": "l6",
+   "scene": "s1",
+   "speaker": "narrator",
+   "vo": "Không phải mạnh hơn. Mà là đông hơn."
+  }
+ ]
+}

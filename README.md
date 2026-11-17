@@ -13,7 +13,7 @@ captions and mix, optional ElevenLabs voice.
 | --- | --- | --- |
 | **Analyzer** (`vfx` CLI) | Reads `.aep`/`.aepx` projects without opening After Effects (layers, effect stacks, keyframes, expressions) and analyzes videos frame by frame (cuts, flashes, shake, speed ramps, glow…) | [CLI usage](#3-cli-usage-vfx) |
 | **Studio** (Remotion) | `ThreeShort` assembles a three.js picture with word captions, light leaks, voice, ducked music and peak-aligned SFX | [`ShortAssembly.tsx`](studio/src/shorts/ShortAssembly.tsx) |
-| **Long-form 2D kit** | `LongForm-<slug>`: SVG puppets, night lighting, GSAP text cards and labels, maps, polaroid ending, three.js shots; per-line ElevenLabs voices, timeline and ducking scripts | [2D long-form workflow](workflows/2d-long-form-video.md) |
+| **Long-form 2D kit** | `LongForm-<slug>` in two styles: `ink-puppet-night` (SVG puppets, night lighting, hand-lettered labels, polaroid ending) and `argument-board` (argument rail, revise, line-carry, evidence diagrams); three.js shots; per-line ElevenLabs voices, timeline and ducking scripts | [2D long-form workflow](workflows/2d-long-form-video.md) |
 | **Short toolkit** | Scaffold, starter film, voice timing (`tighten`, `evenpace`, `fit`, `align`), manifest builder, render script, perceptual QA | [three.js Short workflow](workflows/threejs-character-short.md) |
 | **Agent skills** | `vfxlens` (router), `remotion-3d-director`, `longform-2d`, `motion-scout` for Claude Code and Codex | [`skills/vfxlens`](skills/vfxlens/SKILL.md), [`AGENTS.md`](AGENTS.md) |
 | **Knowledge library** | Techniques, styles, resources and evidence-labelled case studies | [`library/`](library/README.md) |
@@ -45,7 +45,7 @@ Swap in a real voice later with the ElevenLabs steps in the [workflow](workflows
 **Render the 2D long-form demo** (no API key, no extra skill):
 
 ```bash
-python studio/tools/longform-2d/scaffold.py demo-2d
+python studio/tools/longform-2d/scaffold.py demo-2d --style ink-puppet-night   # or: demo-board --style argument-board
 cd local/productions/demo-2d
 python ../../../studio/tools/longform-2d/voice_lines.py --silent   # draft voice timing, no credits
 python ../../../studio/tools/longform-2d/build.py                  # timeline + manifest
